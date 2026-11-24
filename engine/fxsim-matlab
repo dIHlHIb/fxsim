@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+# Load the package from the tree root when launched through engine/ on PATH.
+import os, sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from fxsim._mbatch import main
+raise SystemExit(main())

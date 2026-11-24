@@ -1,0 +1,67 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxexport < <skill dir>/examples/13b_export_decimator.json",
+ "exit_code": 0,
+ "note": "Output captured from this example. Absolute paths use <fxsim tree root>.",
+ "stdout": {
+  "status": "ok",
+  "model": "decim4",
+  "files": {
+   "check_decim4.m": "414644b98fe32539b652040cef52718d37b7323a49f2ec8ba5f8066af53e20e5",
+   "decim4.slx": "4c86af88a4a08e7229923f8c493eb56ef4030f3ff72611b9455d2821ddfb21a2",
+   "decim4_io.json": "ceb7a9f28e5c682693d1f98ae761b4155cba901ebb1cff3c7cd54bec7d2a1c91",
+   "manifest.json": "4eb0ed541443c002b00d38ec9490a9fc45f1e012ee62334793591858c68dcb50"
+  },
+  "blocks": 4,
+  "multirate": true,
+  "hw_profile": "host",
+  "outputs": [
+   {
+    "port": "y",
+    "root_block": "y",
+    "width": 1,
+    "samples": 64,
+    "type": "1,12,11",
+    "period": 4.0,
+    "offset": 0.0
+   }
+  ],
+  "roundtrip": {
+   "blocks": 4,
+   "lines": 3,
+   "params_compared": 16,
+   "outputs_equal": [
+    "y"
+   ],
+   "reader_assumed_defaults": {
+    "x": [
+     "SampleTime"
+    ]
+   },
+   "reader_ignored_parameters": {
+    "DS": [
+     "AllowArbitraryFixedInput"
+    ]
+   }
+  },
+  "unobserved_templates": [],
+  "dropped_parameters": {},
+  "assumed_defaults": {
+   "F": {
+    "FilterStructure": "Direct form",
+    "InitialStates": "0",
+    "StateDataTypeStr": "Inherit: Same as accumulator",
+    "TapSumDataTypeStr": "Inherit: Inherit via internal rule"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "out": "runs/export/decim4",
+  "out_abs": "<fxsim tree root>/runs/export/decim4",
+  "check_command": "cd('<fxsim tree root>/runs/export/decim4'); r = check_decim4; fprintf('FXSIM_VERDICT %s\\n', r.verdict)",
+  "check_batch_command": "matlab -batch \"cd('<fxsim tree root>/runs/export/decim4'); r = check_decim4; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "check_batch_command_here": "matlab -batch \"r = check_decim4; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "verdicts": "PASS: every sample and every compiled type equal; FAIL: a difference (first_diff says where); INCOMPLETE: every compared sample equal but something could not be compared (reason says what) -- only PASS verifies the package. The script prints one JSON line and returns it as r; the commands then print 'FXSIM_VERDICT <verdict>'. Read that line: the process status can be 0 after a failed model check on macOS with MATLAB R2026b",
+  "input_sha256": "58b3f5e54166016d9d6b055499d857a1f7a770dab2aaa7229f2f4cc52bff8c4b"
+ }
+}

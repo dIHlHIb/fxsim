@@ -1,0 +1,216 @@
+{
+ "dsp_rule": {
+  "a_max": 25,
+  "b_max": 18,
+  "const_min_width": 1,
+  "min_out_width": 9,
+  "min_width": 2
+ },
+ "fitted_on": [
+  "calibration_01",
+  "calibration_02",
+  "calibration_03",
+  "calibration_04",
+  "calibration_05",
+  "calibration_06",
+  "calibration_07",
+  "calibration_08",
+  "calibration_09",
+  "calibration_10",
+  "calibration_11",
+  "calibration_12",
+  "calibration_13",
+  "calibration_14",
+  "calibration_15",
+  "calibration_16",
+  "calibration_17",
+  "calibration_18",
+  "calibration_19",
+  "calibration_20",
+  "calibration_21",
+  "calibration_22",
+  "calibration_23",
+  "calibration_24",
+  "calibration_25"
+ ],
+ "linear": {
+  "ff_nodsp": {
+   "c": 0.0,
+   "reg_bits": 0.9393646844314464
+  },
+  "gates": {
+   "adder_bits": 2.4978026374654774,
+   "c": 0.0,
+   "const_mult": 4.4886174578965266,
+   "misc_bits": 0.506908069680303,
+   "var_mult": 6.121352217284865
+  },
+  "lut_dsp": {
+   "adder_bits": 0.878183460569008,
+   "c": 0.0,
+   "dsp": 4.600596082526628,
+   "misc_bits": 0.2920417167045776
+  },
+  "lut_nodsp": {
+   "adder_bits": 0.1366411618053074,
+   "c": 0.0,
+   "const_mult": 1.5089366895898915,
+   "misc_bits": 0.046987081751123254,
+   "var_mult": 2.2026446432951996
+  }
+ },
+ "lofo": {
+  "calibration_23": {
+   "ff_nodsp": 16.9,
+   "gates": 2038.1,
+   "lut_dsp": 66.8,
+   "lut_nodsp": 691.4
+  },
+  "calibration_24": {
+   "ff_nodsp": 0.0,
+   "gates": 6275.8,
+   "lut_dsp": 72.5,
+   "lut_nodsp": 2231.0
+  },
+  "calibration_19": {
+   "ff_nodsp": 76.0,
+   "gates": 893.8,
+   "lut_dsp": 68.7,
+   "lut_nodsp": 243.6
+  },
+  "calibration_25": {
+   "ff_nodsp": 15.0,
+   "gates": 290.8,
+   "lut_dsp": 44.9,
+   "lut_nodsp": 86.6
+  },
+  "calibration_20": {
+   "ff_nodsp": 0.0,
+   "gates": 2866.6,
+   "lut_dsp": 47.2,
+   "lut_nodsp": 984.7
+  },
+  "calibration_21": {
+   "ff_nodsp": 0.0,
+   "gates": 3072.7,
+   "lut_dsp": 48.9,
+   "lut_nodsp": 1056.5
+  },
+  "calibration_22": {
+   "ff_nodsp": 30.0,
+   "gates": 3597.1,
+   "lut_dsp": 83.7,
+   "lut_nodsp": 1240.7
+  },
+  "calibration_01": {
+   "ff_nodsp": 1918.7,
+   "gates": 59617.4,
+   "lut_dsp": 2284.7,
+   "lut_nodsp": 18403.4
+  },
+  "calibration_02": {
+   "ff_nodsp": 1749.4,
+   "gates": 66271.8,
+   "lut_dsp": 2340.5,
+   "lut_nodsp": 20572.6
+  },
+  "calibration_03": {
+   "ff_nodsp": 1636.6,
+   "gates": 46754.6,
+   "lut_dsp": 2452.1,
+   "lut_nodsp": 14015.1
+  },
+  "calibration_04": {
+   "ff_nodsp": 1636.6,
+   "gates": 45414.5,
+   "lut_dsp": 2396.3,
+   "lut_nodsp": 13609.9
+  },
+  "calibration_05": {
+   "ff_nodsp": 218.5,
+   "gates": 7099.5,
+   "lut_dsp": 257.5,
+   "lut_nodsp": 2203.3
+  },
+  "calibration_06": {
+   "ff_nodsp": 218.5,
+   "gates": 5170.1,
+   "lut_dsp": 257.5,
+   "lut_nodsp": 1562.9
+  },
+  "calibration_07": {
+   "ff_nodsp": 1749.4,
+   "gates": 66271.8,
+   "lut_dsp": 2340.5,
+   "lut_nodsp": 20572.6
+  },
+  "calibration_08": {
+   "ff_nodsp": 1693.0,
+   "gates": 44947.8,
+   "lut_dsp": 2340.5,
+   "lut_nodsp": 13494.6
+  },
+  "calibration_17": {
+   "ff_nodsp": 31.8,
+   "gates": 2258.3,
+   "lut_dsp": 56.9,
+   "lut_nodsp": 712.1
+  },
+  "calibration_18": {
+   "ff_nodsp": 31.8,
+   "gates": 2386.6,
+   "lut_dsp": 62.4,
+   "lut_nodsp": 750.8
+  },
+  "calibration_13": {
+   "ff_nodsp": 431.3,
+   "gates": 14262.1,
+   "lut_dsp": 581.2,
+   "lut_nodsp": 4441.2
+  },
+  "calibration_14": {
+   "ff_nodsp": 386.5,
+   "gates": 7749.0,
+   "lut_dsp": 505.9,
+   "lut_nodsp": 2319.2
+  },
+  "calibration_09": {
+   "ff_nodsp": 129.0,
+   "gates": 4900.6,
+   "lut_dsp": 180.2,
+   "lut_nodsp": 1551.1
+  },
+  "calibration_10": {
+   "ff_nodsp": 117.2,
+   "gates": 4451.1,
+   "lut_dsp": 187.1,
+   "lut_nodsp": 1392.9
+  },
+  "calibration_11": {
+   "ff_nodsp": 196.1,
+   "gates": 6566.8,
+   "lut_dsp": 281.3,
+   "lut_nodsp": 2088.4
+  },
+  "calibration_12": {
+   "ff_nodsp": 196.1,
+   "gates": 5562.6,
+   "lut_dsp": 277.1,
+   "lut_nodsp": 1750.2
+  },
+  "calibration_15": {
+   "ff_nodsp": 416.3,
+   "gates": 10775.6,
+   "lut_dsp": 549.8,
+   "lut_nodsp": 3300.2
+  },
+  "calibration_16": {
+   "ff_nodsp": 386.5,
+   "gates": 5350.1,
+   "lut_dsp": 493.5,
+   "lut_nodsp": 1526.4
+  }
+ },
+ "note": "Hardware cost model fitted on 25 objects from 11 families. The errors below use leave-one-family-out validation. The lut_dsp fit uses non-zero measurements. Zero rows use absolute prediction error.",
+ "version": 4
+}

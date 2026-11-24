@@ -1,0 +1,381 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxopt < <skill dir>/examples/03_opt_fir.json",
+ "exit_code": 0,
+ "wall_s": 17.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items. The hardware accuracy field uses the current estimate notice.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "hwbits": 366,
+   "baseline_hwbits": 688,
+   "max_abs_diff": 0.0008288574218749956,
+   "tolerance": 0.0009765625,
+   "max_error_over_tolerance": 0.99625,
+   "max_error_over_tolerance_from": "error search on the final plan",
+   "overflow": "bounded",
+   "error": "sampled",
+   "warnings": [
+    "ERROR_BOUND_SAMPLED"
+   ],
+   "modular_blocks": [],
+   "binding": {
+    "outport": "y",
+    "input_set": "range: random uniform",
+    "error_over_tolerance": 0.84875
+   },
+   "blocks_retyped": [
+    "F"
+   ]
+  },
+  "version": "fxopt-1",
+  "kind": "graph",
+  "hwbits": 366,
+  "baseline": {
+   "hwbits": 688,
+   "of": "the design as given, the same counting as hwbits"
+  },
+  "hw": {
+   "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+  },
+  "hw_default": true,
+  "hwbits_breakdown": {
+   "outputs": 30,
+   "gain_params": 0,
+   "accumulators": 0,
+   "fir_internals": 336,
+   "total": 366
+  },
+  "hwbits_by_block": {
+   "F": {
+    "output_bits": 14,
+    "inner_bits": 336,
+    "hwbits": 350
+   },
+   "x": {
+    "output_bits": 16,
+    "inner_bits": 0,
+    "hwbits": 16
+   }
+  },
+  "auto_caps": {},
+  "mult_area_proxy": 2048,
+  "cost": {
+   "weights": {
+    "hwbits": 1.0,
+    "mult_area": 0.0
+   },
+   "value": 366.0
+  },
+  "hw_estimate": {
+   "dsp48e1": 8,
+   "lut": 123,
+   "ff": 80,
+   "lut_nodsp": 1510,
+   "generic_gates": 4697,
+   "dff": 112,
+   "status": "predicted, not synthesised",
+   "accuracy": "Resource estimates only. Validation data are outside this package. Synthesise your design to measure resource use.",
+   "model": "engine/hwcost_model.json v4"
+  },
+  "max_abs_diff": 0.0008288574218749956,
+  "max_error_over_tolerance": 0.84875,
+  "outports": {
+   "y": {
+    "max_abs_diff": 0.0008288574218749956,
+    "at_sample": 2184,
+    "input_set": "range: random uniform",
+    "tolerance": 0.0009765625,
+    "type": "fixdt(1,14,13)"
+   }
+  },
+  "tolerance": 0.0009765625,
+  "reference": "ideal",
+  "error_by_input_set": [
+   {
+    "input_set": "inputs",
+    "outport": "y",
+    "max_abs_diff": 0.0008142089843751199,
+    "at_sample": 592,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.83375
+   },
+   {
+    "input_set": "inputs~negated",
+    "outport": "y",
+    "max_abs_diff": 0.0007995605468750222,
+    "at_sample": 165,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.81875
+   },
+   {
+    "input_set": "inputs~reversed",
+    "outport": "y",
+    "max_abs_diff": 0.0008142089843748979,
+    "at_sample": 1462,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.83375
+   },
+   {
+    "input_set": "error_search[0]",
+    "outport": "y",
+    "max_abs_diff": 0.0005029296874998757,
+    "at_sample": 21,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.515
+   },
+   "... 12 more"
+  ],
+  "binding": {
+   "max_abs_diff": 0.0008288574218749956,
+   "at_sample": 2184,
+   "input_set": "range: random uniform",
+   "tolerance": 0.0009765625,
+   "type": "fixdt(1,14,13)",
+   "outport": "y",
+   "error_over_tolerance": 0.84875
+  },
+  "guarantees": {
+   "contract": {
+    "inputs": {
+     "x": {
+      "type": "fixdt(1,16,14)"
+     }
+    },
+    "error_reference": "ideal",
+    "error_metric": "max_abs_diff per outport, every input set judged on its own",
+    "tolerances": {
+     "y": 0.0009765625
+    },
+    "initial_state": "design",
+    "input_ranges": {
+     "x": {
+      "min": -0.9000244140625,
+      "max": 0.89996337890625,
+      "type": "fixdt(1,16,14)"
+     }
+    },
+    "horizon": "unbounded (every time step)",
+    "overflow_definition": "any quantisation point (cast after rounding, accumulator partial sum, product step, left shift) outside its type, wrapping or saturating"
+   },
+   "error": {
+    "status": "sampled",
+    "input_sets": [
+     {
+      "label": "inputs",
+      "samples": 2048
+     },
+     {
+      "label": "inputs~negated",
+      "samples": 2048
+     },
+     {
+      "label": "inputs~reversed",
+      "samples": 2048
+     },
+     {
+      "label": "error_search[0]",
+      "samples": 31
+     },
+     "... 12 more"
+    ],
+    "claim": "max_abs_diff <= tolerance for every judged outport, checked bit-exactly on each input set above; no bound is claimed for any other input sequence"
+   },
+   "overflow": {
+    "status": "bounded",
+    "input_sets": [
+     {
+      "label": "inputs",
+      "samples": 2048
+     },
+     {
+      "label": "inputs~negated",
+      "samples": 2048
+     },
+     {
+      "label": "inputs~reversed",
+      "samples": 2048
+     },
+     {
+      "label": "error_search[0]",
+      "samples": 31
+     },
+     "... 12 more"
+    ],
+    "ideal_bounds_used_for_sizing": "impulse-response bound of linear systems (search heuristic, not part of the proof)",
+    "proof": {
+     "fingerprint": "77b2f0d7e9ec97f5e80f699ba893dd7f9ae418ba731058341f8496695b84aa59",
+     "points_checked": 24,
+     "loops": [],
+     "points_not_proven": [],
+     "reasons": []
+    },
+    "claim": "proven for every input sequence inside input_ranges, at every time step: no quantisation point of this design wraps or saturates"
+   }
+  },
+  "solution": {
+   "blocks": {
+    "x": {
+     "type": "Inport"
+    },
+    "F": {
+     "type": "DiscreteFir",
+     "Coefficients": "[0.02 0.06 0.16 0.26 0.26 0.16 0.06 0.02]",
+     "CoefDataTypeStr": "fixdt(0,16,17)",
+     "ProductDataTypeStr": "fixdt(1,12,13)",
+     "AccumDataTypeStr": "fixdt(1,14,13)",
+     "OutDataTypeStr": "fixdt(1,14,13)",
+     "RndMeth": "Floor",
+     "SaturateOnIntegerOverflow": "off"
+    },
+    "y": {
+     "type": "Outport"
+    }
+   },
+   "compiled_types": {
+    "F": "fixdt(1,14,13)",
+    "x": "fixdt(1,16,14)",
+    "y": "fixdt(1,14,13)"
+   }
+  },
+  "search": {
+   "candidates": 213,
+   "variables": 4,
+   "refine_rounds": 8,
+   "after_uniform": {
+    "hwbits": 366,
+    "max_abs_diff": 0.0008288574218749956
+   },
+   "budget_exhausted": false,
+   "seed": 0,
+   "range_repairs": [],
+   "msb_trimmed": [],
+   "hw_search": null,
+   "hw_search_kept": null,
+   "warm_start": null
+  },
+  "deterministic": true,
+  "input_sha256": "59c161a6b2f2c1c65c184e2e4f032bac4c036ed42b54962582556c08ed3d0c63",
+  "run": {
+   "timing_s": {
+    "setup_s": 0.196,
+    "range_proof_s": 0.087,
+    "verify_s": 4.383,
+    "uniform": 0.739,
+    "refine": 0.461,
+    "total_s": 7.335,
+    "total_wall_s": 18.064
+   },
+   "workers": 2,
+   "processes": 16,
+   "busy_at_once": 2,
+   "core_cpu_s": 0.611,
+   "run_dir": "runs/fxopt/59c161a6b2f2c1c6/20261123T211214Z-59c161a6b2f2c1c6-10056-9a90448c",
+   "attempt_id": "20261123T211214Z-59c161a6b2f2c1c6-10056-9a90448c",
+   "last_pass_run_dir": "runs/fxopt/59c161a6b2f2c1c6/20261123T211222Z-59c161a6b2f2c1c6-10056-4ad8849c",
+   "passes": [
+    "runs/fxopt/59c161a6b2f2c1c6/20261123T211222Z-59c161a6b2f2c1c6-10056-4ad8849c"
+   ]
+  },
+  "error_search": {
+   "status": "no sequence over the tolerance found",
+   "margin": 1.0,
+   "counterexamples_added": 1,
+   "rounds": [
+    {
+     "worst_error_over_tolerance": 1.015,
+     "counterexample": true,
+     "exhaustive_over_range": false,
+     "worst_input": {
+      "x": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        0,
+        0,
+        0,
+        0,
+        "... 27 more"
+       ]
+      }
+     }
+    },
+    {
+     "worst_error_over_tolerance": 0.99625,
+     "counterexample": false,
+     "exhaustive_over_range": false,
+     "worst_input": {
+      "x": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        0,
+        0,
+        0,
+        0,
+        "... 27 more"
+       ]
+      }
+     }
+    }
+   ],
+   "work": "24 starts x up to 16 hill-climb rounds per search (fixed, independent of machine load)",
+   "safety_stop_hit": false,
+   "method": "hill-climb over input windows inside the ranges (engine/fxerrsearch.py); heuristic, not a proof"
+  },
+  "time": {
+   "time_budget_s": 20,
+   "elapsed_s": 16.9,
+   "over_budget_s": 0.0,
+   "rule": "time_budget_s bounds the optimisation passes: each re-optimisation gets the rest of the budget but at least as long as the first pass took; the error search rounds are a fixed amount of work (same result on any machine), not cut by the budget, timed here (error_search_s); time_limit_s, when given, caps the request: no error-search round or re-optimisation is started that would end after it (estimated from the previous round), and the stop is reported in error_search.rounds",
+   "passes": [
+    {
+     "pass": "optimisation",
+     "seconds": 6.2,
+     "budget_exhausted": false
+    },
+    {
+     "pass": "error search 1",
+     "seconds": 1.8
+    },
+    {
+     "pass": "re-optimisation 1",
+     "seconds": 7.3,
+     "budget_s": 12.0,
+     "given_minimum": false,
+     "budget_exhausted": false,
+     "warm_start": null
+    },
+    {
+     "pass": "error search 2",
+     "seconds": 1.5
+    }
+   ],
+   "any_pass_budget_exhausted": false,
+   "error_search_s": 3.3
+  },
+  "ranges": {
+   "source": "request"
+  },
+  "settings": {
+   "pair_exchange": false,
+   "wide_exchange": true,
+   "multistart": 2,
+   "warm_reopt": false,
+   "c_core": true,
+   "non_default": [],
+   "sha256": "339b07cf5afa806a"
+  },
+  "warnings": [
+   {
+    "code": "ERROR_BOUND_SAMPLED",
+    "message": "the error bound is only checked on the input sets given (and their variants, see input_variants); other inputs may exceed it -- give input_ranges with error_search, or more input sets, before relying on it"
+   }
+  ]
+ }
+}

@@ -1,0 +1,15 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/21_err_double_in_fxgraph.json",
+ "exit_code": 1,
+ "wall_s": 0.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "UNSUPPORTED",
+  "where": "design",
+  "message": "a feedback loop with floating-point signals is not recorded; floating-point signals are answered only on the recorded shapes",
+  "input_sha256": "c78d86ec06a21b6d7ecf46eee8b2f66ee47a1600dd8101431e17f931fcd26c7f",
+  "refusal_kind": "not_supported",
+  "next_step": "refused, not answered: this configuration has not been verified bit-exact against Simulink. Change the parameter or block named in where / message to a supported form (docs/en/GRAPH.md, docs/en/BLOCKS.md); if the design needs it, report where + message so it can be recorded"
+ }
+}

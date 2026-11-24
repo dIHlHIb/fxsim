@@ -1,0 +1,94 @@
+{
+ "blocks": {
+  "x": {
+   "type": "Inport"
+  },
+  "P": {
+   "type": "Product",
+   "Inputs": "**",
+   "OutDataTypeStr": "fixdt(1,10,9)"
+  },
+  "AB": {
+   "type": "Abs",
+   "OutDataTypeStr": "fixdt(0,8,8)"
+  },
+  "R": {
+   "type": "Constant",
+   "Value": "0.5",
+   "OutDataTypeStr": "fixdt(0,6,6)"
+  },
+  "E": {
+   "type": "Sum",
+   "Inputs": "+-",
+   "AccumDataTypeStr": "fixdt(1,10,9)",
+   "OutDataTypeStr": "fixdt(1,10,9)"
+  },
+  "MU": {
+   "type": "Gain",
+   "Gain": "0.02",
+   "ParamDataTypeStr": "fixdt(0,6,11)",
+   "OutDataTypeStr": "fixdt(1,10,14)"
+  },
+  "GS": {
+   "type": "Sum",
+   "Inputs": "++",
+   "AccumDataTypeStr": "fixdt(0,16,14)",
+   "OutDataTypeStr": "fixdt(0,16,14)"
+  },
+  "GD": {
+   "type": "UnitDelay",
+   "InitialCondition": "1"
+  },
+  "y": {
+   "type": "Outport"
+  }
+ },
+ "lines": [
+  {
+   "src": "x",
+   "dst": "P",
+   "dport": 1
+  },
+  {
+   "src": "GD",
+   "dst": "P",
+   "dport": 2
+  },
+  {
+   "src": "P",
+   "dst": "AB"
+  },
+  {
+   "src": "R",
+   "dst": "E",
+   "dport": 1
+  },
+  {
+   "src": "AB",
+   "dst": "E",
+   "dport": 2
+  },
+  {
+   "src": "E",
+   "dst": "MU"
+  },
+  {
+   "src": "MU",
+   "dst": "GS",
+   "dport": 1
+  },
+  {
+   "src": "GD",
+   "dst": "GS",
+   "dport": 2
+  },
+  {
+   "src": "GS",
+   "dst": "GD"
+  },
+  {
+   "src": "P",
+   "dst": "y"
+  }
+ ]
+}

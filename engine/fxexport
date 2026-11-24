@@ -1,0 +1,173 @@
+#!/usr/bin/env -S python3 -I
+"""fxexport: AI-native CLI that builds a new Simulink model (.slx, R2026b) from scratch out of an fxgraph design and
+writes a verification package next to it: the inputs, fxsim's expected outputs (stored integers, lossless) and a
+self-contained MATLAB check script that prints one JSON line PASS / FAIL. Schema: docs/en/EXPORT.md.
+
+stdin: one JSON request
+  {"design": {...}, "inputs": {port: {s, wl, fl, ints}}, "hw": {...}, "nsteps" | "stop_time",
+   "name": "model_name", "out": "runs/export/<dir>"}
+stdout: one JSON result. Errors carry a stable code and are appended to runs/export_errors.jsonl.
+The package is only written after the exported model has been read back with the project's own reader and
+re-simulated with identical structure, parameters, compiled types and outputs (else EXPORT_ROUNDTRIP_MISMATCH).
+"""
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import shutil
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(ROOT, "ref"))
+import fxgraph_lib as G  # noqa: E402
+import fxslx_lib as S  # noqa: E402
+import fxexport_lib as E  # noqa: E402
+
+ERRLOG = os.path.join(ROOT, "runs", "export_errors.jsonl")
+
+
+def _fxgraph_module():
+    loader = importlib.machinery.SourceFileLoader("fxgraph_cli", os.path.join(HERE, "fxgraph"))
+    spec = importlib.util.spec_from_loader("fxgraph_cli", loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    return mod
+
+
+_FXG = None
+
+
+def run_fxgraph(req):
+    global _FXG
+    if _FXG is None:
+        _FXG = _fxgraph_module()
+    try:
+        return _FXG.handle(json.loads(json.dumps(req)))
+    except G.GraphError as e:
+        raise G.GraphError(e.code, e.where, "engine: " + e.message)
+
+
+def read_slx(data, scope):
+    return S.read(data, scope)
+
+
+def list_slx(data):
+    return S.list_model(data)
+
+
+def handle(req):
+    if not isinstance(req, dict):
+        raise G.GraphError("BAD_JSON", "stdin", "request must be a JSON object")
+    out = req.get("out")
+    if not isinstance(out, str) or not out:
+        raise G.GraphError("MISSING_FIELD", "out", "output directory required (a new directory inside the project, "
+                           "e.g. runs/export/<name>)")
+    # a relative out resolves against the tree root, as fxslx's path / out and fxopt's log_dir do
+    # (a previous version); it must lie inside the project; the result gives the absolute directory too
+    outp = os.path.realpath(out if os.path.isabs(out) else os.path.join(ROOT, out))
+    if not (outp + os.sep).startswith(ROOT + os.sep) or outp == ROOT:
+        raise G.GraphError("BAD_PARAM", "out", "output must be a new directory inside the project directory %s" % ROOT)
+    if os.path.exists(outp):
+        raise G.GraphError("OUT_EXISTS", "out", "%s already exists (every export needs a new directory)"
+                           % os.path.relpath(outp, ROOT))
+    files, summary = E.export_package(req, run_fxgraph, read_slx, list_slx)
+    tmp = outp + ".tmp-%d" % os.getpid()
+    os.makedirs(tmp)
+    try:
+        for name, data in files.items():
+            with open(os.path.join(tmp, name), "wb") as f:
+                f.write(data)
+        os.rename(tmp, outp)
+    except OSError:
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise
+    summary = dict(summary)
+    summary["out"] = os.path.relpath(outp, ROOT)
+    summary["out_abs"] = outp
+    # the manifest is a package file too (it cannot list its own digest)
+    summary["files"] = dict(summary["files"], **{"manifest.json": hashlib.sha256(files["manifest.json"]).hexdigest()})
+    # an absolute path (MATLAB's own current directory does not matter); the script prints
+    # one JSON line and returns it; the commands below print the verdict line (no exit status)
+    q = outp.replace("'", "''")
+    # A failing R2026b batch check on macOS can return status 0. Read the printed verdict.
+    line_ = "fprintf('FXSIM_VERDICT %s\\n', r.verdict)"
+    summary["check_command"] = "cd('%s'); r = check_%s; %s" % (q, summary["model"], line_.replace("\\\\", "\\"))
+    summary["check_batch_command"] = 'matlab -batch "cd(\'%s\'); r = check_%s; %s"' % (q, summary["model"], line_)
+    # The checker resolves its files relative to its own location.
+    summary["check_batch_command_here"] = 'matlab -batch "r = check_%s; %s"' % (summary["model"], line_)
+    summary["verdicts"] = ("PASS: every sample and every compiled type equal; FAIL: a difference (first_diff says "
+                           "where); INCOMPLETE: every compared sample equal but something could not be compared "
+                           "(reason says what) -- only PASS verifies the package. The script prints one JSON line and "
+                           "returns it as r; the commands then print 'FXSIM_VERDICT <verdict>'. Read that line: the "
+                           "process status can be 0 after a failed model check on macOS with MATLAB R2026b")
+    return dict({"status": "ok"}, **summary)
+
+
+def _mem_limit():
+    try:
+        import resource
+        lim = int(os.environ.get("FX_MEM_BYTES", str(4 << 30)))
+        resource.setrlimit(resource.RLIMIT_DATA, (lim, lim))
+    except Exception:  # noqa: BLE001 -- a platform without the limit still answers
+        pass
+
+
+EXPORT_NEXT_STEP = {
+    "UNSUPPORTED_EXPORT": ("not_supported", "the design runs in fxsim, but this part cannot yet be written as a Simulink "
+                           "model whose check script verifies it: change what where / message names, or keep that "
+                           "part verified in fxsim only; report where + message if the design needs it"),
+    "EXPORT_ROUNDTRIP_MISMATCH": ("defect", "the export's own self-check (written model read back and re-simulated) "
+                                  "differs from the design, so no package was written: an export defect, not a "
+                                  "property of the design -- report input_sha256 and the request"),
+    "OOM": ("request", "the export ran out of memory: fewer steps or a smaller design"),
+    "OUT_EXISTS": ("request", "the output directory already exists: give a new out"),
+}
+
+
+def main():
+    import fxcli
+    rc_args = fxcli.reject_arguments("fxexport", ERRLOG)   # stdin only, like fxgraph
+    if rc_args is not None:
+        return rc_args
+    _mem_limit()
+    raw = sys.stdin.buffer.read()
+    sha = hashlib.sha256(raw).hexdigest()
+    try:
+        try:
+            req = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            raise G.GraphError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+        res, rc = handle(req), 0
+        res["input_sha256"] = sha
+    except G.GraphError as e:
+        import error_locations   # located on the request's own block
+        w_, m_ = error_locations.user_loc(locals().get("req"), e.where, e.message)
+        res, rc = {"status": "error", "code": e.code, "where": w_, "message": m_, "input_sha256": sha}, 1
+    except MemoryError:
+        res, rc = {"status": "error", "code": "OOM", "where": "run", "message": "out of memory (FX_MEM_BYTES)",
+                   "input_sha256": sha}, 1
+    except Exception as e:  # noqa: BLE001
+        res, rc = {"status": "error", "code": "INTERNAL", "where": type(e).__name__, "message": str(e)[:500],
+                   "input_sha256": sha}, 1
+    if rc:
+        # the error reporting contract: what kind of refusal it is and what to do next -- the engine's table (fxgraph_lib
+        # NEXT_STEP, a previous version) for the engine's codes, the export's own codes here
+        if res["code"] in EXPORT_NEXT_STEP:
+            res["refusal_kind"], res["next_step"] = EXPORT_NEXT_STEP[res["code"]]
+        else:
+            G.with_next_step(res)   # the engine's table, shared by every tool (a previous version)
+        try:
+            os.makedirs(os.path.dirname(ERRLOG), exist_ok=True)
+            with open(ERRLOG, "a") as f:
+                f.write(json.dumps(res) + "\n")
+        except OSError:
+            pass
+    sys.stdout.write(json.dumps(res) + "\n")
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

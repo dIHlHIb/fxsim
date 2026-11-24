@@ -1,0 +1,6906 @@
+{
+"source": "Native fixed-point simulation records",
+"runs": 351,
+"excluded": {
+"RndMeth Convergent with the numerator sum rounded into the denominator": 12,
+"RndMeth Nearest with the numerator sum rounded into a 64-bit denominat": 5,
+"RndMeth Zero with the numerator sum rounded into a 64-bit denominator ": 6,
+"excluded due to inconsistent agreement on one configuration": 1
+},
+"inputs": [
+[
+1,
+8,
+0
+],
+[
+1,
+8,
+6
+],
+[
+1,
+8,
+7
+],
+[
+1,
+10,
+0
+],
+[
+1,
+10,
+5
+],
+[
+1,
+10,
+8
+],
+[
+1,
+12,
+0
+],
+[
+1,
+12,
+6
+],
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+10
+],
+[
+1,
+13,
+12
+],
+[
+1,
+14,
+0
+],
+[
+1,
+14,
+7
+],
+[
+1,
+14,
+13
+],
+[
+1,
+14,
+14
+],
+[
+1,
+15,
+5
+],
+[
+1,
+16,
+0
+],
+[
+1,
+16,
+8
+],
+[
+1,
+16,
+12
+],
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+15
+],
+[
+1,
+18,
+9
+],
+[
+1,
+18,
+16
+],
+[
+1,
+20,
+10
+],
+[
+1,
+20,
+16
+],
+[
+1,
+20,
+18
+],
+[
+1,
+22,
+0
+],
+[
+1,
+22,
+11
+],
+[
+1,
+22,
+21
+],
+[
+1,
+22,
+22
+],
+[
+1,
+24,
+12
+],
+[
+1,
+24,
+20
+],
+[
+1,
+24,
+22
+],
+[
+1,
+28,
+0
+],
+[
+1,
+28,
+14
+],
+[
+1,
+28,
+27
+],
+[
+1,
+28,
+28
+],
+[
+1,
+32,
+0
+],
+[
+1,
+32,
+16
+],
+[
+1,
+32,
+28
+],
+[
+1,
+32,
+30
+],
+[
+1,
+32,
+31
+]
+],
+"cells": [
+{
+"cell": [
+[
+1,
+10,
+0
+],
+[
+1,
+21,
+4
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-7,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 01"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+5
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+5
+],
+[
+1,
+16,
+20
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+5
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+5
+],
+[
+1,
+32,
+24
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+8
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+8
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 04",
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+8
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+10,
+8
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+0
+],
+[
+1,
+16,
+20
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+0
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+0
+],
+[
+1,
+24,
+20
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+-2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+0
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+10
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+10
+],
+[
+1,
+16,
+10
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 05"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+10
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 04",
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+10
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+10
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+6
+],
+[
+1,
+16,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+6
+],
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+6
+],
+[
+1,
+32,
+16
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+6
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+8
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+8
+],
+[
+1,
+24,
+16
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+12,
+8
+],
+[
+1,
+32,
+24
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+13,
+12
+],
+[
+1,
+24,
+28
+],
+true,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 01"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+0
+],
+[
+1,
+12,
+4
+],
+false,
+"Convergent",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+0
+],
+[
+1,
+12,
+4
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+0
+],
+[
+1,
+20,
+18
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+0
+],
+[
+1,
+28,
+14
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+13
+],
+[
+1,
+20,
+18
+],
+false,
+"Convergent",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+13
+],
+[
+1,
+20,
+18
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+13
+],
+[
+1,
+28,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+13
+],
+[
+1,
+32,
+31
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+14
+],
+[
+1,
+12,
+4
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+14
+],
+[
+1,
+20,
+18
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+7
+],
+[
+1,
+12,
+4
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+7
+],
+[
+1,
+32,
+31
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+14,
+7
+],
+[
+1,
+32,
+31
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+15,
+5
+],
+[
+1,
+31,
+24
+],
+true,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 01"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+0
+],
+[
+1,
+16,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+0
+],
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+0
+],
+[
+1,
+32,
+16
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+12
+],
+[
+1,
+16,
+10
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 08"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+10,
+6
+],
+false,
+"Floor",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+10,
+6
+],
+true,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+12,
+8
+],
+false,
+"Floor",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+12,
+8
+],
+true,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+14,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+14,
+10
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+15,
+11
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+15,
+11
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+10
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 08"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+12
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+12
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+12
+],
+true,
+"Floor",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+12
+],
+true,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+1,
+2,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+20
+],
+false,
+"Zero",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+0,
+2
+],
+"num_ovf": true,
+"den_ovf": true,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+17,
+13
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+18,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02",
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Convergent",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+24,
+16
+],
+true,
+"Zero",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+0,
+3
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+4,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 10"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+14
+],
+[
+1,
+32,
+24
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 05",
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+-1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 11",
+"Recording set 03",
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+15
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 03",
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+8
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+8
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+8
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+16,
+8
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+18,
+16
+],
+[
+1,
+16,
+10
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+18,
+9
+],
+[
+1,
+16,
+10
+],
+false,
+"Zero",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+18,
+9
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+18,
+9
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+18,
+9
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+10
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+10
+],
+[
+1,
+24,
+16
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+10
+],
+[
+1,
+32,
+24
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+16
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+16
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+11,
+8
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+11,
+8
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+11,
+8
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+11,
+8
+],
+false,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+6
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+6
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+6
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-4,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+6
+],
+false,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+8
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+8
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+8
+],
+false,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+20,
+18
+],
+[
+1,
+12,
+8
+],
+false,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+0
+],
+[
+1,
+28,
+14
+],
+false,
+"Convergent",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+0
+],
+[
+1,
+28,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+0
+],
+[
+1,
+32,
+31
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+11
+],
+[
+1,
+12,
+4
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+11
+],
+[
+1,
+20,
+18
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+11
+],
+[
+1,
+28,
+14
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+21
+],
+[
+1,
+12,
+4
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+21
+],
+[
+1,
+32,
+31
+],
+false,
+"Convergent",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+21
+],
+[
+1,
+32,
+31
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+22
+],
+[
+1,
+20,
+18
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+22
+],
+[
+1,
+28,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+22,
+22
+],
+[
+1,
+32,
+31
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 02",
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+16,
+20
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 02",
+"Recording set 03",
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 03",
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+12
+],
+[
+1,
+32,
+24
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+20
+],
+[
+1,
+24,
+16
+],
+true,
+"Nearest",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+20
+],
+[
+1,
+24,
+16
+],
+true,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+20
+],
+[
+1,
+24,
+16
+],
+true,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+20
+],
+[
+1,
+24,
+16
+],
+true,
+"Zero",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+20
+],
+[
+1,
+32,
+24
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 09"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+22
+],
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+22
+],
+[
+1,
+16,
+20
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+22
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+24,
+22
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 02",
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+0
+],
+[
+1,
+12,
+4
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+0
+],
+[
+1,
+20,
+18
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+14
+],
+[
+1,
+28,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+14
+],
+[
+1,
+32,
+31
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+27
+],
+[
+1,
+12,
+4
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+27
+],
+[
+1,
+20,
+18
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+27
+],
+[
+1,
+28,
+14
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+28
+],
+[
+1,
+12,
+4
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+28
+],
+[
+1,
+32,
+31
+],
+false,
+"Convergent",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 06"
+]
+},
+{
+"cell": [
+[
+1,
+28,
+28
+],
+[
+1,
+32,
+31
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 07"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+0
+],
+[
+1,
+16,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+0
+],
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+0
+],
+[
+1,
+32,
+16
+],
+false,
+"Nearest",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+0
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+16,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+2,
+-11,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 05",
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+0,
+3
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": true,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+4,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 10"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+32,
+16
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+16
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+28
+],
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+28
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+28
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+2,
+1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 14"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 4
+}
+],
+"sources": [
+"Recording set 15",
+"Recording set 02",
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"on"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 15"
+]
+},
+{
+"cell": [
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": true,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 13"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+0
+],
+[
+1,
+16,
+10
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+0
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+0
+],
+[
+1,
+24,
+16
+],
+false,
+"Zero",
+"on"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+0
+],
+[
+1,
+32,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+0,
+3
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+2,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+4,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 10"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+0
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 12"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+6
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+6
+],
+[
+1,
+16,
+12
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 3
+}
+],
+"sources": [
+"Recording set 04",
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+6
+],
+[
+1,
+24,
+16
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+6
+],
+[
+1,
+32,
+24
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+0,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+-1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+},
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 2
+}
+],
+"sources": [
+"Recording set 03"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+7
+],
+[
+1,
+16,
+10
+],
+false,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+2,
+2,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+7
+],
+[
+1,
+24,
+16
+],
+true,
+"Floor",
+"off"
+],
+"shapes": [
+{
+"shape": [
+3,
+3,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+},
+{
+"cell": [
+[
+1,
+8,
+7
+],
+[
+1,
+32,
+24
+],
+false,
+"Zero",
+"off"
+],
+"shapes": [
+{
+"shape": [
+4,
+4,
+1,
+2
+],
+"num_ovf": false,
+"den_ovf": false,
+"runs": 1
+}
+],
+"sources": [
+"Recording set 02"
+]
+}
+]
+}

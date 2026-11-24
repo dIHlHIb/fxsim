@@ -1,0 +1,15 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/22_err_algebraic_loop.json",
+ "exit_code": 1,
+ "wall_s": 0.2,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "ALGEBRAIC_LOOP",
+  "where": "design.blocks.A",
+  "message": "cycle without a Unit Delay through: A, S",
+  "input_sha256": "1dc5876c0fe73f1840842f3c994a4a1f9caf6a3999ce634076c05ec397f6d9f1",
+  "refusal_kind": "request",
+  "next_step": "a feedback path without delay: put a Unit Delay (or Delay) in the loop"
+ }
+}

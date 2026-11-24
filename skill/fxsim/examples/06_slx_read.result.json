@@ -1,0 +1,123 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxslx < <skill dir>/examples/06_slx_read.json",
+ "exit_code": 0,
+ "wall_s": 0.55,
+ "note": "Observed after generating the FIR model with example 05 in this release.",
+ "stdout": {
+  "status": "ok",
+  "design": {
+   "blocks": {
+    "x": {
+     "type": "Inport"
+    },
+    "F": {
+     "type": "DiscreteFir",
+     "Coefficients": "[0.02 0.06 0.16 0.26 0.26 0.16 0.06 0.02]",
+     "CoefSource": "Dialog parameters",
+     "FilterStructure": "Direct form",
+     "InitialStates": "0",
+     "CoefDataTypeStr": "fixdt(0,16,17)",
+     "ProductDataTypeStr": "fixdt(1,12,13)",
+     "AccumDataTypeStr": "fixdt(1,14,13)",
+     "StateDataTypeStr": "Inherit: Same as accumulator",
+     "OutDataTypeStr": "fixdt(1,14,13)",
+     "RndMeth": "Floor",
+     "SaturateOnIntegerOverflow": "off",
+     "TapSumDataTypeStr": "Inherit: Inherit via internal rule"
+    },
+    "y": {
+     "type": "Outport"
+    }
+   },
+   "lines": [
+    {
+     "src": "x",
+     "dst": "F",
+     "dport": 1
+    },
+    {
+     "src": "F",
+     "dst": "y",
+     "dport": 1
+    }
+   ]
+  },
+  "info": {
+   "blocks": 3,
+   "lines": 2,
+   "inport_types": {
+    "x": {
+     "s": 1,
+     "wl": 16,
+     "fl": 14
+    }
+   },
+   "origin": {
+    "x": {
+     "part": "simulink/systems/system_4.xml",
+     "sid": "1",
+     "path": "DUT/x"
+    },
+    "F": {
+     "part": "simulink/systems/system_4.xml",
+     "sid": "2",
+     "path": "DUT/F"
+    },
+    "y": {
+     "part": "simulink/systems/system_4.xml",
+     "sid": "3",
+     "path": "DUT/y"
+    }
+   },
+   "scope": "DUT",
+   "parts": [
+    "[Content_Types].xml",
+    "_rels/.rels",
+    "metadata/coreProperties.xml",
+    "metadata/mwcoreProperties.xml",
+    "metadata/mwcorePropertiesExtension.xml",
+    "metadata/mwcorePropertiesReleaseInfo.xml",
+    "simulink/_rels/blockDiagram.json.rels",
+    "simulink/_rels/configSetInfo.json.rels",
+    "simulink/bddefaults.json",
+    "simulink/blockDiagram.json",
+    "simulink/configSet0.json",
+    "simulink/configSetInfo.json",
+    "simulink/graphicalInterface.json",
+    "simulink/modelDictionary.xml",
+    "simulink/systems/_rels/system_root.xml.rels",
+    "simulink/systems/system_4.xml",
+    "simulink/systems/system_root.xml"
+   ],
+   "assumed_defaults": {
+    "x": [
+     "SampleTime"
+    ]
+   },
+   "assumed_values": {
+    "x": {
+     "SampleTime": "-1"
+    }
+   },
+   "simulink_defaults_filled": {},
+   "has_block_defaults": false,
+   "solver": {
+    "name": "FixedStepDiscrete",
+    "fixed_step": "1",
+    "explicit_sample_times": [],
+    "stop_time": "199"
+   },
+   "hw": {
+    "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+   },
+   "ignored_parameters": {},
+   "workspace_sources": {},
+   "workspace_source_settings": {},
+   "named_parameters": {},
+   "unresolved_names": {},
+   "referenced_models": {}
+  },
+  "file_sha256": "ef614c91189972e91dac30fa6365f7f835b56ad0820ffcda681d4f52f245e336",
+  "input_sha256": "3595ac677dcbbcd47609aa03861ada3bfca94d34f6d6aadbb1b5e680474d33f1"
+ }
+}

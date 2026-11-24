@@ -1,0 +1,15723 @@
+{
+"cells": [
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+3,
+2,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+12,
+11
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+32,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+17
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+11
+],
+"NumProductDataTypeStr": [
+1,
+32,
+17
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+12,
+11
+],
+[
+1,
+12,
+9
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+9
+],
+"DenProductDataTypeStr": [
+1,
+32,
+19
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+11
+],
+"NumProductDataTypeStr": [
+1,
+32,
+21
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+12,
+13
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+13
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+12,
+10
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+32,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+10
+],
+"NumProductDataTypeStr": [
+1,
+32,
+20
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+18
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+32,
+18
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+18
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+18
+],
+"OutDataTypeStr": [
+1,
+32,
+18
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+2,
+[
+1,
+12,
+10
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+32,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+10
+],
+"NumProductDataTypeStr": [
+1,
+32,
+16
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Floor",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+12,
+10
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+10
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+12,
+10
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+13
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+13
+],
+"DenProductDataTypeStr": [
+1,
+32,
+27
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+29
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+29
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+13
+],
+2
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+13
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+2,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+31
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+31
+],
+"OutDataTypeStr": [
+1,
+64,
+31
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+29
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+true,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+14
+],
+true,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+13
+],
+2
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+13
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+37,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+33,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+33,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Nearest",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+40,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Nearest",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+23
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Nearest",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+36,
+23
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+34,
+23
+],
+"NumAccumDataTypeStr": [
+1,
+36,
+23
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+34,
+23
+],
+"OutDataTypeStr": [
+1,
+36,
+23
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Zero",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+16
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+16
+],
+"NumProductDataTypeStr": [
+1,
+32,
+24
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Zero",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+36,
+20
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+34,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+34,
+21
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+34,
+21
+],
+"OutDataTypeStr": [
+1,
+34,
+21
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+16,
+8
+],
+true,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+40,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+32
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+33
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+31
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+31
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+31
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+31
+],
+"OutDataTypeStr": [
+1,
+64,
+31
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+56,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+16
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+32
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+32
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+32
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+16
+],
+"NumProductDataTypeStr": [
+1,
+64,
+32
+],
+"OutDataTypeStr": [
+1,
+64,
+32
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+32,
+24
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+32,
+24
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+24
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+16
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+32
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+32
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+32
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+16
+],
+"NumProductDataTypeStr": [
+1,
+64,
+32
+],
+"OutDataTypeStr": [
+1,
+64,
+32
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+32,
+24
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+18,
+16
+],
+true,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+42,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+42,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+42,
+30
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Convergent",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Convergent",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+3,
+2,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+43,
+35
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+42,
+35
+],
+"NumAccumDataTypeStr": [
+1,
+44,
+35
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+42,
+35
+],
+"OutDataTypeStr": [
+1,
+44,
+35
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+24,
+23
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+44,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+42,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+44,
+29
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+23
+],
+"NumProductDataTypeStr": [
+1,
+42,
+29
+],
+"OutDataTypeStr": [
+1,
+44,
+29
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+45,
+38
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+44,
+38
+],
+"NumAccumDataTypeStr": [
+1,
+44,
+38
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+44,
+38
+],
+"OutDataTypeStr": [
+1,
+44,
+38
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+24,
+23
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+48,
+42
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+23
+],
+"NumProductDataTypeStr": [
+1,
+48,
+43
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+24,
+20
+],
+true,
+"Floor",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+44,
+35
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+42,
+35
+],
+"NumAccumDataTypeStr": [
+1,
+44,
+35
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+42,
+35
+],
+"OutDataTypeStr": [
+1,
+44,
+35
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+45
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+45
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+38
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+64,
+38
+],
+"OutDataTypeStr": [
+1,
+64,
+38
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+36
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+36
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+37
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+31
+],
+"NumProductDataTypeStr": [
+1,
+64,
+37
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Nearest",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+32,
+32
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+60
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+32
+],
+"NumProductDataTypeStr": [
+1,
+64,
+62
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Nearest",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+32,
+32
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+32
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+36
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+36
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+37
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+31
+],
+"NumProductDataTypeStr": [
+1,
+64,
+37
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+56,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+4,
+3,
+[
+1,
+32,
+32
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+60
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+32
+],
+"NumProductDataTypeStr": [
+1,
+64,
+62
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+3,
+2,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+45
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+45
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+38
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+64,
+38
+],
+"OutDataTypeStr": [
+1,
+64,
+38
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteFilter",
+[
+1,
+32,
+30
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+32,
+30
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+30
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+64,
+16
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+10,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+10,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+11,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+11,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Convergent",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+11
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+11
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Convergent",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+31,
+25
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+30,
+25
+],
+"NumAccumDataTypeStr": [
+1,
+31,
+25
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+30,
+25
+],
+"OutDataTypeStr": [
+1,
+31,
+25
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+12,
+13
+],
+[
+1,
+12,
+9
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+34,
+25
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+9
+],
+"DenProductDataTypeStr": [
+1,
+32,
+25
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+29
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+13
+],
+"NumProductDataTypeStr": [
+1,
+32,
+29
+],
+"OutDataTypeStr": [
+1,
+32,
+29
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+12,
+11
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+31,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+30,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+30,
+17
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+11
+],
+"NumProductDataTypeStr": [
+1,
+30,
+17
+],
+"OutDataTypeStr": [
+1,
+30,
+17
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Floor",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+12,
+10
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+24,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+10
+],
+"NumProductDataTypeStr": [
+1,
+24,
+20
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Floor",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+25
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+30,
+25
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+25
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+30,
+25
+],
+"OutDataTypeStr": [
+1,
+32,
+25
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+12,
+10
+],
+true,
+"Nearest",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+12,
+11
+],
+[
+1,
+12,
+10
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+42,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+10
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+42,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+11
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+42,
+30
+],
+"StateDataTypeStr": [
+1,
+12,
+10
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+20
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+21
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+21
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+29
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+16,
+16
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+16
+],
+"NumProductDataTypeStr": [
+1,
+32,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+22
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+32,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+22
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+22
+],
+"OutDataTypeStr": [
+1,
+32,
+22
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+13
+],
+2
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+13
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+16,
+17
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+20
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+23
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+23
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+false,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+true,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+13
+],
+2
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+13
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+true,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+14
+],
+true,
+"Zero",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+33,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+33,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+33,
+28
+],
+"StateDataTypeStr": [
+1,
+16,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+2
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+2
+],
+"StateDataTypeStr": [
+1,
+16,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+3
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+3
+],
+"StateDataTypeStr": [
+1,
+16,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+4
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+4
+],
+"StateDataTypeStr": [
+1,
+16,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+5
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+5
+],
+"StateDataTypeStr": [
+1,
+16,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+],
+[
+2,
+2,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+],
+[
+3,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+16,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+20
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+20
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+21
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+21
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+29
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+14
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+23
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+23
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+23
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+23
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+23
+],
+"OutDataTypeStr": [
+1,
+64,
+23
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+30
+],
+"OutDataTypeStr": [
+1,
+64,
+30
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Nearest",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+56,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Zero",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+22
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+32,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+22
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+32,
+22
+],
+"OutDataTypeStr": [
+1,
+32,
+22
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+16,
+15
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+31
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+15
+],
+"NumProductDataTypeStr": [
+1,
+64,
+31
+],
+"OutDataTypeStr": [
+1,
+64,
+31
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+16,
+17
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+17
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+16,
+8
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+false,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+32,
+24
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+true,
+"Convergent",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+16,
+8
+],
+true,
+"Floor",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+24,
+14
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+24,
+14
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+24,
+14
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+14
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+31
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+31
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+24
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+22
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+23
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+23
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+32
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+33
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Nearest",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+18,
+18
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+18
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+2,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+22
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+22
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+23
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+23
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+56,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+18,
+17
+],
+[
+1,
+18,
+16
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+16
+],
+"DenProductDataTypeStr": [
+1,
+64,
+32
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+17
+],
+"NumProductDataTypeStr": [
+1,
+64,
+33
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+18,
+16
+],
+false,
+"Zero",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+12,
+8
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+31
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+64,
+31
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+24
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+18,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Convergent",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+24,
+23
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+64,
+42
+],
+"NumAccumDataTypeStr": [
+1,
+32,
+24
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+23
+],
+"NumProductDataTypeStr": [
+1,
+64,
+43
+],
+"OutDataTypeStr": [
+1,
+32,
+24
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Convergent",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+16,
+14
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+16,
+14
+],
+[
+1,
+16,
+14
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+34
+],
+"DenCoefDataTypeStr": [
+1,
+16,
+14
+],
+"DenProductDataTypeStr": [
+1,
+64,
+34
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+34
+],
+"NumCoefDataTypeStr": [
+1,
+16,
+14
+],
+"NumProductDataTypeStr": [
+1,
+64,
+34
+],
+"OutDataTypeStr": [
+1,
+64,
+34
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+1,
+3,
+[
+1,
+24,
+23
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+32,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+23
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Convergent",
+"on",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+20
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+64,
+16
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Convergent",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+32,
+28
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+32,
+24
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+24,
+16
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+32,
+24
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+32,
+28
+],
+"OutDataTypeStr": [
+1,
+24,
+16
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+64,
+42
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+64,
+42
+],
+"OutDataTypeStr": [
+1,
+56,
+16
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+1,
+4,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+28
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+64,
+28
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+28
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+64,
+28
+],
+"OutDataTypeStr": [
+1,
+64,
+28
+],
+"StateDataTypeStr": [
+1,
+24,
+20
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+24,
+20
+],
+false,
+"Floor",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+20,
+16
+]
+]
+]
+],
+"shapes": [
+[
+2,
+2,
+[
+1,
+24,
+22
+],
+[
+1,
+24,
+22
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+64,
+38
+],
+"DenCoefDataTypeStr": [
+1,
+24,
+22
+],
+"DenProductDataTypeStr": [
+1,
+64,
+38
+],
+"NumAccumDataTypeStr": [
+1,
+64,
+38
+],
+"NumCoefDataTypeStr": [
+1,
+24,
+22
+],
+"NumProductDataTypeStr": [
+1,
+64,
+38
+],
+"OutDataTypeStr": [
+1,
+64,
+38
+],
+"StateDataTypeStr": [
+1,
+20,
+16
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+31,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+31,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Nearest",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+29
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+29
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+31
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Nearest",
+"off",
+[
+[
+"StateDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+40,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Nearest",
+"on",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+2,
+4,
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+60
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+31
+],
+"NumProductDataTypeStr": [
+1,
+64,
+61
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Nearest",
+"on",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+]
+]
+],
+"shapes": [
+[
+2,
+3,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+52,
+45
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+50,
+45
+],
+"NumAccumDataTypeStr": [
+1,
+51,
+45
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+50,
+45
+],
+"OutDataTypeStr": [
+1,
+51,
+45
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Zero",
+"off",
+[
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+32,
+30
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+64,
+60
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+30
+],
+"NumProductDataTypeStr": [
+1,
+64,
+60
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Zero",
+"off",
+[
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+]
+]
+],
+"shapes": [
+[
+3,
+4,
+[
+1,
+32,
+34
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+34
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+40,
+30
+],
+"StateDataTypeStr": [
+1,
+32,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+18,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+32,
+31
+],
+[
+1,
+32,
+30
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+52,
+36
+],
+"DenCoefDataTypeStr": [
+1,
+32,
+30
+],
+"DenProductDataTypeStr": [
+1,
+50,
+36
+],
+"NumAccumDataTypeStr": [
+1,
+52,
+37
+],
+"NumCoefDataTypeStr": [
+1,
+32,
+31
+],
+"NumProductDataTypeStr": [
+1,
+50,
+37
+],
+"OutDataTypeStr": [
+1,
+52,
+37
+],
+"StateDataTypeStr": [
+1,
+18,
+6
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+30
+],
+true,
+"Zero",
+"on",
+[
+[
+"StateDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+18,
+15
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+40,
+30
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+12
+]
+]
+]
+],
+"shapes": [
+[
+4,
+4,
+[
+1,
+18,
+15
+],
+[
+1,
+18,
+15
+],
+1
+]
+],
+"sources": [
+"Recording set 01"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+40,
+30
+],
+"DenCoefDataTypeStr": [
+1,
+18,
+15
+],
+"DenProductDataTypeStr": [
+1,
+40,
+30
+],
+"NumAccumDataTypeStr": [
+1,
+40,
+30
+],
+"NumCoefDataTypeStr": [
+1,
+18,
+15
+],
+"NumProductDataTypeStr": [
+1,
+40,
+30
+],
+"OutDataTypeStr": [
+1,
+16,
+12
+],
+"StateDataTypeStr": [
+1,
+40,
+30
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+32,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+32,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+33,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+33,
+4
+]
+}
+},
+{
+"cell": [
+"DiscreteTransferFcn",
+[
+1,
+9,
+4
+],
+false,
+"Floor",
+"off",
+[
+[
+"NumCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"DenCoefDataTypeStr",
+[
+1,
+12,
+8
+]
+],
+[
+"NumProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenProductDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"NumAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"DenAccumDataTypeStr",
+[
+1,
+56,
+16
+]
+],
+[
+"OutDataTypeStr",
+[
+1,
+16,
+6
+]
+]
+]
+],
+"shapes": [
+[
+3,
+3,
+[
+1,
+12,
+8
+],
+[
+1,
+12,
+8
+],
+1
+]
+],
+"sources": [
+"Recording set 02"
+],
+"types": {
+"DenAccumDataTypeStr": [
+1,
+56,
+16
+],
+"DenCoefDataTypeStr": [
+1,
+12,
+8
+],
+"DenProductDataTypeStr": [
+1,
+56,
+16
+],
+"NumAccumDataTypeStr": [
+1,
+56,
+16
+],
+"NumCoefDataTypeStr": [
+1,
+12,
+8
+],
+"NumProductDataTypeStr": [
+1,
+56,
+16
+],
+"OutDataTypeStr": [
+1,
+16,
+6
+],
+"StateDataTypeStr": [
+1,
+9,
+4
+]
+}
+}
+],
+"source": "Native fixed-point simulation records"
+}

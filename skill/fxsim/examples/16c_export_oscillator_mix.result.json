@@ -1,0 +1,95 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxexport < <skill dir>/examples/16c_export_oscillator_mix.json",
+ "exit_code": 0,
+ "note": "Output captured from this example. Absolute paths use <fxsim tree root>.",
+ "stdout": {
+  "status": "ok",
+  "model": "oscillator_mix",
+  "files": {
+   "check_oscillator_mix.m": "737441627095881957e4346b68e4638da12ac4a8962fd6fd62cc5819eadde40b",
+   "oscillator_mix.slx": "2974a3bac95062e7d459fc66eea57cfe7ffbd355955b33841254df3c0a04538d",
+   "oscillator_mix_io.json": "ba3dfbdefdd303eaba18b28f5bb3ffe46014d0bc7a0c2be954fad9bf123b79f2",
+   "manifest.json": "9df7d7f08be9bc43f89cccca8473448cfbf34f0d7ef23b56606a7b226b051875"
+  },
+  "blocks": 6,
+  "multirate": false,
+  "hw_profile": "host",
+  "outputs": [
+   {
+    "port": "vo",
+    "root_block": "vo",
+    "width": 1,
+    "samples": 512,
+    "type": "boolean",
+    "period": 1.0,
+    "offset": 0.0
+   },
+   {
+    "port": "y",
+    "root_block": "y",
+    "width": 1,
+    "samples": 512,
+    "type": "1,12,11",
+    "period": 1.0,
+    "offset": 0.0
+   }
+  ],
+  "roundtrip": {
+   "blocks": 6,
+   "lines": 5,
+   "params_compared": 33,
+   "outputs_equal": [
+    "vo",
+    "y"
+   ],
+   "reader_assumed_defaults": {
+    "v": [
+     "SampleTime"
+    ],
+    "x": [
+     "SampleTime"
+    ]
+   },
+   "reader_ignored_parameters": {}
+  },
+  "unobserved_templates": [],
+  "dropped_parameters": {},
+  "assumed_defaults": {
+   "N": {
+    "AccumulatorDataType": "Binary point scaling",
+    "AccumulatorFL": "0",
+    "AccumulatorSigned": "yes",
+    "FreqResolution": "0.05",
+    "Frequency": "510",
+    "LUTCompress": "off",
+    "NumDitherBits": "4",
+    "OutputDataType": "Binary point scaling",
+    "OutputSigned": "yes",
+    "OverflowAction": "Wrap",
+    "PhaseOffset": "0",
+    "PhaseOffsetR": "pi/3",
+    "PhaseOffsetSource": "Property",
+    "PhasePort": "off",
+    "PhaseQuantization": "on",
+    "ResetAction": "off",
+    "RoundingMethod": "Floor",
+    "SamplesPerFrame": "1",
+    "SamplingFreq": "4000",
+    "SimulateUsing": "Code generation"
+   },
+   "vo": {
+    "OutDataTypeStr": "Inherit: auto"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "out": "runs/export/oscillator_mix",
+  "out_abs": "<fxsim tree root>/runs/export/oscillator_mix",
+  "check_command": "cd('<fxsim tree root>/runs/export/oscillator_mix'); r = check_oscillator_mix; fprintf('FXSIM_VERDICT %s\\n', r.verdict)",
+  "check_batch_command": "matlab -batch \"cd('<fxsim tree root>/runs/export/oscillator_mix'); r = check_oscillator_mix; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "check_batch_command_here": "matlab -batch \"r = check_oscillator_mix; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "verdicts": "PASS: every sample and every compiled type equal; FAIL: a difference (first_diff says where); INCOMPLETE: every compared sample equal but something could not be compared (reason says what) -- only PASS verifies the package. The script prints one JSON line and returns it as r; the commands then print 'FXSIM_VERDICT <verdict>'. Read that line: the process status can be 0 after a failed model check on macOS with MATLAB R2026b",
+  "input_sha256": "e07b4f523337a819ebf9f22ad045e8f3fdf9e82c06eb94154c9c3bae8e2e8dae"
+ }
+}

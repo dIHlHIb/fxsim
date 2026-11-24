@@ -1,0 +1,1 @@
+{"op": "write_types", "path": "runs/export/fir8_opt/fir8_opt.slx", "scope": "DUT", "out": "runs/fir8_typed.slx", "blocks": {"F": {"OutDataTypeStr": "fixdt(1,16,14)"}}}

@@ -1,0 +1,309 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/10_blocks_mix.json",
+ "exit_code": 0,
+ "wall_s": 0.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "outputs": {
+    "y": {
+     "type": "fixdt(1,12,10)",
+     "steps": 64,
+     "min": 0.0,
+     "max": 0.8603515625,
+     "last": 0.4775390625
+    },
+    "yb": {
+     "type": "boolean",
+     "steps": 64,
+     "ones": 28
+    }
+   },
+   "blocks": 13,
+   "engine": "c",
+   "blocks_with_assumed_defaults": [
+    "AB",
+    "DTC",
+    "G",
+    "L",
+    "... 6 more"
+   ],
+   "blocks_with_ignored_parameters": [],
+   "parameters_quantized": 1,
+   "simulink_warnings": 0,
+   "simulink_warnings_unchecked": 0,
+   "diagnostics": {
+    "blocks_wrapped": [],
+    "blocks_saturated": [],
+    "total_wraps": 0,
+    "total_saturations": 0,
+    "blocks_divided_by_zero": [],
+    "first_event": null
+   }
+  },
+  "compiled_types": {
+   "AB": "fixdt(1,24,20)",
+   "C": "fixdt(1,16,14)",
+   "DL": "fixdt(1,12,10)",
+   "DTC": "fixdt(1,12,10)",
+   "G": "fixdt(1,20,16)",
+   "L": "fixdt(1,16,14)",
+   "P": "fixdt(1,24,20)",
+   "R": "boolean",
+   "SAT": "fixdt(1,20,16)",
+   "SW": "fixdt(1,24,20)",
+   "x": "fixdt(1,16,14)",
+   "y": "fixdt(1,12,10)",
+   "yb": "boolean"
+  },
+  "compiled_port_types": {},
+  "ignored_parameters": {},
+  "assumed_defaults": {
+   "AB": {
+    "SaturateOnIntegerOverflow": "off",
+    "RndMeth": "Floor"
+   },
+   "DTC": {
+    "ConvertRealWorld": "Real World Value (RWV)"
+   },
+   "G": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "L": {
+    "BreakpointsForDimension1FirstPoint": "1",
+    "BreakpointsForDimension1Spacing": "1",
+    "BreakpointsSpecification": "Explicit values",
+    "FractionDataTypeStr": "Inherit: Inherit via internal rule",
+    "IntermediateResultsDataTypeStr": "Inherit: Same as output",
+    "InternalRulePriority": "Speed",
+    "RndMeth": "Simplest",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "P": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "R": {
+    "OutDataTypeStr": "boolean",
+    "RndMeth": "Simplest"
+   },
+   "SAT": {
+    "RndMeth": "Floor"
+   },
+   "SW": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off",
+    "Threshold": "0"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   },
+   "yb": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "parameter_quantization": {
+   "design.blocks.L.Table": {
+    "written": "0.96",
+    "type": "fixdt(1,16,14)",
+    "used": "0.96002197265625",
+    "why": "rounded to the type's precision"
+   }
+  },
+  "simulink_warnings": {
+   "expected": [],
+   "unchecked": []
+  },
+  "accumulator_types": {},
+  "internal_types": {},
+  "schedule": [
+   "C",
+   "DL",
+   "x",
+   "G",
+   "... 9 more"
+  ],
+  "outputs": {
+   "y": {
+    "type": "fixdt(1,12,10)",
+    "s": 1,
+    "wl": 12,
+    "fl": 10,
+    "ints": [
+     0,
+     0,
+     0,
+     0,
+     "... 60 more"
+    ]
+   },
+   "yb": {
+    "type": "boolean",
+    "bool": [
+     0,
+     0,
+     1,
+     1,
+     "... 60 more"
+    ]
+   }
+  },
+  "metrics": {
+   "nsteps": 64,
+   "nblocks": 13,
+   "engine": "c"
+  },
+  "hw": {
+   "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+  },
+  "hw_default": true,
+  "timing_ms": {
+   "compile": 17.609,
+   "run": 17.853
+  },
+  "diagnostics": {
+   "summary": {
+    "blocks_wrapped": [],
+    "blocks_saturated": [],
+    "total_wraps": 0,
+    "total_saturations": 0,
+    "blocks_divided_by_zero": [],
+    "first_event": null
+   },
+   "definition": "an event = a value leaving the type of one of the block's quantisation points (its output, accumulator, product or cast) at that step, then wrapped or saturated as the block specifies (a Discrete-Time Integrator's state update at the step it was made); a block can count several per step; a counter's designed wrap-around is not an event; a division by zero (saturated by the dividend's sign) is counted apart; min / max = the block's output over the run",
+   "blocks": {
+    "C": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,16,14)",
+     "min": 0.25,
+     "max": 0.25,
+     "stored_min": 4096,
+     "stored_max": 4096
+    },
+    "DL": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,12,10)",
+     "min": 0.0,
+     "max": 0.8603515625,
+     "stored_min": 0,
+     "stored_max": 881
+    },
+    "G": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,20,16)",
+     "min": -2.249908447265625,
+     "max": 2.248992919921875,
+     "stored_min": -147450,
+     "stored_max": 147390
+    },
+    "SAT": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,20,16)",
+     "min": -1.5,
+     "max": 1.5,
+     "stored_min": -98304,
+     "stored_max": 98304
+    },
+    "L": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,16,14)",
+     "min": -0.86004638671875,
+     "max": 0.8599853515625,
+     "stored_min": -14091,
+     "stored_max": 14090
+    },
+    "AB": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,24,20)",
+     "min": 0.0,
+     "max": 0.86004638671875,
+     "stored_min": 0,
+     "stored_max": 901824
+    },
+    "P": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,24,20)",
+     "min": -0.2150115966796875,
+     "max": 0.214996337890625,
+     "stored_min": -225456,
+     "stored_max": 225440
+    },
+    "R": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "boolean",
+     "min": 0.0,
+     "max": 1.0
+    },
+    "SW": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,24,20)",
+     "min": 0.0,
+     "max": 0.86004638671875,
+     "stored_min": 0,
+     "stored_max": 901824
+    },
+    "DTC": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,12,10)",
+     "min": 0.0,
+     "max": 0.8603515625,
+     "stored_min": 0,
+     "stored_max": 881
+    }
+   }
+  },
+  "input_sha256": "f1d840ea4df007077e5804766457c7f25bcbeff5ccb8502d231046fd47caa367"
+ }
+}

@@ -1,0 +1,94 @@
+function check___MODEL__(reference)
+% Compare the saved flat SLX itself with the recorded scalar streams.
+here=fileparts(mfilename('fullpath')); mdl='__MODEL__';
+io=jsondecode(fileread(fullfile(here,[mdl '_io.json'])));
+mf=jsondecode(fileread(fullfile(here,[mdl '_manifest.json'])));
+entry=fullfile(here,[mdl '.slx']);
+assert(strcmp(io.model_sha256,filehash(entry)));
+assert(strcmp(mf.files.(matlab.lang.makeValidName([mdl '_io.json'])),filehash(fullfile(here,[mdl '_io.json']))));
+assert(isequal(numel(mf.outputs),numel(io.outputs)),'Manifest and I/O disagree on output count.');
+for k=1:numel(io.outputs)
+    y=item(io.outputs,k); o=item(mf.outputs,k);
+    assert(strcmp(o.port,y.port) && y.index==k && strcmp(o.type,y.type) && o.width==y.width ...
+        && o.samples==numel(y.t) && isequal(o.period,y.period) && isequal(o.offset,y.offset), ...
+        'Manifest output binding or clock differs from the saved I/O.');
+end
+assert(~bdIsLoaded(mdl),'Run in a fresh session to verify the saved file.');
+actual=replay(entry,mdl,io);
+if nargin>0
+    [~,name,ext]=fileparts(reference); assert(strcmp(name,mdl) && strcmp(ext,'.slx'));
+    original=replay(reference,mdl,io);
+    disp('Both saved files reproduce every expected output bit and timestamp.');
+    if ~isequaln(actual.position,original.position), disp('Saved block positions differ.'); end
+    assert(isequaln(actual.blocks,original.blocks),'Root block types, dialog readbacks or port connections differ.');
+    assert(isequaln(actual.settings,original.settings),'Model settings differ.');
+end
+fprintf('PASS %s flat model output replay\n',mdl);
+end
+function design=replay(entry,mdl,io)
+load_system(entry); cleanup=onCleanup(@()close_system(mdl,0));
+f=get_param(mdl,'FileName'); assert(strcmp(char(java.io.File(f).getCanonicalPath()),char(java.io.File(entry).getCanonicalPath())));
+found=find_system(mdl,'SearchDepth',1,'Type','Block'); found=sort(found(:));
+design.blocks=cell(numel(found),1); design.position=cell(numel(found),1);
+for j=1:numel(found)
+    b=found{j}; keys=sort(fieldnames(get_param(b,'DialogParameters'))); values=cell(size(keys));
+    for q=1:numel(keys), values{q}=get_param(b,keys{q}); end
+    ph=get_param(b,'PortHandles'); edges=cell(numel(ph.Inport),1);
+    for q=1:numel(edges)
+        ln=get_param(ph.Inport(q),'Line');
+        if ln~=-1
+            h=get_param(ln,'SrcPortHandle');
+            edges{q}={get_param(h,'Parent'),get_param(h,'PortNumber')};
+        end
+    end
+    design.blocks{j}={b,get_param(b,'BlockType'),get_param(b,'ReferenceBlock'),keys,values,edges};
+    design.position{j}=get_param(b,'Position');
+end
+keys={'Solver','SolverType','FixedStep','StartTime','StopTime','SaveOutput','SaveTime','SaveState',...
+      'SaveFormat','OutputSaveName','TimeSaveName','SignalLogging','SignalLoggingName',...
+      'DataTypeOverride','MinMaxOverflowLogging','LoadExternalInput','ExternalInput'};
+design.settings=cellfun(@(k)get_param(mdl,k),keys,'UniformOutput',false);
+in=Simulink.SimulationInput(mdl);
+ds=Simulink.SimulationData.Dataset;
+for j=1:numel(io.inputs)
+    x=item(io.inputs,j); t=double(x.t(:)); bins=cellstr(string(x.bins(:)));
+    if isfield(x,'type') && strcmp(x.type,'boolean')
+        data=logical(strcmp(bins,'1'));
+    else
+        data=fi(zeros(numel(t),1),x.s,x.wl,x.fl); data.bin=char(bins);
+    end
+    ts=timeseries(data,t);
+    if strcmp(x.source,'simulink/Sources/From Workspace')
+        in=in.setVariable(x.variable,ts);
+    else
+        ds=ds.addElement(ts,x.port);
+    end
+end
+if ds.numElements>0, in=in.setExternalInput(ds); end
+in=in.setModelParameter('SaveFormat','Dataset','SaveOutput','on','OutputSaveName','yout','ReturnWorkspaceOutputs','on');
+result=sim(in);
+assert(result.yout.numElements==numel(io.outputs),'Output count differs');
+for j=1:numel(io.outputs)
+    y=item(io.outputs,j); assert(y.width==1 && isempty(y.part));
+    el=result.yout.getElement(y.index); assert(strcmp(el.BlockPath.getBlock(1),[mdl '/' y.port]));
+    v=el.Values; assert(isequal(v.Time,double(y.t(:))),'Time mismatch');
+    assert(isequal(size(v.Data),[numel(y.t) 1]),'Data shape mismatch');
+    if strcmp(y.type,'boolean')
+        assert(islogical(v.Data)); bits=cellstr(char(double(v.Data)+'0'));
+    else
+        q=v.Data; if isinteger(q), q=fi(q); end
+        assert(isfi(q) && isreal(q));
+        assert(strcmp(sprintf('%d,%d,%d',q.Signed,q.WordLength,q.FractionLength),y.type),'Type mismatch');
+        bits=cellstr(bin(q));
+    end
+    assert(isequal(bits(:),cellstr(string(y.bins(:)))),'Stored bits mismatch');
+end
+end
+function v=item(rows,k)
+if iscell(rows), v=rows{k}; else, v=rows(k); end
+end
+function h=filehash(p)
+fid=fopen(p,'rb'); assert(fid>=0); done=onCleanup(@()fclose(fid));
+md=java.security.MessageDigest.getInstance('SHA-256'); md.update(fread(fid,inf,'*uint8'));
+h=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2).',1,[]));
+end

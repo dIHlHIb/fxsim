@@ -1,0 +1,87 @@
+{
+ "design": {
+  "blocks": {
+   "x": {
+    "type": "Inport"
+   },
+   "B": {
+    "type": "Gain",
+    "Gain": "0.3",
+    "ParamDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "S": {
+    "type": "Sum",
+    "Inputs": "++",
+    "AccumDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "D": {
+    "type": "UnitDelay",
+    "InitialCondition": "0"
+   },
+   "A": {
+    "type": "Gain",
+    "Gain": "0.7",
+    "ParamDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "y": {
+    "type": "Outport"
+   }
+  },
+  "lines": [
+   {
+    "src": "x",
+    "dst": "B"
+   },
+   {
+    "src": "B",
+    "dst": "S",
+    "dport": 1
+   },
+   {
+    "src": "A",
+    "dst": "S",
+    "dport": 2
+   },
+   {
+    "src": "S",
+    "dst": "D"
+   },
+   {
+    "src": "D",
+    "dst": "A"
+   },
+   {
+    "src": "S",
+    "dst": "y"
+   }
+  ]
+ },
+ "inputs": {
+  "x": {
+   "kind": "sine",
+   "amplitude": 0.9,
+   "omega": 0.02,
+   "n": 4096,
+   "type": {
+    "s": 1,
+    "wl": 12,
+    "fl": 11
+   }
+  }
+ },
+ "error": {
+  "max_abs": 0.001953125
+ },
+ "cost": {
+  "fpga_xc7": 1
+ },
+ "hw": {
+  "ProdHWDeviceType": "ASIC/FPGA"
+ },
+ "time_budget_s": 20,
+ "time_limit_s": 120,
+ "workers": 2
+}

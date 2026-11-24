@@ -1,0 +1,82 @@
+{
+ "design": {
+  "blocks": {
+   "x": {
+    "type": "Inport"
+   },
+   "F": {
+    "type": "DiscreteFir",
+    "Coefficients": "[0.02 0.06 0.16 0.26 0.26 0.16 0.06 0.02]",
+    "CoefDataTypeStr": "fixdt(1,16,15)",
+    "ProductDataTypeStr": "fixdt(1,32,29)",
+    "AccumDataTypeStr": "fixdt(1,32,29)",
+    "OutDataTypeStr": "fixdt(1,32,29)",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "y": {
+    "type": "Outport"
+   }
+  },
+  "lines": [
+   {
+    "src": "x",
+    "dst": "F"
+   },
+   {
+    "src": "F",
+    "dst": "y"
+   }
+  ]
+ },
+ "inputs": {
+  "x": {
+   "kind": "sine",
+   "amplitude": 0.9,
+   "omega": 0.05,
+   "n": 2048,
+   "type": {
+    "s": 1,
+    "wl": 16,
+    "fl": 14
+   }
+  }
+ },
+ "input_ranges": {
+  "x": {
+   "type": {
+    "s": 1,
+    "wl": 16,
+    "fl": 14
+   },
+   "min": -0.9000244140625,
+   "max": 0.9
+  }
+ },
+ "error": {
+  "max_abs": 0.0009765625
+ },
+ "wordlengths": [
+  4,
+  6,
+  8,
+  10,
+  12,
+  14,
+  16,
+  18,
+  20,
+  24,
+  28,
+  32
+ ],
+ "block_wordlengths": {
+  "F": [
+   2,
+   16
+  ]
+ },
+ "time_budget_s": 2,
+ "workers": 2,
+ "time_limit_s": 2.5
+}

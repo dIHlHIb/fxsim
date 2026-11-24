@@ -1,0 +1,45 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxslx < <skill dir>/examples/06_slx_list.json",
+ "exit_code": 0,
+ "wall_s": 0.461,
+ "note": "Observed after generating the FIR model with example 05 in this release.",
+ "stdout": {
+  "status": "ok",
+  "file_sha256": "ef614c91189972e91dac30fa6365f7f835b56ad0820ffcda681d4f52f245e336",
+  "top_level": [
+   {
+    "name": "DUT",
+    "type": "SubSystem",
+    "inputs": {
+     "1": {
+      "block": "src_x",
+      "port": 1
+     }
+    }
+   },
+   {
+    "name": "src_x",
+    "type": "FromWorkspace",
+    "params": {
+     "Interpolate": "off",
+     "OutputAfterFinalValue": "Holding final value",
+     "SampleTime": "1",
+     "VariableName": "fir8_opt_in1"
+    }
+   },
+   {
+    "name": "y",
+    "type": "Outport",
+    "params": {
+     "SampleTime": "1"
+    }
+   }
+  ],
+  "subsystems": [
+   "DUT"
+  ],
+  "unsupported": [],
+  "params_note": "parameters as written in the file (and its block defaults); a parameter the file omits has the block's Simulink default value",
+  "input_sha256": "67d9aade05e411296f2980ea100d6630d651edfc3955ded34f993929f1b7663d"
+ }
+}

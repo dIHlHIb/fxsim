@@ -1,0 +1,1314 @@
+#!/usr/bin/env -S python3 -I
+"""fxopt: AI-native word-length optimiser for cascaded fixed-point FIR chains.
+
+Reads one JSON request on stdin (or from the file given as the only argument), writes one JSON
+result on stdout. Every bit-exact candidate evaluation is appended to <run_dir>/candidates.jsonl.
+Schema and algorithm: docs/en/OPTIMIZER.md.
+"""
+import hashlib
+import json
+import re
+import math
+import os
+import subprocess
+import sys
+import threading
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import fxopt_lib as L  # noqa: E402
+import fxgraph_lib as G  # noqa: E402 -- error records: refusal_kind / next_step
+
+RUNS = os.path.join(ROOT, "runs")
+ERRLOG = os.path.join(RUNS, "fxopt_errors.jsonl")
+VERSION = "fxopt-1"
+
+
+def cpu_limit():
+    n = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
+    try:  # cgroup v2 quota (containers)
+        q, p = open("/sys/fs/cgroup/cpu.max").read().split()
+        if q != "max":
+            n = min(n, max(1, int(int(q) // int(p))))
+    except (OSError, ValueError):
+        pass
+    # a cap for the default on a shared machine (scripts that do not write "workers" themselves,
+    # e.g. the regression check); the request's own "workers" still wins. Results do not depend on it.
+    cap = os.environ.get("FXOPT_WORKERS", "").strip()
+    if cap.isdigit() and int(cap) >= 1:
+        n = min(n, int(cap))
+    return n
+
+
+def breakdown(pb, wl):
+    b = {"gain_out": 0, "gain_param": 0, "sum_accum": 0, "sum_out": 0,
+         "unit_delay": (pb.nt - 1) * pb.xt[1], "input_port": pb.xt[1]}
+    for s in range(pb.ns):
+        o = s * pb.nvar_stage
+        b["gain_param"] += sum(wl[o:o + pb.nt])
+        b["gain_out"] += sum(wl[o + pb.nt:o + 2 * pb.nt])
+        b["sum_accum"] += wl[o + 2 * pb.nt]
+        b["sum_out"] += wl[o + 2 * pb.nt + 1]
+        if s + 1 < pb.ns:
+            b["unit_delay"] += (pb.nt - 1) * wl[o + 2 * pb.nt + 1]
+    b["total"] = sum(b.values())
+    return b
+
+
+def strict_max_err(where, ov, want_type, ref, nsteps):
+    """max |y - ref| only after checking that the re-simulated output has the solution's type and
+    exactly nsteps in-range integer samples, and that the reference has nsteps finite values."""
+    got = (ov.get("s"), ov.get("wl"), ov.get("fl"))
+    if tuple(want_type) != got:
+        raise L.OptError("VERIFY_FAILED", where, "re-simulated output type %s differs from the solution's %s"
+                         % (got, tuple(want_type)))
+    ints = ov.get("ints")
+    if not isinstance(ints, list) or len(ints) != nsteps:
+        raise L.OptError("VERIFY_FAILED", where, "re-simulated output has %s samples, expected %d"
+                         % (len(ints) if isinstance(ints, list) else "no", nsteps))
+    if len(ref) != nsteps or not all(math.isfinite(y) for y in ref):
+        raise L.OptError("VERIFY_FAILED", where, "reference has %d samples (expected %d) or non-finite values"
+                         % (len(ref), nsteps))
+    s_, w_, f_ = want_type
+    lo, hi = (-(1 << (w_ - 1)), (1 << (w_ - 1)) - 1) if s_ else (0, (1 << w_) - 1)
+    if not all(isinstance(v, int) and not isinstance(v, bool) and lo <= v <= hi for v in ints):
+        raise L.OptError("VERIFY_FAILED", where, "re-simulated output has values outside its type")
+    sc = 2.0 ** -f_
+    md, at = 0.0, 0
+    from fractions import Fraction
+    for i, (v, y) in enumerate(zip(ints, ref)):
+        # a value with more than 53 significant bits is compared exactly, not through double
+        d = abs(v * sc - y) if float(v) == v else float(abs(Fraction(v) * Fraction(2) ** -f_ - Fraction(y)))
+        if d > md:
+            md, at = d, i
+    return md, at
+
+
+def _fixdt_tuple(text):
+    import re
+    m = re.match(r"^fixdt\((\d+),\s*(\d+),\s*(-?\d+)\)$", text.strip())
+    if not m:
+        raise L.OptError("INTERNAL", "solution", "solution type %r is not fixdt(s,w,f)" % text)
+    return int(m.group(1)), int(m.group(2)), int(m.group(3))
+
+
+def verify_independent(pb, blocks, yref):
+    """Re-simulate the final solution with the validated fxchain CLI (separate front-end and planner)
+    and compare with the pure-Python double reference."""
+    req = {"design": {"nstages": pb.ns, "ntaps": pb.nt}, "blocks": blocks,
+           "x": {"s": pb.xt[0], "wl": pb.xt[1], "fl": pb.xt[2], "ints": pb.x}, "outputs": "final"}
+    p = subprocess.run([os.path.join(HERE, "fxchain")], input=json.dumps(req).encode(), capture_output=True,
+                       timeout=600)
+    lines = p.stdout.decode().splitlines()
+    if p.returncode != 0 or len(lines) != 1:
+        raise L.OptError("VERIFY_FAILED", "engine/fxchain", "fxchain exited with code %d and %d result lines"
+                         % (p.returncode, len(lines)))
+    try:
+        o = json.loads(lines[0])
+    except ValueError:
+        raise L.OptError("VERIFY_FAILED", "engine/fxchain", "fxchain result is not JSON")
+    if o.get("status") != "ok":
+        raise L.OptError("VERIFY_FAILED", "engine/fxchain", "fxchain error %s: %s" % (o.get("code"), o.get("message")))
+    outs = o.get("outputs") or {}
+    ft = outs.get("final_type") or {}
+    want = _fixdt_tuple(blocks["Acc%d" % pb.ns]["OutDataTypeStr"])
+    md, at = strict_max_err("engine/fxchain", dict(ft, ints=outs.get("final")), want, yref, len(pb.x))
+    summ = outs.get("stages_summary") or []
+    if len(summ) != pb.ns:
+        raise L.OptError("VERIFY_FAILED", "engine/fxchain", "%d stage summaries, expected %d" % (len(summ), pb.ns))
+    return md, at, summ[-1]["fnv1a64"]
+
+
+WALL_START = [time.time()]  # wall-clock start of the request being solved (set per request)
+CURRENT_RUN = {}  # run directory of the request being solved (for the failure state), reset per request
+
+
+def _atomic_json(path, obj):
+    tmp = "%s.tmp%d" % (path, os.getpid())
+    with open(tmp, "w") as f:
+        json.dump(obj, f)
+        f.write("\n")
+    os.replace(tmp, path)
+
+
+def open_run_dir(req, sha):
+    """every execution gets its own attempt id and an exclusively created directory. An explicit
+    log_dir must not exist yet (no silent append / overwrite; there is no resume)."""
+    attempt = "%s-%s-%d-%s" % (time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()), sha[:16], os.getpid(),
+                               os.urandom(4).hex())
+    explicit = req.get("log_dir")
+    if explicit is not None and not isinstance(explicit, str):
+        raise L.OptError("BAD_PARAM", "log_dir", "directory path string required")
+    if explicit and not os.path.isabs(explicit):   # relative to the project directory, whatever the cwd
+        explicit = os.path.join(os.path.dirname(RUNS), explicit)
+    run_dir = os.path.abspath(explicit if explicit else os.path.join(RUNS, "fxopt", sha[:16], attempt))
+    if not (run_dir + os.sep).startswith(os.path.abspath(RUNS) + os.sep):
+        raise L.OptError("BAD_PARAM", "log_dir", "log_dir must be inside runs/")
+    os.makedirs(os.path.dirname(run_dir), exist_ok=True)
+    try:
+        os.mkdir(run_dir)
+    except FileExistsError:
+        raise L.OptError("LOG_DIR_EXISTS", "log_dir", "%s already exists; every run needs a new directory (there "
+                         "is no resume)" % os.path.relpath(run_dir, ROOT))
+    # the first directory of a request is the request's (its result.json is the final answer); the re-optimisations'
+    # directories are passes (second cold start: the top-level result.json kept a solution the error search
+    # had rejected and state.json stayed "running")
+    first = not CURRENT_RUN
+    if first:
+        CURRENT_RUN.update(dir=run_dir, attempt=attempt, sha=sha, passes=[], t0=time.monotonic(),
+                           phase="optimisation", extra={})
+    else:
+        CURRENT_RUN["passes"].append(run_dir)
+    _atomic_json(os.path.join(run_dir, "state.json"), {"attempt_id": attempt, "request_sha256": sha,
+                                                        "state": "running", "pid": os.getpid(),
+                                                        "phase": "optimisation" if run_dir == CURRENT_RUN["dir"]
+                                                        else "re-optimisation (pass)", "elapsed_s": 0.0,
+                                                        "heartbeat_s": HEARTBEAT_S})
+    if first:
+        _start_heartbeat()
+    with open(os.path.join(run_dir, "request.json"), "x") as f:
+        json.dump(req, f)
+    return run_dir, attempt
+
+
+# state.json of a running request is rewritten at every phase change and at least every HEARTBEAT_S seconds
+# (during a long first pass it kept its initial snapshot, so a running and a stuck run looked alike)
+HEARTBEAT_S = float(os.environ.get("FXOPT_HEARTBEAT_S", "10"))
+_STATE_LOCK = threading.Lock()
+
+
+def _write_running_state():
+    run = CURRENT_RUN
+    if not run:
+        return
+    try:
+        _atomic_json(os.path.join(run["dir"], "state.json"),
+                     dict({"attempt_id": run["attempt"], "request_sha256": run["sha"], "state": "running",
+                           "pid": os.getpid(), "phase": run["phase"],
+                           "elapsed_s": round(time.monotonic() - run["t0"], 1), "heartbeat_s": HEARTBEAT_S},
+                          **run["extra"]))
+    except OSError:
+        pass
+
+
+def _start_heartbeat():
+    run = CURRENT_RUN
+    stop = threading.Event()
+    run["stop"] = stop
+
+    def beat():
+        while not stop.wait(HEARTBEAT_S):
+            with _STATE_LOCK:
+                if stop.is_set() or CURRENT_RUN.get("stop") is not stop:
+                    return
+                _write_running_state()
+    threading.Thread(target=beat, daemon=True).start()
+
+
+def set_phase(phase, **extra):
+    """Progress of the running request in its state.json (stdout stays silent for minutes)."""
+    with _STATE_LOCK:
+        if not CURRENT_RUN:
+            return
+        CURRENT_RUN["phase"], CURRENT_RUN["extra"] = phase, extra
+        _write_running_state()
+
+
+def close_run_dir(out):
+    """Final state of the request's run directory: result.json (atomic) = the final answer, state done / failed with
+    the final location; every pass directory is marked as an interim pass superseded by it."""
+    with _STATE_LOCK:   # no heartbeat may overwrite the final state
+        run = dict(CURRENT_RUN)
+        CURRENT_RUN.clear()
+        if run.get("stop"):
+            run["stop"].set()
+    if not run:
+        return
+    try:
+        final = os.path.relpath(os.path.join(run["dir"], "result.json"), ROOT)
+        if out.get("status") == "ok":
+            _atomic_json(os.path.join(run["dir"], "result.json"), out)
+            state = {"state": "done", "result": final}
+        else:
+            state = {"state": "failed", "code": out.get("code"), "message": out.get("message")}
+        state["elapsed_s"] = round(time.monotonic() - run["t0"], 1)
+        state["passes"] = [os.path.relpath(p, ROOT) for p in run.get("passes", [])]
+        _atomic_json(os.path.join(run["dir"], "state.json"),
+                     dict(state, attempt_id=run["attempt"], request_sha256=run["sha"], pid=os.getpid()))
+        for pdir in run.get("passes", []):
+            _atomic_json(os.path.join(pdir, "state.json"),
+                         {"state": "superseded", "note": "an interim pass of the request; the answer is stdout and "
+                          "%s" % (final if out.get("status") == "ok" else "the request failed"),
+                          "request_sha256": run["sha"], "pid": os.getpid()})
+    except OSError:
+        pass
+
+
+def _vector_solution(pb, blocks, d):
+    """Scalarised vector design -> solution on the original blocks (element 1 carries the block's types)."""
+    out, types = {}, {}
+    for name, (orig, k) in pb.vec_info["element"].items():
+        if k == 1 and orig in pb.spec_vec["blocks"] and name in blocks:
+            # the original block (its vector parameters and dimensions as given) with the chosen data types: the
+            # scalarised copy carried element 1's scalar Gain and the internal _GainVec, so the solution was not the
+            # proven design and fxgraph refused it (side finding); recordings: a
+            # vector Reshape / Data Type Duplicate has no block of its own in the optimised design (an identity and
+            # a sink, lowered away) and keeps its parameters below
+            out[orig] = dict(pb.spec_vec["blocks"][orig],
+                             **{kk: v for kk, v in blocks[name].items() if kk.endswith("DataTypeStr")})
+            if name in d.otype:
+                types[orig] = d.type_str(name)
+    for b, p in pb.spec_vec["blocks"].items():   # Mux / Demux / Selector stay as they were
+        out.setdefault(b, dict(p))
+    return {"blocks": out, "compiled_types": types,
+            "vectors": {"scalarised_blocks": len(blocks), "note": "elements of one block share its data types"}}
+
+
+def H_MODEL_VERSION():
+    try:
+        with open(os.path.join(HERE, "hwcost_model.json")) as f:
+            return json.load(f).get("version", 1)
+    except (OSError, ValueError):
+        return "?"
+
+
+def envelope_ranges(req, stored=None, given_only=False):
+    """{Inport: {type, min, max}} = the stored-integer envelope of every given input set (min / max per Inport);
+    stored (a dict) receives the exact stored min / max."""
+    import fxgopt_lib as GL
+    pb = GL.GraphProblem({k: v for k, v in req.items() if k != "ranges_from_inputs"})
+    out = {}
+    for x in pb.d0.inports:
+        t = pb.in_types[x]
+        if not isinstance(t, tuple):
+            return None   # boolean inputs: no range
+        vals = [v for sc in pb.scenarios for v in sc["ints"][x]
+                if "~" not in sc["label"] or not given_only]   # G9 variants: part of the envelope, not "given"
+        if not vals:
+            return None
+        # in doubles a 64-bit envelope 2^62 + 1040 came out 2^62 + 1024 -- narrower than the inputs.
+        # An int where the value is one, a float where that is exact, else a float rounded outward (min down, max up):
+        # the range the proof covers always contains every given input
+        out[x] = {"type": {"s": t[0], "wl": t[1], "fl": t[2]}, "min": _outward(min(vals), t[2], -1),
+                  "max": _outward(max(vals), t[2], 1)}
+        if stored is not None:
+            stored[x] = (min(vals), max(vals))
+    return out
+
+
+def _outward(n, f, direction):
+    """n * 2^-f as an int if integral, else a float, rounded away from the inside (direction -1: down, +1: up)."""
+    import math
+    from fractions import Fraction
+    v = Fraction(n) / Fraction(2) ** f
+    if v.denominator == 1:
+        return int(v)
+    x = float(v)
+    while (Fraction(x) > v) if direction < 0 else (Fraction(x) < v):
+        x = math.nextafter(x, -math.inf if direction < 0 else math.inf)
+    return x
+
+
+def inputs_outside_ranges(req, ranges):
+    """{Inport: {stored min, max of the given inputs, stored range}} for every Inport whose given input values leave
+    input_ranges (second cold start: a sine through a Floor conversion reaches floor(-0.9 * 2^14) = -14746,
+    one below the stored range of min -0.9)."""
+    try:
+        exact = {}
+        env = envelope_ranges(req, exact, given_only=True)
+        _t, rng = _range_ints(ranges)
+    except (L.OptError, KeyError, TypeError, ValueError):
+        return {}
+    out = {}
+    for x, e in (env or {}).items():
+        if x not in rng:
+            continue
+        lo, hi = exact[x]   # the given inputs' exact stored min / max (round() of doubles before)
+        if lo < rng[x][0] or hi > rng[x][1]:
+            out[x] = {"given_stored_min": lo, "given_stored_max": hi, "range_stored": list(rng[x])}
+    return out
+
+
+def _range_ints(ranges):
+    """{Inport: {type, min, max}} -> ({Inport: (s, wl, fl)}, {Inport: (stored lo, stored hi)})."""
+    import math
+    types, ints = {}, {}
+    for x, r in ranges.items():
+        t = r["type"]
+        types[x] = (t["s"], t["wl"], t["fl"])
+        ints[x] = L.stored_range(r["min"], r["max"], t["fl"])   # exact (doubles when fl < 0)
+    return types, ints
+
+
+def req_log_dir(q):
+    """The caller's log_dir without any reopt_<k> suffix already added."""
+    d = q["log_dir"].rstrip("/")
+    return re.sub(r"/reopt_\d+$", "", d)
+
+
+MARGIN_ROUNDS = 2   # fallback re-optimisations with a tightened tolerance after the 2 counterexample rounds
+
+
+def _scaled_error(err, f):
+    """The error request with every tolerance multiplied by f (max_abs and per-outport values)."""
+    e = dict(err)
+    if "max_abs" in e:
+        e["max_abs"] = float(e["max_abs"]) * f
+    elif "outports" not in e:
+        e["max_abs"] = 2.0 ** -10 * f
+    if isinstance(e.get("outports"), dict):
+        e["outports"] = {o: float(v) * f for o, v in e["outports"].items()}
+    return e
+
+
+def error_search_loop(q, res, ranges, sha, t_start, budget, workers, seed, max_rounds, flag):
+    """Worst-case error search (engine/fxerrsearch.py) on the range-mode solution: a sequence inside the ranges
+    whose error exceeds the tolerance is added to the input sets and the design re-optimised (at most 2 times); if a
+    sequence over the tolerance still remains, up to MARGIN_ROUNDS more re-optimisations use every counterexample and
+    a tolerance divided by the worst ratio seen (the search keeps judging against the requested tolerance).
+    The search is reported in res["error_search"]; the error guarantee stays "sampled" unless a sequence over the
+    tolerance remains, then it is "violated", or the search was exhaustive over the range and found none, then it is
+    "exhaustive". Also run when range mode refused the design (the search needs only
+    the input ranges, not a range proof)."""
+    import fxerrsearch as ES
+    if flag is False:
+        res["error_search"] = {"status": "off (error_search: false)"}
+        return res
+    if q.get("reference", "ideal") != "ideal":
+        res["error_search"] = {"status": "skipped (reference is a design, not ideal)"}
+        return res
+    if len(ranges) > 1 and res.get("solution", {}).get("multirate"):
+        res["error_search"] = {"status": "skipped (multirate design with several inputs)"}
+        return res
+    try:
+        types, ints = _range_ints(ranges)
+    except (KeyError, TypeError, ValueError):
+        res["error_search"] = {"status": "skipped (ranges not in {type, min, max} form)"}
+        return res
+    rounds, added, cap_hit = [], 0, False
+    # time budget rule (second cold start: the last re-optimisation got the leftover ~110 s, no refinement,
+    # +19.6 % cost, and the overrun was reported only inside that pass): time_budget_s is for the whole request; a
+    # re-optimisation gets the rest of it, but never less than the first pass took; the overrun, if any, is reported
+    # at the top level (res["time"])
+    first_pass_s = max(1.0, time.monotonic() - t_start)
+    passes = [{"pass": "optimisation", "seconds": round(first_pass_s, 1),
+               "budget_exhausted": bool(res.get("search", {}).get("budget_exhausted"))}]
+    q_judge = q            # the search always judges against the requested tolerance (x stress_tolerance_scale)
+    sk_ = float(q.get("stress_tolerance_scale", 1))
+    if sk_ != 1:
+        e_ = dict(q.get("error") or {})
+        if "max_abs" in e_ or "outports" not in e_:
+            e_["max_abs"] = float(e_.get("max_abs", 2.0 ** -10)) * sk_
+        if isinstance(e_.get("outports"), dict):
+            e_["outports"] = {o: float(v) * sk_ for o, v in e_["outports"].items()}
+        q_judge = dict(q, error=e_, stress_tolerance_scale=1)   # already in the tolerances: not applied twice
+    margin = 1.0           # margin rounds re-optimise against a tolerance divided by this
+    last_seq = None
+    unsearched = False
+    limit = q.get("time_limit_s")   # a cap on the whole request, error search included
+    last_es_s = 0.0
+    for k in range(3 + MARGIN_ROUNDS):
+        st = {}
+        if limit is not None and k and time.monotonic() + last_es_s > t_start + limit:
+            # the previous round's counterexample was absorbed by the re-optimisation (res = res2): the plan passes
+            # it but is not searched again (reported as violated before)
+            rounds[-1]["stopped"] = "time_limit_s: the next error-search round would end after %g s" % limit
+            unsearched = True
+            break
+        set_phase("error search round %d" % (k + 1))
+        t_es = time.monotonic()
+        try:
+            ratio, seq = ES.search(q_judge, res["solution"]["blocks"], types, ints, seed=seed + k, stats=st,
+                                   workers=workers or cpu_limit())
+            passes.append({"pass": "error search %d" % (k + 1), "seconds": round(time.monotonic() - t_es, 1)})
+            last_es_s = time.monotonic() - t_es
+            cap_hit |= bool(st.get("cap_hit"))
+        except (L.OptError, ES.G.GraphError) as e:
+            passes.append({"pass": "error search %d" % (k + 1), "seconds": round(time.monotonic() - t_es, 1),
+                           "failed": "%s" % str(e)})
+            res["error_search"] = {"status": "skipped (%s)" % str(e), "rounds": rounds}
+            return _time_block(res, t_start, budget, passes)
+        if not math.isfinite(ratio):
+            # the ideal reference is undefined (x / x at x = 0) somewhere inside the ranges -- refused
+            # as for training inputs, never promised as "exhaustive"
+            ex = {x: (v[:8] if isinstance(v, list) else v) for x, v in (seq or {}).items()}
+            raise L.OptError("REFERENCE_NOT_FINITE", "inputs", "the error search found inputs inside the ranges where "
+                             "the ideal double-precision reference is not finite (division by zero?): stored "
+                             "integers %s; narrow the input ranges or change the design" % json.dumps(ex)[:300])
+        rounds.append({"worst_error_over_tolerance": round(ratio, 6), "counterexample": seq is not None,
+                       "exhaustive_over_range": bool(st.get("exhaustive"))})
+        ws_ = seq if seq is not None else st.get("worst_seq")
+        if ws_:
+            # the round's worst input in fxgraph's inputs form (replayable), also within the tolerance
+            rounds[-1]["worst_input"] = {x: {"s": types[x][0], "wl": types[x][1], "fl": types[x][2],
+                                             "ints": list(ws_[x])} for x in types if x in ws_}
+        st.pop("worst_seq", None)
+        last_seq = seq
+        if margin > 1.0:
+            rounds[-1]["after_margin"] = round(margin, 6)
+        if seq is None or k == 2 + MARGIN_ROUNDS:
+            break
+        sets = list(q.get("input_sets") or [])
+        if len(sets) + (1 if q.get("inputs") is not None else 0) >= 64:
+            break
+        sets.append({x: {"type": {"s": types[x][0], "wl": types[x][1], "fl": types[x][2]}, "ints": seq[x]}
+                     for x in types})
+        n_found = int(q.get("_n_search_sets", 0)) + 1   # the trailing sets are the search's own counterexamples
+        q = dict(q, input_sets=sets, _n_search_sets=n_found)
+        q_judge = dict(q_judge, input_sets=sets, _n_search_sets=n_found)
+        if k >= 2:
+            # Tighten the search tolerance by the worst observed ratio.
+            margin *= max(ratio, 1.05)
+            q = dict(q, error=_scaled_error(q_judge.get("error", {}), 1.0 / margin))
+            rounds[-1]["next"] = "margin re-optimisation, tolerance / %.4g" % margin
+        if q.get("log_dir"):
+            # Each re-optimisation requires a fresh log directory.
+            q = dict(q, log_dir=os.path.join(req_log_dir(q), "reopt_%d" % (k + 1)))
+        now = time.monotonic()
+        left = t_start + budget - now
+        pass_budget = max(left, first_pass_s)
+        if limit is not None and now + pass_budget + last_es_s > t_start + limit:
+            rounds[-1]["stopped"] = ("time_limit_s: a re-optimisation (at least %.0f s) and its check would end after "
+                                     "%g s" % (pass_budget, limit))
+            break
+        set_phase("re-optimisation %d" % (k + 1), pass_budget_s=round(pass_budget, 1))
+        try:
+            import fxgopt_lib as GL_
+            # Use a cold search for the final pass, including a pass cut short by the time limit.
+            last_chance = k == 1 + MARGIN_ROUNDS or (
+                limit is not None and now + 2 * (pass_budget + last_es_s) > t_start + limit)
+            auto = REOPT_MODE[0] == "auto" and not last_chance
+            if auto:
+                GL_.WARM_REOPT = True
+            try:
+                res2 = run_graph(q, sha, now, pass_budget, workers, seed, max_rounds, None,
+                                 warm=CURRENT_RUN.get("last_wl"))
+            finally:
+                if auto:
+                    GL_.WARM_REOPT = False
+            passes.append({"pass": "re-optimisation %d" % (k + 1), "seconds": round(time.monotonic() - now, 1),
+                           "budget_s": round(pass_budget, 1), "given_minimum": left < first_pass_s,
+                           "budget_exhausted": bool(res2.get("search", {}).get("budget_exhausted")),
+                           "warm_start": res2.get("search", {}).get("warm_start")})
+            # "auto" (recordings 20:20): the warm start is kept when it costs at most AUTO_RISE more than
+            # the plan before the counterexample; else a cold re-optimisation follows and the cheaper plan wins
+            c_prev, c_warm = (res.get("cost") or {}).get("value"), (res2.get("cost") or {}).get("value")
+            if auto and isinstance(c_prev, (int, float)) and isinstance(c_warm, (int, float)) and \
+                    c_warm > c_prev * (1 + AUTO_RISE):
+                now2 = time.monotonic()
+                if limit is None or now2 + pass_budget + last_es_s <= t_start + limit:
+                    # the cold pass gets its own log_dir (it shared reopt_N with the warm one and failed
+                    # with LOG_DIR_EXISTS, silently)
+                    q3 = dict(q, log_dir=q["log_dir"] + "_cold") if q.get("log_dir") else q
+                    try:
+                        res3 = run_graph(q3, sha, now2, pass_budget, workers, seed, max_rounds, None, warm=None)
+                        passes.append({"pass": "re-optimisation %d (cold, warm cost %.0f > %.0f x %.2f)"
+                                       % (k + 1, c_warm, c_prev, 1 + AUTO_RISE),
+                                       "seconds": round(time.monotonic() - now2, 1), "budget_s": round(pass_budget, 1),
+                                       "budget_exhausted": bool(res3.get("search", {}).get("budget_exhausted"))})
+                        c_cold = (res3.get("cost") or {}).get("value")
+                        if isinstance(c_cold, (int, float)) and c_cold < c_warm:
+                            res2 = res3
+                    except L.OptError as e:   # the warm plan stands; the failed cold pass is recorded
+                        passes.append({"pass": "re-optimisation %d (cold)" % (k + 1),
+                                       "seconds": round(time.monotonic() - now2, 1), "failed": e.code})
+        except L.OptError as e:   # the counterexample cannot be met (e.g. wider than the word-length set)
+            rounds[-1]["re_optimisation_failed"] = "%s: %s" % (e.code, e.message[:200])
+            passes.append({"pass": "re-optimisation %d" % (k + 1), "seconds": round(time.monotonic() - now, 1),
+                           "budget_s": round(pass_budget, 1), "failed": e.code})
+            break
+        res = res2
+        added += 1
+    last = rounds[-1]
+    open_cex = last["counterexample"] and not unsearched
+    res["error_search"] = {
+        "status": ("stopped by time_limit_s after %d re-optimisations: the plan passes every sequence found so far, "
+                   "but was not searched again" % added) if unsearched else
+                  ("no sequence over the tolerance found" + (" (after a precision margin: tolerance / %.4g in the "
+                                                             "re-optimisation)" % margin if margin > 1.0 else ""))
+                  if not last["counterexample"] else
+                  "a sequence over the tolerance remains after %d re-optimisations" % added,
+        "margin": round(margin, 6),
+        "counterexamples_added": added, "rounds": rounds,
+        "work": "24 starts x up to 16 hill-climb rounds per search (fixed, independent of machine load)",
+        "safety_stop_hit": cap_hit,
+        "method": ("every stored input value of the range (one input; a memoryless design, or input-independent counters covered over their whole period): exact over the range"
+                   if rounds and rounds[-1].get("exhaustive_over_range") else
+                   "hill-climb over input windows inside the ranges (engine/fxerrsearch.py); heuristic, not a proof")}
+    if open_cex:
+        # Report the violation in both error_search and the error guarantee.
+        res["status_note"] = "error search found an input inside the ranges over the tolerance; see error_search"
+        g = res.setdefault("guarantees", {}).setdefault("error", {})
+        g["status"] = "violated"
+        g["violation"] = {"worst_error_over_tolerance": last["worst_error_over_tolerance"],
+                          "found_by": "error_search", "inside": "input ranges",
+                          "re_optimisation": rounds[-1].get("re_optimisation_failed") or "not attempted / exhausted"}
+        if last_seq is not None:
+            # the error reporting contract: the counterexample input itself, ready to replay (fxgraph inputs form)
+            g["violation"]["counterexample_input"] = {
+                x: {"s": types[x][0], "wl": types[x][1], "fl": types[x][2], "ints": list(last_seq[x])} for x in types}
+        # the binding constraint is the violation, not the judged sets
+        res["binding"] = {"source": "error_search", "input_set": "guarantees.error.violation.counterexample_input",
+                          "error_over_tolerance": last["worst_error_over_tolerance"],
+                          "outport": None, "note": "worst over the judged outports (normalised to each tolerance)",
+                          "judged_sets_binding": res.get("binding")}
+    elif last.get("exhaustive_over_range") and not last["counterexample"] and not unsearched and not cap_hit:
+        # every stored input value of the range was tried on the final plan (a memoryless design
+        # with one input, or one driven by a counter whose period was covered) and none exceeds the tolerance -- the
+        # error bound holds for every input inside the range, not only on the given sets
+        g = res.setdefault("guarantees", {}).setdefault("error", {})
+        g["status"] = "exhaustive"
+        g["claim"] = ("max_abs_diff <= tolerance for every judged outport and every input inside input_ranges: the "
+                      "error search tried every stored input value of the range on this plan (%s)"
+                      % res["error_search"]["method"])
+    if cap_hit:
+        res["deterministic"] = False   # the safety stop cut a search short: the result depends on machine load
+    return _time_block(res, t_start, budget, passes)
+
+
+TIME_RULE = ("time_budget_s bounds the optimisation passes: each re-optimisation gets the rest of the budget but at "
+             "least as long as the first pass took; the error search rounds are a fixed amount of work (same result "
+             "on any machine), not cut by the budget, timed here (error_search_s); time_limit_s, when given, caps "
+             "the request: no error-search round or re-optimisation is started that would end after it (estimated "
+             "from the previous round), and the stop is reported in error_search.rounds")
+
+
+def _time_block(res, t_start, budget, passes):
+    """The request's time report (every path, including a failed error search or re-optimisation
+    and runs without an error search, reports it)."""
+    elapsed = time.monotonic() - t_start
+    res["time"] = {"time_budget_s": budget, "elapsed_s": round(elapsed, 1),
+                   "over_budget_s": round(max(0.0, elapsed - budget), 1),
+                   "rule": TIME_RULE,
+                   "passes": passes,
+                   "any_pass_budget_exhausted": any(p_.get("budget_exhausted") for p_ in passes),
+                   "error_search_s": round(sum(p_["seconds"] for p_ in passes if p_["pass"].startswith("error")), 1)}
+    if res["time"]["any_pass_budget_exhausted"]:
+        res["deterministic"] = False
+    return res
+
+
+def _ensure_time(res, t_start, budget):
+    """A result that went through no error search (or skipped it) still reports its time."""
+    if isinstance(res, dict) and res.get("status") == "ok" and "time" not in res:
+        _time_block(res, t_start, budget, [{"pass": "optimisation", "seconds": round(time.monotonic() - t_start, 1),
+                                            "budget_exhausted": bool(res.get("search", {}).get("budget_exhausted"))}])
+    return res
+
+
+def run_graph_ranged(req, sha, t_start, budget, workers, seed, max_rounds):
+    return _ensure_time(_run_graph_ranged(req, sha, t_start, budget, workers, seed, max_rounds), t_start, budget)
+
+
+def _run_graph_ranged(req, sha, t_start, budget, workers, seed, max_rounds):
+    """Use the envelope of the supplied inputs when explicit ranges are absent.
+    Fall back to the supplied sequences if range mode cannot handle the design."""
+    flag = req.get("ranges_from_inputs", True)
+    if not isinstance(flag, bool):
+        raise L.OptError("BAD_PARAM", "ranges_from_inputs", "true or false")
+    es = req.get("error_search", True)
+    if not isinstance(es, bool):
+        raise L.OptError("BAD_PARAM", "error_search", "true or false")
+    base = {k: v for k, v in req.items() if k not in ("ranges_from_inputs", "error_search")}
+    if "input_ranges" in req or not flag:
+        res = run_graph(base, sha, t_start, budget, workers, seed, max_rounds, None)
+        res["ranges"] = {"source": "request" if "input_ranges" in req else "none (sampled sequences only)"}
+        if "input_ranges" in req:
+            res = error_search_loop(base, res, req["input_ranges"], sha, t_start, budget, workers, seed, max_rounds, es)
+            res["ranges"] = {"source": "request"}
+            out = inputs_outside_ranges(base, req["input_ranges"])
+            if out:
+                res["ranges"]["given_inputs_outside"] = out
+                res["ranges"]["note"] = ("some given input values lie outside input_ranges (stored integers "
+                                         "ceil(min*2^fl)..floor(max*2^fl)): the overflow proof and the error search "
+                                         "do not cover them; give the ranges as the quantised signal's own min / max "
+                                         "or omit input_ranges to use the inputs' envelope")
+        return res
+    env = envelope_ranges(base)
+    if env is None:
+        res = run_graph(base, sha, t_start, budget, workers, seed, max_rounds, None)
+        res["ranges"] = {"source": "none (boolean or empty inputs)"}
+        return res
+    try:
+        res = run_graph(dict(base, input_ranges=env), sha, t_start, budget, workers, seed, max_rounds, None)
+        res = error_search_loop(dict(base, input_ranges=env), res, env, sha, t_start, budget, workers, seed,
+                                max_rounds, es)
+        res["ranges"] = {"source": "envelope of the given inputs", "input_ranges": env}
+        return res
+    except L.OptError as e:
+        if e.code not in ("UNSUPPORTED", "NO_SOLUTION"):
+            raise
+        reason = "%s: %s" % (e.code, e.message)
+    if base.get("log_dir") and CURRENT_RUN:
+        # the range attempt already made the caller's log_dir; the fallback is a pass of its own
+        # (it reported LOG_DIR_EXISTS instead of the real reason)
+        base = dict(base, log_dir=os.path.join(req_log_dir(base), "fallback_sampled"))
+    res = run_graph(base, sha, t_start, budget, workers, seed, max_rounds, None)
+    # no range proof, but the worst-case error search only needs the input ranges: search the envelope anyway
+    res = error_search_loop(base, res, env, sha, t_start, budget, workers, seed, max_rounds, es)
+    # the error reporting contract: the whole reason (it was cut at 300 characters, losing the closing advice)
+    res["ranges"] = {"source": "none (sampled sequences only)", "envelope_attempt_failed": reason}
+    return res
+
+
+def run_graph(req, sha, t_start, budget, workers, seed, max_rounds, run_dir, warm=None):
+    import fxgopt_lib as GL
+    timing = {}
+    t = time.monotonic()
+    G.check_user_design(req.get("design"))
+    pb = GL.GraphProblem(req)
+    run_dir, attempt = open_run_dir(req, sha)
+    log = L.Log(os.path.join(run_dir, "candidates.jsonl"))
+    pool = GL.MultiPool(pb, workers)  # one pool per input set ; a single set behaves as before
+    pb.finish_setup()
+    timing["setup_s"] = round(time.monotonic() - t, 3)
+    killer = threading.Timer(budget + 300, lambda: [p.kill() for p in pool.procs])
+    killer.daemon = True
+    killer.start()
+    try:
+        if pb.cost_model:
+            res = GL.optimise_hw(pb, pool, log, t_start, t_start + budget, max_rounds=int(max_rounds))
+        else:
+            res = GL.optimise(pb, pool, log, t_start + budget, max_rounds=int(max_rounds), warm=warm)
+        proof, repairs = None, []
+        if pb.range_spec is not None:  # prove no overflow for every sequence in the ranges, repair
+            t = time.monotonic()
+            wl2, rec, proof, repairs = GL.prove_and_repair(pb, pool, res["wl"])
+            if repairs and not rec["err"] <= pb.tol:
+                wid = [r for r in repairs if r.get("to")]
+                caps = getattr(pb, "block_wordlengths", None) or {}
+                capped = sorted({r["variable"].split(".")[0] for r in wid} & set(caps))
+                parts = ["widening %s for the overflow proof (%s) pushed the error to %.9g (tolerance %.9g)" % (
+                    "these types" if wid else "types", "; ".join("%s %s -> %s" % (r["variable"], r["from"], r["to"])
+                                                              for r in wid[:6]) or "see guarantees",
+                    rec["err"], pb.tol)]
+                if capped:
+                    parts.append("the widened blocks %s are limited by block_wordlengths %s, which removes the "
+                                 "fraction bits the error needs: raise those caps first" % (
+                                     ", ".join(capped), json.dumps({b: caps[b] for b in capped})))
+                parts.append("other ways out, cheapest first: narrow input_ranges to the real signal range; if the "
+                             "requirement allows full-scale stress inputs a multiple of the tolerance, give "
+                             "\"stress_tolerance_scale\": k (the given inputs stay at 1 x); loosen error.max_abs to "
+                             "%.6g; or allow longer word lengths (wordlengths). Keep ranges_from_inputs: it carries "
+                             "the overflow proof" % (rec["err"] * 1.05))
+                raise L.OptError("NO_SOLUTION", "solution", "; ".join(parts))
+            res["wl"], res["rec"] = wl2, rec
+            timing["range_proof_s"] = round(time.monotonic() - t, 3)
+        bad = [pb.vars[i] for i, w in enumerate(res["wl"]) if w not in pb.wls]
+        if bad:  # every decision type must come from the requested word-length set
+            raise L.OptError("INTERNAL", "solution", "word length outside the requested set for %s" % (bad[:3],))
+    finally:
+        killer.cancel()
+        pool.close()
+        log.close()
+    wl = res["wl"]
+    if CURRENT_RUN:
+        CURRENT_RUN["last_wl"] = list(wl)   # the start of a warm re-optimisation (error_search_loop)
+    t = time.monotonic()
+    blocks = pb.blocks(wl)
+    # independent check: validated batch path of the fxgraph CLI + pure-Python double reference, on every input set
+    dsol = pb.design(wl)  # the solution's compiled output types
+    per = {}
+    per_set = []   # every input set x outport, with its own tolerance and ratio
+    seen_ovf = []  # wraps / saturations of the plan, per input set (range mode)
+    worst = 0.0
+    worst_abs = 0.0   # the largest error itself; `worst` is normalised to the strictest tolerance (search metric)
+    for k, sc in enumerate(pb.scenarios):
+        pb.use_scenario(k)
+        vreq = {"design": {"blocks": blocks, "lines": pb.spec["lines"]}, "hw": pb.hw,
+                "inputs": {n: {"s": pb.in_types[n][0], "wl": pb.in_types[n][1], "fl": pb.in_types[n][2],
+                               "ints": pb.in_ints[n]} for n in pb.d0.inports},
+                "outputs": list(pb.tols)}
+        if pb.range_spec is not None:
+            # count the wraps / saturations of the plan on every input set (all inside input_ranges in
+            # range mode) -- an overflow seen there is a witness; it was reported as "unknown" without one
+            vreq["diagnostics"] = True
+        p = subprocess.run([os.path.join(HERE, "fxgraph")], input=json.dumps(vreq).encode(), capture_output=True,
+                           timeout=900, env=dict(os.environ, FXSIM_TRUSTED_CALLER="fxopt-verify",
+                                                            FXGRAPH_RUNLOG=os.devnull))   # not the agent's run
+        lines = p.stdout.decode().splitlines()
+        if p.returncode != 0 or len(lines) != 1:
+            raise L.OptError("VERIFY_FAILED", "engine/fxgraph", "fxgraph exited with code %d and %d result lines (%s)"
+                             % (p.returncode, len(lines), sc["label"]))
+        try:
+            o = json.loads(lines[0])
+        except ValueError:
+            raise L.OptError("VERIFY_FAILED", "engine/fxgraph", "fxgraph result is not JSON")
+        if o.get("status") != "ok":
+            raise L.OptError("VERIFY_FAILED", "engine/fxgraph", "fxgraph error %s on %s: %s"
+                             % (o.get("code"), sc["label"], o.get("message")))
+        dref = pb.reference_waveforms()  # computed again on its own (Python path for the ideal reference)
+        if vreq.get("diagnostics"):
+            inside = all(pb.range_ints[n][0] <= min(pb.in_ints[n]) and max(pb.in_ints[n]) <= pb.range_ints[n][1]
+                         for n in pb.d0.inports) if getattr(pb, "range_ints", None) else False
+            for blk, ev in sorted(((o.get("diagnostics") or {}).get("blocks") or {}).items()):
+                for kind in ("wrap", "saturation"):
+                    cnt = ev.get(kind + "s") or 0
+                    if cnt:
+                        seen_ovf.append({"input_set": sc["label"], "inside_input_ranges": inside, "block": blk,
+                                         "kind": kind, "count": cnt,
+                                         "first_step": ev.get("first_%s_step" % kind, ev.get("first_%s_time" % kind))})
+        outs = o.get("outputs") or {}
+        if set(outs) != set(pb.tols):
+            raise L.OptError("VERIFY_FAILED", "engine/fxgraph", "re-simulation returned outputs %s, expected %s"
+                             % (sorted(outs), sorted(pb.tols)))
+        for name, tl in pb.tols.items():
+            tl = tl * sc.get("scale", 1.0)   # tolerance_scale of this input set
+            ov = outs[name]
+            md, at = strict_max_err("engine/fxgraph:" + name, ov, dsol.otype[name], dref.get(name, []), pb.nsteps)
+            if md > tl:
+                raise L.OptError("VERIFY_FAILED", "solution", "outport %s on %s: independent max_abs_diff %.9g > %.9g"
+                                 % (name, sc["label"], md, tl))
+            per_set.append({"input_set": sc["label"], "outport": name, "max_abs_diff": md, "at_sample": at,
+                            "tolerance": tl, "tolerance_scale": sc.get("scale", 1.0),
+                            "error_over_tolerance": round(md / tl, 6) if tl else None})
+            # the set closest to its own tolerance (with tolerance_scale the largest absolute error can
+            # sit on a relaxed set while a 1x set binds); `worst` below uses the same ratio
+            if name not in per or (md / tl if tl else md) > (per[name]["max_abs_diff"] / per[name]["tolerance"]
+                                                               if per[name]["tolerance"] else per[name]["max_abs_diff"]):
+                per[name] = {"max_abs_diff": md, "at_sample": at, "input_set": sc["label"], "tolerance": tl,
+                             "type": ov["type"]}
+            worst = max(worst, md * pb.tol / tl)   # tl includes the set's tolerance_scale
+            worst_abs = max(worst_abs, md)
+    pb.use_scenario(0)
+    if abs(worst - res["rec"]["err"]) > 1e-12:
+        raise L.OptError("VERIFY_FAILED", "solution", "independent max_abs_diff %.9g differs from search %.9g"
+                         % (worst, res["rec"]["err"]))
+    d = pb.design(wl)
+    hb = pb.compiled_hwbits(d)
+    if hb != pb.hwbits(wl):
+        # a block whose stored bits follow another block's type is outside the linear cost model (error review
+        # a lookup with breakpoints 'Same as corresponding input' behind an optimised signal); the
+        # search's costs were not the design's, so no plan is returned
+        luts = sorted(b for b in d.names if d.btype[b] in ("Lookup1D", "Lookup2D") and any(
+            str(v).startswith("Inherit: Same as corresponding input") for k, v in d.params[b].items()
+            if k.startswith("BreakpointsForDimension") and k.endswith("DataTypeStr")))
+        if luts:
+            raise L.OptError("UNSUPPORTED", "design.blocks." + luts[0], "the cost of lookup table %s follows the data "
+                             "type of its (optimised) input through breakpoints 'Inherit: Same as corresponding "
+                             "input', which the cost model does not cover: give the breakpoints an explicit type"
+                             % ", ".join(luts[:3]))
+        raise L.OptError("INTERNAL", "cost", "structural cost differs from compiled cost")
+    timing["verify_s"] = round(time.monotonic() - t, 3)
+    timing.update(res["stats"]["phase_s"])
+    timing["total_s"] = round(time.monotonic() - t_start, 3)
+    timing["total_wall_s"] = round(time.time() - WALL_START[0], 3)
+    bd = {"outputs": 0, "gain_params": 0, "accumulators": 0, "fir_internals": 0}
+    for b in d.names:
+        if d.btype[b] == "Outport" or not pb.costed(b):   # the counter sees the model's own blocks only
+            continue
+        k = int(d.params[b].get("DelayLength", "1")) if d.btype[b] == "Delay" else 1
+        bd["outputs"] += k * (1 if d.otype[b] == G.BOOL else d.otype[b][1])
+        key = {"Gain": "gain_params", "Sum": "accumulators", "DiscreteFir": "fir_internals"}.get(d.btype[b])
+        if key:
+            bd[key] += pb.inner_wl(d, b)
+    bd["total"] = hb
+    # the error reporting contract: the cost split by block (the same counting as hwbits; a multirate lowering's internal blocks
+    # appear under the model block they carry)
+    carrier_of = {v: k for k, v in ((pb.mr_info or {}).get("carrier") or {}).items()}
+    by_block = {}
+    for b in d.names:
+        if d.btype[b] == "Outport" or not pb.costed(b):
+            continue
+        k = int(d.params[b].get("DelayLength", "1")) if d.btype[b] == "Delay" else 1
+        ob, ib = k * (1 if d.otype[b] == G.BOOL else d.otype[b][1]), pb.inner_wl(d, b)
+        # summed, not overwritten: a slow-domain stateful block keeps its own name and also has a hold carrier
+        # under it (the table did not add up to hwbits)
+        # (under the user block -- lowering helpers and vector elements, fxgraph_lib.user_block_of)
+        e_ = by_block.setdefault(G.user_block_of(carrier_of.get(b, b), d.names),
+                                 {"output_bits": 0, "inner_bits": 0, "hwbits": 0})
+        e_["output_bits"] += ob
+        e_["inner_bits"] += ib
+        e_["hwbits"] += ob + ib
+    # constants outside the compiled design's own blocks: multirate filters' inner words (fixed by the lowering)
+    # and blocks costed by the block-cost hook (fxgopt_lib.cost_hooks)
+    extra = dict(getattr(pb, "mr_filter_bits", {}) or {})
+    for o_, v_ in (getattr(pb, "_hook_bits", {}) or {}).items():
+        extra[o_] = extra.get(o_, 0) + GL.hook_cost(d, v_)
+    for b, ib in extra.items():
+        e_ = by_block.setdefault(G.user_block_of(b, d.names), {"output_bits": 0, "inner_bits": 0, "hwbits": 0})
+        e_["inner_bits"] += ib
+        e_["hwbits"] += ib
+    # the design as given, costed the same way (recordings cold start: no tool reported the cost before optimisation)
+    try:
+        d_given = G.Design(pb.spec, pb.hw)
+        d_given.compile(pb.in_types)
+        baseline = {"hwbits": pb.compiled_hwbits(d_given), "of": "the design as given, the same counting as hwbits"}
+    except G.GraphError as e:
+        baseline = {"hwbits": None, "reason": "%s: %s" % (e.code, e.message[:200])}
+    out = {"status": "ok", "version": VERSION, "kind": "graph", "hwbits": hb, "baseline": baseline,
+           "hw": dict(pb.hw or {}) or {"ProdHWDeviceType": "Intel->x86-64 (Windows64)"}, "hw_default": not pb.hw,
+           "hwbits_breakdown": bd, "hwbits_by_block": by_block,
+           # word-length caps the optimiser set itself (a 2-D linear table with a falling segment stays
+           # below a 32-bit table type on the host); {} when none
+           "auto_caps": dict(getattr(pb, "auto_caps", {}) or {}),
+           "mult_area_proxy": pb.mult_area(wl),
+           "cost": ({"model": pb.cost_model, "value": pb.cost(wl)} if pb.cost_model else
+                    {"weights": {"hwbits": pb.cost_w[0], "mult_area": pb.cost_w[1]}, "value": pb.cost(wl)}),
+           # resource prediction (always reported); "DSP not worse" needs a real synthesis to confirm.
+           # fpga_xc7 cost = lexicographic (DSP48E1, LUT + FF); asic_gates cost = combinational gates, DFF separate
+           "hw_estimate": dict({k: v for k, v in pb.hw_estimate(wl).items() if k != "cost"},
+                               status="predicted, not synthesised",
+                               accuracy='Resource estimates only. Validation data are outside this package. Synthesise your design to measure resource use.',
+                               model="engine/hwcost_model.json v%s" % H_MODEL_VERSION()),
+           # with per-outport tolerances the normalised search metric was reported here
+           # (0.000209 for a real largest error of 0.01336); now the largest error itself, and the
+           # worst error / tolerance ratio beside it. With one tolerance the two say the same.
+           "max_abs_diff": worst_abs, "max_error_over_tolerance": round(worst / pb.tol, 6) if pb.tol else None,
+           "outports": per, "tolerance": pb.tol, "reference": pb.reference,
+           # every input set x outport against its own tolerance (tolerance_scale included)
+           "error_by_input_set": per_set,
+           "_overflow_seen": seen_ovf,   # consumed by run() once wraps_intended_in is known
+           # the error reporting contract: the constraint that binds -- the outport / input set / step whose error is closest to
+           # its tolerance (a cheaper plan would break this one first)
+           "binding": (lambda o: dict(per[o], outport=o, error_over_tolerance=round(
+               per[o]["max_abs_diff"] / per[o]["tolerance"], 6)))(
+               max(per, key=lambda o: per[o]["max_abs_diff"] / per[o]["tolerance"])) if per else None,
+           "guarantees": pb.guarantees(proof),
+           "solution": (_vector_solution(pb, blocks, d) if pb.vec_info is not None else
+                        {"blocks": blocks, "compiled_types": {b: d.type_str(b) for b in d.names}} if pb.mr_info is None
+                        # every original block as given, with the chosen data types (the lowered copies carried
+                        # the internal _GateSteps / _GateSlot and the Downsample was missing: the solution did not
+                        # replay in fxgraph)
+                        else {"blocks": {b: dict(p0, **{k: v for k, v in blocks.get(b, {}).items()
+                                                        if k.endswith("DataTypeStr")})
+                                         for b, p0 in pb.spec_orig["blocks"].items()},
+                              # every model block, through the lowering's carrier (a Downsample's output lives in
+                              # its Hold)
+                              "compiled_types": {b: d.type_str(pb.mr_info["carrier"].get(b, b))
+                                                 for b in pb.spec_orig["blocks"]
+                                                 if pb.mr_info["carrier"].get(b, b) in d.otype},
+                              "multirate": {"lowered_to_base_step": str(pb.mr_info["base"]),
+                                            "internal_blocks": len(pb.mr_info["internal"]),
+                                            "note": "error judged at every base step on held signals; hwbits count the "
+                                                    "model's own blocks (a Downsample / Upsample / Rate Transition as "
+                                                    "its output register), not the lowering's phase counters and "
+                                                    "enables, as the public cost counter does"}}),
+           "search": {"candidates": pool.evals, "variables": pb.nvar, "refine_rounds": res["stats"]["rounds"],
+                      "after_uniform": res["stats"]["after_uniform"], "budget_exhausted": res["timed_out"],
+                      "seed": seed, "range_repairs": repairs,
+                      "msb_trimmed": res["stats"].get("msb_trimmed", []),
+                      "hw_search": res["stats"].get("hw_search"), "hw_search_kept": res["stats"].get("hw_search_kept"),
+                      "warm_start": res["stats"].get("warm_start")},
+           "deterministic": not res["timed_out"], "input_sha256": sha,
+           "run": {"timing_s": timing, "workers": workers, "processes": len(pool.procs),
+                   "busy_at_once": getattr(pool, "busy_at_once", len(pool.procs)), "core_cpu_s": round(pool.core_ns / 1e9, 3),
+                   "run_dir": os.path.relpath(run_dir, ROOT), "attempt_id": attempt}}
+    # interim: the answer of this optimisation pass, before the error search and any re-optimisation; the request's
+    # final answer is stdout and <request run dir>/result.json (written by close_run_dir)
+    with open(os.path.join(run_dir, "pass_result.json"), "w") as f:
+        json.dump(dict(out, interim=True), f)
+    return out
+
+
+REOPT_MODE = ["cold"]   # the request's "reoptimisation" (run() sets it per request)
+AUTO_RISE = 0.02        # "auto": the warm plan may cost this much more than the plan before the counterexample
+
+
+def run(req, sha, t_start):
+    if not isinstance(req, dict):
+        raise L.OptError("BAD_JSON", "stdin", "request must be a JSON object")
+    budget = req.get("time_budget_s", 85)
+    workers = req.get("workers", cpu_limit())
+    seed = req.get("seed", 0)
+    max_rounds = req.get("max_rounds", 200)
+    common = ("design", "error", "wordlengths", "time_budget_s", "workers", "max_rounds", "seed", "log_dir",
+              "reference")
+    if isinstance(req.get("design"), dict) and "lines" in req["design"]:
+        L.check_fields(req, common + ("inputs", "input_sets", "input_ranges", "range_test", "stress_tolerance_scale", "initial_state", "hw", "cost", "fixed_blocks",
+                                      "allow_unsigned", "ranges_from_inputs", "error_search", "hwbits_slack",
+                                      "preadd_full_precision", "input_variants", "block_wordlengths", "time_limit_s",
+                                      "reoptimisation", "modular"), "")
+    else:
+        L.check_fields(req, common + ("blocks", "input", "rounding", "saturate"), "")
+    import fxgopt_lib as GL_
+    ro = req.get("reoptimisation")
+    if ro is not None and ro not in ("cold", "warm", "auto"):
+        raise L.OptError("BAD_PARAM", "reoptimisation", "'cold' (the default: every re-optimisation after an "
+                         "error-search counterexample is a full search), 'warm' (it starts from the previous plan) or "
+                         "'auto' (warm; a cold one too when the warm plan costs more than %g %% over the plan "
+                         "before the counterexample, the cheaper kept)" % (100 * AUTO_RISE))
+    GL_.WARM_REOPT = (ro == "warm") if ro is not None else GL_.WARM_REOPT_ENV   # per request: never carried over
+    REOPT_MODE[0] = ro or "cold"
+    for name, v, lo, hi, integer in (("time_budget_s", budget, 1, 86400, False), ("workers", workers, 1, 256, True),
+                                     ("max_rounds", max_rounds, 0, 100000, True)):
+        if not isinstance(v, int if integer else (int, float)) or isinstance(v, bool) or not (lo <= v <= hi):
+            raise L.OptError("BAD_PARAM", name, "%s in %g..%g required" % ("integer" if integer else "number", lo, hi))
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        raise L.OptError("BAD_PARAM", "seed", "integer required")
+    tl = req.get("time_limit_s")
+    if tl is not None and (not isinstance(tl, (int, float)) or isinstance(tl, bool) or not budget <= tl <= 86400):
+        raise L.OptError("BAD_PARAM", "time_limit_s", "number with time_budget_s <= time_limit_s <= 86400 required")
+    workers = int(workers)
+    deadline = t_start + budget
+    if isinstance(req.get("design"), dict) and "lines" in req["design"]:
+        if req.get("modular", True) not in (True, False):
+            raise L.OptError("BAD_PARAM", "modular", "true (the default: integrator-comb chains wrap where that is "
+                             "exact, engine/fxmodular.py) or false")
+        import fxmodular
+        extra = {}
+        for _attempt in range(3):
+            req2, mods = fxmodular.apply(req, extra)
+            try:
+                res = run_graph_ranged(req2, sha, t_start, budget, workers, seed, max_rounds)
+            except L.OptError as e:
+                xr = fxmodular.across_rate(req) if e.code in ("INFEASIBLE", "NO_SOLUTION") else []
+                if xr:
+                    # say why -- not a property of the design
+                    raise L.OptError(e.code, e.where, e.message + "; note: the integrator chain %s leaves through a "
+                                     "rate change (Downsample / decimation), which the optimiser does not recognise "
+                                     "as a wrap-around (CIC) region yet, so it keeps those integrators from wrapping "
+                                     "-- a hand plan with one wide type for every integrator and comb Sum (wrapping, "
+                                     "fraction length of the input) is exact: write those types into the design and "
+                                     "check it with fxcert, or put the combs before the rate change"
+                                     % ", ".join(xr[:8]))
+                raise
+            if not mods or not isinstance(res, dict) or res.get("status") != "ok":
+                break
+            sol = (res.get("solution") or {}).get("blocks") or {}
+            trimmed = {t.split(".")[0] for t in (res.get("search") or {}).get("msb_trimmed") or []}
+            # the pruned fraction lengths round inside the region: the leaving values move by at most the error
+            # bound; when that no longer fits the shared integer width, one more integer bit and search again (a
+            # region the MSB trim narrowed further rests on the judged sets instead, WRAP_RELIED_ON)
+            checks = [fxmodular.fits(m, sol, m["ib"]) for m in mods]
+            bad = [k for k, (ok, _eb) in enumerate(checks) if not ok and not trimmed & set(mods[k]["blocks"])]
+            bump = [k for k in bad if checks[k][1] is not None]   # no bound / width broken: reported unproven
+            if not bump or _attempt == 2:
+                break
+            for k in bump:
+                extra[k] = extra.get(k, 0) + 1
+        if mods and isinstance(res, dict) and res.get("status") == "ok":
+            # recordings: the region's Sums keep
+            # one integer width and wrap by design; their fraction lengths are chosen by the search (pruning)
+            sol = (res.get("solution") or {}).get("blocks") or {}
+            trimmed = {t.split(".")[0] for t in (res.get("search") or {}).get("msb_trimmed") or []}
+            res["modular_regions"] = []
+            for m in mods:
+                if trimmed & set(m["blocks"]):
+                    res["modular_regions"].append({
+                        "blocks": m["blocks"], "integer_bits": m["ib"], "inputs": m["inputs"], "proven": False,
+                        "types": {b: {"out": sol[b].get("OutDataTypeStr"), "accumulator": sol[b].get("AccumDataTypeStr")}
+                                  for b in m["sums"] if b in sol},
+                        "proof": "none: with no input ranges the search narrowed the chain below the proven %d integer "
+                                 "bits (search.msb_trimmed, WRAP_RELIED_ON) -- the wraps are checked on the judged "
+                                 "input sets only; give input_ranges for a proven chain" % m["ib"]})
+                    continue
+                _ok, eb = fxmodular.fits(m, sol, m["ib"])
+                if not _ok:
+                    # a type that breaks the common integer width (or a bound that does not fit) -- the
+                    # wrap argument does not hold; the overflow prover treats the chain as ordinary signals then
+                    res["modular_regions"].append({
+                        "blocks": m["blocks"], "integer_bits": m["ib"], "inputs": m["inputs"], "proven": False,
+                        "types": {b: {"out": sol[b].get("OutDataTypeStr"), "accumulator": sol[b].get("AccumDataTypeStr")}
+                                  for b in m["sums"] if b in sol},
+                        "proof": "none: %s" % ("a Sum type of the chain is unsigned or has fewer than %d integer bits, "
+                                               "so its wraps are not multiples of the common modulus" % m["ib"]
+                                               if not fxmodular.types_keep_width(m, sol, m["ib"]) else
+                                               "the leaving range with the rounding error bound does not fit %d integer "
+                                               "bits" % m["ib"])})
+                    continue
+                res["modular_regions"].append({
+                    "blocks": m["blocks"], "integer_bits": m["ib"], "inputs": m["inputs"],
+                    "types": {b: {"out": sol[b].get("OutDataTypeStr"), "accumulator": sol[b].get("AccumDataTypeStr")}
+                              for b in m["sums"] if b in sol},
+                    "proven": True,
+                    "leaving": {e: {"min": b[0], "max": b[1], "rounding_error_bound": float(eb[e])}
+                                for e, b in m["bounds"].items()},
+                    "proof": "only + / - and delays inside, every input a fixed-point Inport, every Sum type with "
+                             "%d integer bits: arithmetic modulo 2^%d is exact up to the rounding of the chosen "
+                             "fraction lengths; the values leaving the region have a finite impulse response (%d "
+                             "taps) and stay within the range above widened by rounding_error_bound, which fits -- "
+                             "the wraps inside the region are intended; %s"
+                             % (m["ib"], m["ib"], m["fir_length"],
+                                # Round / Zero / Simplest are not invariant under the modular shift
+                                "the values leaving it are within rounding_error_bound of the exact ones (with "
+                                "Round / Zero rounding they may differ from a non-wrapping implementation by up to "
+                                "that bound)" if any(str((req["design"]["blocks"].get(b) or {}).get("RndMeth", "Floor"))
+                                                     in ("Round", "Zero", "Simplest") for b in m["sums"]) else
+                                "they do not change any value leaving it")})
+            ov = (res.get("guarantees") or {}).get("overflow")
+            if isinstance(ov, dict):
+                ov["wraps_intended_in"] = sorted(b for m in mods for b in m["blocks"])
+                proven = [m for m in res["modular_regions"] if m.get("proven")]
+                # the claim follows each region's actual status
+                ov["claim"] = str(ov.get("claim", "")) + (
+                    "; the Sums of modular_regions wrap by design (exact: the values leaving each region are proven "
+                    "to fit) and are not counted as overflow" if len(proven) == len(mods) else
+                    "; the Sums of modular_regions wrap by design; the regions with proven false rest on the judged "
+                    "input sets only")
+        if isinstance(res, dict):
+            _overflow_witness(res)
+        return res
+    timing = {}
+    t = time.monotonic()
+    if req.get("reference", "ideal") != "ideal":
+        raise L.OptError("UNSUPPORTED", "reference", "the chain form supports the ideal reference only; "
+                         "write the design as a graph (design.blocks/lines) to use {\"kind\": \"design\"}")
+    pb = L.Problem(req)
+    stages = pb.reference()
+    pb.set_ranges(stages)
+    timing["setup_s"] = round(time.monotonic() - t, 3)
+    run_dir, attempt = open_run_dir(req, sha)
+    log = L.Log(os.path.join(run_dir, "candidates.jsonl"))
+    pool = L.Pool(pb, workers, budget + 120)
+    killer = threading.Timer(budget + 300, lambda: [p.kill() for p in pool.procs])  # hard stop for hung workers
+    killer.daemon = True
+    killer.start()
+    try:
+        res = L.optimise(pb, pool, log, deadline, max_rounds=int(max_rounds))
+    finally:
+        killer.cancel()
+        pool.close()
+        log.close()
+    wl = res["wl"]
+    t = time.monotonic()
+    blocks = pb.blocks(wl)
+    md, at, h = verify_independent(pb, blocks, stages[-1])
+    timing["verify_s"] = round(time.monotonic() - t, 3)
+    if md > pb.tol or abs(md - res["rec"]["err"]) > 1e-12:
+        raise L.OptError("VERIFY_FAILED", "solution", "independent re-simulation gives max_abs_diff %.9g "
+                         "(search reported %.9g, tolerance %.9g)" % (md, res["rec"]["err"], pb.tol))
+    timing.update(res["stats"]["phase_s"])
+    timing["total_s"] = round(time.monotonic() - t_start, 3)
+    timing["total_wall_s"] = round(time.time() - WALL_START[0], 3)
+    bd = breakdown(pb, wl)
+    assert bd["total"] == pb.hwbits(wl)
+    out = {
+        "status": "ok",
+        "version": VERSION,
+        "hwbits": bd["total"],
+        "hwbits_breakdown": bd,
+        "max_abs_diff": md,
+        "max_abs_diff_at_sample": at,
+        "tolerance": pb.tol,
+        "final_output_fnv1a64": h,
+        "solution": {"blocks": blocks},
+        "search": {"candidates": pool.evals, "model_steps": res["stats"]["model_steps"],
+                   "refine_rounds": res["stats"]["rounds"],
+                   "after_calibration": res["stats"]["after_calibration"],
+                   "budget_exhausted": res["timed_out"], "seed": seed},
+        "deterministic": not res["timed_out"],
+        "input_sha256": sha,
+        # the fields below vary between runs (wall clock, process id); everything above is reproducible
+        "run": {"timing_s": timing, "workers": workers, "core_cpu_s": round(pool.core_ns / 1e9, 3),
+                "run_dir": os.path.relpath(run_dir, ROOT), "attempt_id": attempt},
+    }
+    return out
+
+
+def search_settings():
+    """Process settings that change the search and so the answer (FXOPT_PAIR_EXCHANGE changed the
+    solution of the same request bytes, both runs reported deterministic: true): reported in every result; the
+    same request gives the same answer only under the same settings (and version)."""
+    import fxgopt_lib as GL
+    cur = {"pair_exchange": L.PAIR_EXCHANGE, "wide_exchange": L.WIDE_EXCHANGE, "multistart": GL.MULTISTART,
+           "warm_reopt": GL.WARM_REOPT_ENV, "c_core": not os.environ.get("FXGRAPH_NO_FAST")}
+    default = {"pair_exchange": False, "wide_exchange": True, "multistart": 2, "warm_reopt": False, "c_core": True}
+    out = dict(cur)
+    out["non_default"] = sorted(k for k in cur if cur[k] != default[k])
+    out["sha256"] = hashlib.sha256(json.dumps(cur, sort_keys=True).encode()).hexdigest()[:16]
+    return out
+
+
+def _overflow_witness(res):
+    """an overflow (wrap or saturation outside the intended modular regions) that the plan produced on an
+    input set inside input_ranges is a witness -- the overflow status is "violated" then, not "unknown" (the stress set
+    worst_case_y_max wrapped S 3526 times while the result said unknown, without a witness)."""
+    seen = res.pop("_overflow_seen", None)
+    ov = (res.get("guarantees") or {}).get("overflow")
+    if res.get("status") != "ok" or not isinstance(ov, dict) or not seen:
+        return
+    intended = set(ov.get("wraps_intended_in") or [])
+    hits = [e for e in seen if e.get("inside_input_ranges") and e["block"].split("[")[0] not in intended]
+    if not hits:
+        return
+    hits.sort(key=lambda e: (str(e["input_set"]), e["first_step"] if isinstance(e["first_step"], int) else 0, e["block"]))
+    ov["observed_overflows"] = hits[:40]
+    if ov.get("status") == "bounded":
+        # a proof and an observation that contradict each other: never hand such a plan in
+        raise L.OptError("VERIFY_FAILED", "guarantees.overflow", "the range proof says bounded but input set %r "
+                         "overflows block %s (%d %ss from step %s)" % (hits[0]["input_set"], hits[0]["block"],
+                                                                        hits[0]["count"], hits[0]["kind"],
+                                                                        hits[0]["first_step"]))
+    if ov.get("status") in ("unknown", "sampled"):
+        w = hits[0]
+        ov["status"] = "violated"
+        ov["witness"] = {"input_set": w["input_set"], "block": w["block"], "kind": w["kind"], "count": w["count"],
+                         "first_step": w["first_step"],
+                         "how_to_replay": "run the solution in fxgraph with diagnostics on this input set (the stress "
+                                          "sets are listed in guarantees.overflow.input_sets)"}
+        ov["claim"] = ("an input set inside input_ranges overflows a quantisation point outside the intended modular "
+                       "regions (see witness and observed_overflows); the design is NOT overflow-free for these "
+                       "ranges -- widen the block named in the witness (block_wordlengths) or narrow input_ranges")
+
+
+def warnings_of(out):
+    """Top-level warnings of an ok result: what an agent must not miss before handing the plan
+    in -- a guarantee found broken or not established, or a search cut short."""
+    w = []
+    g = out.get("guarantees") or {}
+    err, ov = g.get("error") or {}, g.get("overflow") or {}
+    if err.get("status") == "violated":
+        w.append({"code": "ERROR_BOUND_VIOLATED", "message": "the error search found an input inside the ranges whose "
+                  "error exceeds the tolerance; this plan is not a valid answer (see guarantees.error.violation)"})
+    elif err.get("status") == "sampled":
+        w.append({"code": "ERROR_BOUND_SAMPLED", "message": "the error bound is only checked on the input sets given "
+                  "(and their variants, see input_variants); other inputs may exceed it -- give input_ranges with "
+                  "error_search, or more input sets, before relying on it"})
+    if ov.get("status") == "violated":
+        w.append({"code": "OVERFLOW_POSSIBLE", "message": "an input inside input_ranges overflows a quantisation point "
+                  "(see guarantees.overflow)"})
+    elif ov.get("status") in ("unknown", "sampled"):
+        w.append({"code": "OVERFLOW_NOT_PROVEN", "message": "freedom from overflow is %s, not proven over the input "
+                  "ranges" % ov.get("status")})
+    env_fail = (out.get("ranges") or {}).get("envelope_attempt_failed")
+    if env_fail:
+        # the fallback to a sampled plan was visible only as OVERFLOW_NOT_PROVEN
+        w.append({"code": "RANGE_MODE_FAILED", "message": "the plan for the input envelope could not be made, so this "
+                  "plan rests on the sampled sequences only; the reason: %s" % env_fail})
+    if ((out.get("search") or {}).get("msb_trimmed")):
+        w.append({"code": "WRAP_RELIED_ON", "message": "these types hold fewer integer bits than their signal's "
+                  "simulated range (%s): a wrap-around cancels downstream on the judged inputs (an integrator before "
+                  "a comb), which is how such designs are built -- confirm it holds for your signals"
+                  % ", ".join(out["search"]["msb_trimmed"][:8])})
+    if (out.get("search") or {}).get("budget_exhausted") or (out.get("time") or {}).get("any_pass_budget_exhausted"):
+        w.append({"code": "BUDGET_EXHAUSTED", "message": "the search stopped at time_budget_s; a cheaper plan may "
+                  "exist and the result can differ between runs"})
+    return w
+
+
+def solve_one(raw, t0):
+    """One request (bytes) -> (result dict, rc)."""
+    sha = hashlib.sha256(raw).hexdigest()
+    CURRENT_RUN.clear()
+    try:
+        try:
+            req = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            raise L.OptError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+        out, rc = run(req, sha, t0), 0
+    except L.OptError as e:
+        out, rc = {"status": "error", "code": e.code, "where": e.where, "message": e.message, "input_sha256": sha}, 1
+    except MemoryError:
+        out, rc = {"status": "error", "code": "OOM", "where": "run", "message": "out of memory (FX_MEM_BYTES)",
+                   "input_sha256": sha}, 1
+    except Exception as e:  # noqa: BLE001 -- never leave the caller without a structured answer
+        if type(e).__name__ == "GraphError" and hasattr(e, "code"):  # engine errors keep their stable code
+            out, rc = {"status": "error", "code": e.code, "where": e.where, "message": e.message,
+                       "input_sha256": sha}, 1
+        else:
+            out, rc = {"status": "error", "code": "INTERNAL", "where": type(e).__name__, "message": str(e)[:500],
+                       "input_sha256": sha}, 1
+    out["settings"] = search_settings()
+    if out.get("status") == "ok":
+        w = warnings_of(out)
+        if w:
+            out["warnings"] = w
+        try:
+            req_design = (json.loads(raw.decode("utf-8")).get("design") or {}).get("blocks")
+        except (ValueError, UnicodeDecodeError, AttributeError):
+            req_design = None
+        if out.get("kind") == "graph":   # the error reporting contract: the first layer, details below it
+            g = out.get("guarantees") or {}
+            b = out.get("binding") or {}
+            sm = {"hwbits": out.get("hwbits"), "baseline_hwbits": (out.get("baseline") or {}).get("hwbits"),
+                  "max_abs_diff": out.get("max_abs_diff"), "tolerance": out.get("tolerance"),
+                  # judge the plan by this ratio (<= 1 passes): with per-outport tolerances max_abs_diff and the
+                  # strictest tolerance beside it belong to different outports
+                  # recordings (the native recheck): under an exhaustive error search the judged input sets gave
+                  # 0.8715 while the search over the whole range on the final plan found 0.8931 (= Simulink): the
+                  # summary takes the larger and names where it comes from
+                  "max_error_over_tolerance": _summary_ratio(out)[0],
+                  "max_error_over_tolerance_from": _summary_ratio(out)[1],
+                  "overflow": (g.get("overflow") or {}).get("status"), "error": (g.get("error") or {}).get("status"),
+                  "warnings": [x["code"] for x in w],
+                  "modular_blocks": sorted(b for m in out.get("modular_regions") or [] for b in m["blocks"]),
+                  "binding": {k: b.get(k) for k in ("outport", "input_set", "error_over_tolerance")} if b else None,
+                  # blocks whose type parameters the plan changed (listed every block)
+                  "blocks_retyped": sorted(b for b, p in ((out.get("solution") or {}).get("blocks") or {}).items()
+                                           if isinstance(p, dict) and any(
+                                               str(v) != str(((req_design or {}).get(b) or {}).get(k))
+                                               for k, v in p.items() if k.endswith("DataTypeStr")))}
+            out = dict({"status": "ok", "summary": sm}, **{k: v for k, v in out.items() if k != "status"})
+    req_run = CURRENT_RUN
+    if req_run and out.get("status") == "ok" and isinstance(out.get("run"), dict):
+        # after re-optimisations the response named the last (superseded) pass; it names the request's
+        # directory and attempt now (where result.json is), the passes listed apart
+        out["run"]["last_pass_run_dir"] = out["run"].get("run_dir")
+        out["run"]["run_dir"] = os.path.relpath(req_run["dir"], ROOT)
+        out["run"]["attempt_id"] = req_run["attempt"]
+        out["run"]["passes"] = [os.path.relpath(p_, ROOT) for p_ in req_run.get("passes", [])]
+    close_run_dir(out)
+    if rc:
+        try:
+            os.makedirs(RUNS, exist_ok=True)
+            with open(ERRLOG, "a") as f:
+                f.write(json.dumps(dict(out, time=time.strftime("%Y-%m-%dT%H:%M:%S"))) + "\n")
+        except OSError:
+            pass
+    return out, rc
+
+
+def _mem_limit():
+    """Per-run memory limit (without one a large request was killed by the kernel with no
+    structured answer). FX_MEM_BYTES, default 4 GiB; exceeding it is reported as OOM."""
+    try:
+        import resource
+        lim = int(os.environ.get("FX_MEM_BYTES", str(4 << 30)))
+        resource.setrlimit(resource.RLIMIT_DATA, (lim, lim))
+    except Exception:  # noqa: BLE001 -- a platform without the limit still answers
+        pass
+
+
+
+def _summary_ratio(out):
+    """(worst error / tolerance, source) for the summary: the larger of the judged input sets' ratio and the error
+    search's last round, which ran on the final plan."""
+    judged = out.get("max_error_over_tolerance")
+    rounds = (out.get("error_search") or {}).get("rounds") or []
+    last = rounds[-1].get("worst_error_over_tolerance") if rounds and isinstance(rounds[-1], dict) else None
+    if isinstance(last, (int, float)) and (judged is None or last > judged):
+        return last, ("error search over the whole input range on the final plan" if rounds[-1].get(
+            "exhaustive_over_range") else "error search on the final plan")
+    return judged, "judged input sets"
+
+def main():
+    """One JSON request (may span lines), or a JSONL batch: one request per line, one result per line,
+    solved one after another (each with its own time budget, workers and log directory)."""
+    _mem_limit()
+    t0 = time.monotonic()
+    WALL_START[0] = time.time()
+    try:
+        data = open(sys.argv[1], "rb").read() if len(sys.argv) > 1 else sys.stdin.buffer.read()
+    except OSError as e:
+        out = G.with_next_step({"status": "error", "code": "BAD_PARAM", "where": "argv[1]", "message": "cannot read "
+                                "request file: %s" % e, "input_sha256": hashlib.sha256(b"").hexdigest()})
+        sys.stdout.write(json.dumps(out) + "\n")
+        return 1
+    try:
+        json.loads(data.decode("utf-8"))
+        items = [data]
+    except (ValueError, UnicodeDecodeError):
+        items = [l for l in data.split(b"\n") if l.strip()] or [data]
+    rc = 0
+    for k, raw in enumerate(items):
+        if k:
+            WALL_START[0] = time.time()
+        out, r = solve_one(raw, t0 if k == 0 else time.monotonic())
+        G.with_next_step(out)
+        try:
+            text = json.dumps(out, allow_nan=False)
+        except ValueError:  # never emit NaN / Infinity as a result
+            out = {"status": "error", "code": "INTERNAL", "where": "result", "message": "non-finite number in result",
+                   "input_sha256": out.get("input_sha256")}
+            text, r = json.dumps(out), 1
+        rc |= r
+        sys.stdout.write(text + "\n")
+        sys.stdout.flush()
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

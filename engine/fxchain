@@ -1,0 +1,390 @@
+#!/usr/bin/env -S python3 -I
+"""fxchain: AI-native CLI for bit-exact fixed-point cascaded FIR simulation.
+
+Reads one JSON request (or a JSONL batch) on stdin, writes one JSON result per
+request on stdout. The per-sample arithmetic runs in the C core (fxchain_core);
+this front-end only parses types, quantises gains and resolves internal-rule
+types once per request (reusing ref/fxcore.py). Schema: docs/en/ENGINE.md.
+"""
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from fractions import Fraction
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, os.path.join(ROOT, "ref"))
+import fxcore as fc  # noqa: E402
+
+CORE = os.path.join(HERE, "fxchain_core")
+ERRLOG = os.environ.get("FXCHAIN_ERRLOG", os.path.join(ROOT, "runs", "engine_errors.jsonl"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fxcli  # noqa: E402
+import fxgraph_lib as G  # noqa: E402  (the shared request, hardware and type rules)
+import fxnum  # noqa: E402
+
+MAX_SAMPLES = 20_000_000
+MAX_TAPS = 4096
+MAX_STAGES = 64
+MAX_BITS = 126  # int128 headroom for every intermediate value
+TIMEOUT_S = float(os.environ.get("FXCHAIN_TIMEOUT_S", "600"))
+MEM_LIMIT = int(os.environ.get("FXCHAIN_MEM_BYTES", str(4 << 30)))
+RM = {"Floor": 0, "Ceiling": 1, "Zero": 2, "Nearest": 3, "Round": 4, "Convergent": 5, "Simplest": 0}
+
+
+class FxError(Exception):
+    def __init__(self, code, where, message):
+        Exception.__init__(self, message)
+        self.code, self.where, self.message = code, where, message
+
+
+FAST_BITS = 62  # every intermediate fits int64 -> the core may use its 64-bit kernel
+
+
+def _chk_shift(where, wl_from, sh):
+    _FAST[0] = _FAST[0] and wl_from + max(0, -sh) <= FAST_BITS and sh <= 60
+    if wl_from + max(0, -sh) > MAX_BITS or sh >= MAX_BITS:
+        raise FxError("UNSUPPORTED_WIDTH", where, "word length / shift exceeds the 126-bit engine limit")
+
+
+_FAST = [True]  # per-request scratch flag set by the checks below (single-threaded process)
+
+
+def _chk_type(where, t):
+    s, w, f = t
+    _FAST[0] = _FAST[0] and w + 1 <= FAST_BITS
+    if not (1 <= w <= MAX_BITS - 2) or (s and w < 2):
+        raise FxError("UNSUPPORTED_WIDTH", where, "word length %d outside 1..%d (signed >=2)" % (w, MAX_BITS - 2))
+    return t
+
+
+def _known(where, p, bt):
+    """The graph engine's block-parameter rule (fxgraph_lib._check_params: unknown parameters, value-restricted ones,
+    data type string syntax), so the two CLIs accept and refuse the same blocks."""
+    try:
+        G._check_params(bt, p, where)
+    except G.GraphError as e:
+        raise FxError(e.code, e.where, e.message)
+
+
+def _resolve(where, text, same_as, inherit=()):
+    """A data type string by the graph engine's rules: fxgraph_lib._fixdt (fixdt and the named
+    integer types int8 .. uint32), the internal rule (None), or one of the block's own inheritance strings (inherit:
+    a Gain output 'Same as input', a Sum output / accumulator 'Same as first input') -> same_as; anything else is
+    BAD_TYPE, as in fxgraph."""
+    try:
+        t = G._fixdt(text, where)
+    except G.GraphError as e:
+        raise FxError(e.code, e.where, e.message)
+    if t is not None:
+        return _chk_type(where, t)
+    if text in inherit:
+        return same_as
+    if text == fc._INHERIT_RULE:
+        return None
+    raise FxError("BAD_TYPE", where, "unsupported data type string: %r" % text)
+
+
+def _fm(where, p):
+    rm = p.get("RndMeth", "Floor")
+    if rm not in RM:
+        raise FxError("UNSUPPORTED_ROUNDING", where + ".RndMeth", "unsupported rounding method %r" % (rm,))
+    sat = 1 if p.get("SaturateOnIntegerOverflow") == "on" else 0
+    return RM[rm], sat
+
+
+def _cast_tokens(sh, rm, t, sat):
+    return "%d %d %d %d %d" % (sh, rm, t[0], t[1], sat)
+
+
+def plan_candidate(req, xt):
+    """Resolve all types of a request; return (token string, final stage type)."""
+    d = req.get("design")
+    if not isinstance(d, dict) or "nstages" not in d or "ntaps" not in d:
+        raise FxError("MISSING_FIELD", "design", "design.nstages and design.ntaps are required")
+    ns, nt = d["nstages"], d["ntaps"]
+    if not (isinstance(ns, int) and isinstance(nt, int) and 1 <= ns <= MAX_STAGES and 1 <= nt <= MAX_TAPS):
+        raise FxError("LIMIT_EXCEEDED", "design", "nstages 1..%d and ntaps 1..%d required" % (MAX_STAGES, MAX_TAPS))
+    blocks = req.get("blocks")
+    if not isinstance(blocks, dict):
+        raise FxError("MISSING_FIELD", "blocks", "blocks object is required")
+    try:   # the shared hardware rule (the host word sizes were used whatever hw said)
+        words = G.hw_words(req.get("hw"))
+    except G.GraphError as e:
+        raise FxError(e.code, e.where, e.message)
+    _FAST[0] = xt[1] <= FAST_BITS
+    toks = []
+    cur = xt
+    for s in range(1, ns + 1):
+        gtypes = []
+        for k in range(1, nt + 1):
+            name = "G%d_%d" % (s, k)
+            where = "blocks." + name
+            p = blocks.get(name)
+            if not isinstance(p, dict):
+                raise FxError("MISSING_FIELD", where, "block missing")
+            _known(where, p, "Gain")
+            for key in ("Gain", "OutDataTypeStr", "ParamDataTypeStr"):
+                if key not in p:
+                    raise FxError("MISSING_FIELD", where + "." + key, "parameter missing")
+            c = fxnum.canonical(p["Gain"], "scalar")   # the one numeric parser
+            if isinstance(c, fxnum.NumError):
+                raise FxError(c.code, where + ".Gain", c.message)
+            g = float(c)
+            if g != g or g in (float("inf"), float("-inf")):
+                raise FxError("BAD_PARAM", where + ".Gain", "gain must be finite")
+            rm, sat = _fm(where, p)
+            si, wi, fi_ = cur
+            pt = _resolve(where + ".ParamDataTypeStr", p["ParamDataTypeStr"], None)
+            if pt is None:   # the shared rule, negative-edge included
+                try:
+                    pt = (si, wi, fc.gain_param_fl(g, si, wi, False, p["OutDataTypeStr"] == fc._INHERIT_RULE))
+                except ValueError as e:
+                    raise FxError("UNSUPPORTED", where + ".ParamDataTypeStr", str(e))
+            if pt[0] is None or pt[2] > 4000 or pt[2] < -4000:
+                raise FxError("BAD_TYPE", where + ".ParamDataTypeStr", "fraction length out of range")
+            _FAST[0] = _FAST[0] and wi + pt[1] <= FAST_BITS and pt[1] <= FAST_BITS
+            if wi + pt[1] > MAX_BITS:
+                raise FxError("UNSUPPORTED_WIDTH", where, "product word length exceeds the 126-bit engine limit")
+            # recordings (recordings fxchain, 14 of 14): a gain outside its parameter
+            # type stops Simulink (fxpParameterOverflow, default diagnostics); fxchain had saturated it while fxgraph
+            # refused the same graph -- the one rule now (hw.ParameterOverflowMsg 'warning' / 'none' saturates)
+            try:
+                G._param_overflow(g, tuple(pt), where + ".Gain", "Gain %s: Gain" % name, mode=str(
+                    (req.get("hw") or {}).get("ParameterOverflowMsg", G.PARAM_OVERFLOW_DEFAULT)).strip())
+            except G.GraphError as e:
+                raise FxError(e.code, e.where, e.message)
+            npar = fc._quant_param(g, *pt)
+            full = (1 if (si or pt[0]) else 0, wi + pt[1], fi_ + pt[2])
+            ot = _resolve(where + ".OutDataTypeStr", p["OutDataTypeStr"], cur, (fc._SAME_INPUT,))
+            if ot is None:   # the internal rule, shared with the graph engine (one-bit factor included)
+                ot = tuple(fc.gain_inherit_out(si, wi, fi_, tuple(pt), words))
+            sh = full[2] - ot[2]
+            _chk_shift(where, full[1], sh)
+            gtypes.append(ot)
+            toks.append("%d %s" % (npar, _cast_tokens(sh, rm, ot, sat)))
+            toks.append("@@%d" % (len(toks)))  # placeholder, replaced below
+        # sum block
+        name = "Acc%d" % s
+        where = "blocks." + name
+        p = blocks.get(name)
+        if not isinstance(p, dict):
+            raise FxError("MISSING_FIELD", where, "block missing")
+        _known(where, p, "Sum")
+        for key in ("OutDataTypeStr", "AccumDataTypeStr"):
+            if key not in p:
+                raise FxError("MISSING_FIELD", where + "." + key, "parameter missing")
+        # the graph engine's port-count reading (isdigit() took '٣' as a count)
+        signs = G.fxnum.port_count(p.get("Inputs", "+" * nt), "+-|")
+        if isinstance(signs, G.fxnum.NumError):
+            raise FxError(signs.code, where + ".Inputs", signs.message)
+        signs = signs.replace("|", "")
+        if signs.isdigit():
+            signs = "+" * int(signs)
+        if len(signs) != nt or set(signs) - set("+-"):
+            raise FxError("BAD_PARAM", where + ".Inputs", "sign string must have one + or - per tap")
+        rm, sat = _fm(where, p)
+        why1 = fc.sum_one_input_unobserved(p, nt, words, max_wl=max(t[1] for t in gtypes))   # the graph engine's rule
+        if why1:
+            raise FxError("UNSUPPORTED", where, why1)
+        out_x = _resolve(where + ".OutDataTypeStr", p["OutDataTypeStr"], gtypes[0], (fc._SAME_FIRST,))
+        acc_x = _resolve(where + ".AccumDataTypeStr", p["AccumDataTypeStr"], gtypes[0], (fc._SAME_FIRST,))
+        if acc_x is None:   # the internal rule, refused where it is unobserved -- as the graph engine
+            why = fc.sum_acc_unobserved(gtypes, signs, out_x or fc._sum_out_rule(gtypes, words), bool(sat), words,
+                                   p.get("RndMeth", "Floor"))
+            if why:
+                raise FxError("UNSUPPORTED", where + ".AccumDataTypeStr", why)
+        # the shared Sum type rule (the output's internal rule on ASIC/FPGA is the accumulator type,
+        # which a direct _sum_out_rule call missed)
+        sp = {"OutDataTypeStr": fc._INHERIT_RULE if out_x is None else "fixdt(%d,%d,%d)" % out_x,
+              "AccumDataTypeStr": fc._INHERIT_RULE if acc_x is None else "fixdt(%d,%d,%d)" % acc_x}
+        out_t, acc_t = fc._sum_types(sp, gtypes, signs, {"rm": "Floor", "om": "Saturate" if sat else "Wrap"}, words)
+        out_t, acc_t = tuple(out_t), tuple(acc_t)
+        _chk_type(where, out_t)
+        _chk_type(where, acc_t)
+        # fix up the per-tap tokens: append tap-input cast and sign after each gain cast
+        for k in range(nt):
+            ash = gtypes[k][2] - acc_t[2]
+            _chk_shift(where, gtypes[k][1], ash)
+            idx = len(toks) - 2 * (nt - k)
+            toks[idx + 1] = "%s %d" % (_cast_tokens(ash, rm, acc_t, sat), 1 if signs[k] == "+" else -1)
+        first = signs.find("+")
+        osh = acc_t[2] - out_t[2]
+        _chk_shift(where, acc_t[1], osh)
+        toks.append("%d %s %s" % (first, _cast_tokens(0, rm, acc_t, sat), _cast_tokens(osh, rm, out_t, sat)))
+        cur = out_t
+    return " ".join(toks), cur, 1 if _FAST[0] else 0
+
+
+def _parse_xtype(x, where="x"):
+    if not isinstance(x, dict) or not isinstance(x.get("ints"), list):
+        raise FxError("MISSING_FIELD", where, "{s, wl, fl, ints} required")
+    try:
+        t = (1 if x["s"] else 0, int(x["wl"]), int(x["fl"]))
+    except (KeyError, TypeError, ValueError):
+        raise FxError("MISSING_FIELD", where, "{s, wl, fl, ints} required")
+    _chk_type(where, t)
+    n = len(x["ints"])
+    if not (1 <= n <= MAX_SAMPLES):
+        raise FxError("LIMIT_EXCEEDED", where + ".ints", "1..%d samples required" % MAX_SAMPLES)
+    lo, hi = (-(1 << (t[1] - 1)), (1 << (t[1] - 1)) - 1) if t[0] else (0, (1 << t[1]) - 1)
+    ints = x["ints"]
+    for j, v in enumerate(ints):
+        if isinstance(v, float) and v.is_integer():  # JSON writers may emit integral values as 12.0
+            v = ints[j] = int(v)
+        if not isinstance(v, int) or isinstance(v, bool) or v < lo or v > hi:
+            raise FxError("BAD_INPUT", where + ".ints", "stored integer out of range for its type or not an integer")
+    return t
+
+
+def _log_error(err, sha):
+    try:
+        with open(ERRLOG, "a") as f:
+            f.write(json.dumps({"code": err["code"], "where": err["where"], "message": err["message"],
+                                "input_sha256": sha}) + "\n")
+    except OSError:
+        pass
+
+
+def _limits():
+    try:
+        import resource
+        resource.setrlimit(resource.RLIMIT_DATA, (MEM_LIMIT, MEM_LIMIT))
+    except Exception:
+        pass
+
+
+def _err(code, where, message, sha):
+    e = {"status": "error", "code": code, "where": where, "message": message, "input_sha256": sha}
+    _log_error(e, sha)
+    return e
+
+
+def run_batch(lines):
+    """lines: list of raw request lines. Returns list of result dicts (same order)."""
+    results = [None] * len(lines)
+    shas = [hashlib.sha256(l.encode("utf-8", "replace")).hexdigest() for l in lines]
+    stream = []  # core protocol chunks
+    jobs = []  # (idx, final type, mode, req)
+    prev_x = None  # (type, ints) of the last request that carried x
+    cur_x_key = None
+    has_ref = False
+    x_serial = 0
+    for i, line in enumerate(lines):
+        try:
+            try:
+                req = json.loads(line)
+            except ValueError as e:
+                raise FxError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+            if not isinstance(req, dict):
+                raise FxError("BAD_JSON", "stdin", "request must be a JSON object")
+            try:   # the shared request-field rule (unknown fields were ignored)
+                G.check_request_fields(req, ("design", "blocks", "x", "outputs", "reference", "hw"))
+            except G.GraphError as e:
+                raise FxError(e.code, e.where, e.message)
+            if "x" in req:
+                xt = _parse_xtype(req["x"])
+                prev_x = (xt, req["x"]["ints"])
+                x_serial += 1
+            elif prev_x is None:
+                raise FxError("MISSING_FIELD", "x", "x is required (it may only be omitted to reuse the previous request's x)")
+            xt, xints = prev_x
+            mode = {"summary": 0, "final": 1, "stages": 2}.get(req.get("outputs", "summary"))
+            if mode is None:
+                raise FxError("BAD_PARAM", "outputs", "outputs must be summary, final or stages")
+            toks, ft, fast = plan_candidate(req, xt)
+            ref = req.get("reference")
+            if ref is not None:
+                rt = _parse_xtype(ref, "reference")
+                if len(ref["ints"]) != len(xints):
+                    raise FxError("BAD_INPUT", "reference.ints", "reference length differs from x")
+            xkey = x_serial
+            if xkey != cur_x_key:
+                stream.append("X %d %d %d %d %s\n" % (len(xints), xt[0], xt[1], xt[2], " ".join(map(str, xints))))
+                cur_x_key = xkey
+            if ref is not None:
+                stream.append("REF %d %d %d %d %s\n" % (len(ref["ints"]), rt[0], rt[1], rt[2], " ".join(map(str, ref["ints"]))))
+                has_ref = True
+            elif has_ref:
+                stream.append("NOREF\n")
+                has_ref = False
+            stream.append("C %d %d %d %d %d %s\n" % (req["design"]["nstages"], req["design"]["ntaps"], mode, ft[2],
+                                                      1 if (fast and not os.environ.get("FXCHAIN_NO_FAST")) else 0, toks))
+            jobs.append((i, ft, mode, req["design"]["nstages"], xt, ref is not None))
+        except FxError as e:
+            results[i] = _err(e.code, e.where, e.message, shas[i])
+    if jobs:
+        stream.append("END\n")
+        try:
+            proc = subprocess.run([CORE], input="".join(stream).encode(), capture_output=True,
+                                  timeout=TIMEOUT_S, preexec_fn=_limits)
+            out = proc.stdout.decode().split("\n")
+            rc = proc.returncode
+        except subprocess.TimeoutExpired:
+            out, rc = ["E TIMEOUT core exceeded %gs" % TIMEOUT_S], -1
+        except OSError as e:
+            out, rc = ["E CORE_UNAVAILABLE %s" % e], -1
+        li = 0
+        for (i, ft, mode, ns, xt, hasref) in jobs:
+            try:
+                if li >= len(out) or out[li].startswith("E ") or not out[li].startswith("R "):
+                    msg = out[li] if li < len(out) else "core exited (rc=%s) without output" % rc
+                    parts = msg.split(" ", 2)
+                    code = parts[1] if len(parts) > 1 and parts[0] == "E" else "CORE_FAILED"
+                    raise FxError(code, "core", parts[2] if len(parts) > 2 else msg)
+                _, ns_t, nx, nst = out[li].split()
+                li += 1
+                stages = []
+                for s in range(ns):
+                    _, si_, h, mn, mx = out[li].split()
+                    li += 1
+                    stages.append({"fnv1a64": h, "min": int(mn), "max": int(mx)})
+                metrics = {}
+                if hasref:
+                    _, md, F = out[li].split()
+                    li += 1
+                    metrics["max_abs_diff_vs_reference_stored"] = int(md)
+                    metrics["diff_fraction_length"] = int(F)
+                    metrics["max_abs_diff_vs_reference"] = float(Fraction(int(md), 1 << int(F)))
+                outputs = {"stages_summary": stages, "final_type": {"s": ft[0], "wl": ft[1], "fl": ft[2]}}
+                if mode >= 1:
+                    while out[li].startswith("O "):
+                        parts = out[li].split(" ")
+                        li += 1
+                        idx = int(parts[1])
+                        ints = [int(v) for v in parts[2:]]
+                        stages[idx]["ints"] = ints
+                        if idx == ns - 1:
+                            outputs["final"] = ints
+                assert out[li] == "D"
+                li += 1
+                results[i] = {"status": "ok", "outputs": outputs, "metrics": metrics,
+                              "timing_ms": int(ns_t) / 1e6, "input_sha256": shas[i]}
+            except FxError as e:
+                results[i] = _err(e.code, e.where, e.message, shas[i])
+                break
+        for i, _, _, _, _, _ in jobs:
+            if results[i] is None:
+                results[i] = _err("CORE_FAILED", "core", "core stopped before this request", shas[i])
+    return results
+
+
+def main():
+    rc_args = fxcli.reject_arguments("fxchain", ERRLOG)   # stdin only
+    if rc_args is not None:
+        return rc_args
+    data = sys.stdin.read()
+    lines = [l for l in data.split("\n") if l.strip()]
+    if not lines:
+        sys.stdout.write(json.dumps(_err("BAD_JSON", "stdin", "empty input", hashlib.sha256(b"").hexdigest())) + "\n")
+        return 2
+    results = run_batch(lines)
+    for r in results:
+        sys.stdout.write(json.dumps(r) + "\n")
+    return 0 if all(r["status"] == "ok" for r in results) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

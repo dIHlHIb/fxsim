@@ -1,0 +1,63 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxexport < <skill dir>/examples/05_export_fir.json",
+ "exit_code": 0,
+ "note": "Output captured from this example. Absolute paths use <fxsim tree root>.",
+ "stdout": {
+  "status": "ok",
+  "model": "fir8_opt",
+  "files": {
+   "check_fir8_opt.m": "b4698e79d96fc0c34c2cebc79f1b66aa9cca841bd5af9cb72f6ffa2c414c80ca",
+   "fir8_opt.slx": "ef614c91189972e91dac30fa6365f7f835b56ad0820ffcda681d4f52f245e336",
+   "fir8_opt_io.json": "00186173e248e91130994ec89623f581b797b58f317390e2ef26a6160520d3e1",
+   "manifest.json": "60523c861030136b3188cff2b3f0bde40529345fc417eca5817aa97b6b8a2d9d"
+  },
+  "blocks": 3,
+  "multirate": false,
+  "hw_profile": "host",
+  "outputs": [
+   {
+    "port": "y",
+    "root_block": "y",
+    "width": 1,
+    "samples": 200,
+    "type": "1,14,13",
+    "period": 1.0,
+    "offset": 0.0
+   }
+  ],
+  "roundtrip": {
+   "blocks": 3,
+   "lines": 2,
+   "params_compared": 11,
+   "outputs_equal": [
+    "y"
+   ],
+   "reader_assumed_defaults": {
+    "x": [
+     "SampleTime"
+    ]
+   },
+   "reader_ignored_parameters": {}
+  },
+  "unobserved_templates": [],
+  "dropped_parameters": {},
+  "assumed_defaults": {
+   "F": {
+    "FilterStructure": "Direct form",
+    "InitialStates": "0",
+    "StateDataTypeStr": "Inherit: Same as accumulator",
+    "TapSumDataTypeStr": "Inherit: Inherit via internal rule"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "out": "runs/export/fir8_opt",
+  "out_abs": "<fxsim tree root>/runs/export/fir8_opt",
+  "check_command": "cd('<fxsim tree root>/runs/export/fir8_opt'); r = check_fir8_opt; fprintf('FXSIM_VERDICT %s\\n', r.verdict)",
+  "check_batch_command": "matlab -batch \"cd('<fxsim tree root>/runs/export/fir8_opt'); r = check_fir8_opt; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "check_batch_command_here": "matlab -batch \"r = check_fir8_opt; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "verdicts": "PASS: every sample and every compiled type equal; FAIL: a difference (first_diff says where); INCOMPLETE: every compared sample equal but something could not be compared (reason says what) -- only PASS verifies the package. The script prints one JSON line and returns it as r; the commands then print 'FXSIM_VERDICT <verdict>'. Read that line: the process status can be 0 after a failed model check on macOS with MATLAB R2026b",
+  "input_sha256": "8d0b71a7fe86f51798b089c34f45e2a17f4559fa6315c30363a1472f4c820f74"
+ }
+}

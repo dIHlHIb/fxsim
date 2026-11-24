@@ -1,0 +1,24 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxopt < <skill dir>/examples/26_err_opt_infeasible.json",
+ "exit_code": 1,
+ "wall_s": 1.0,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "INFEASIBLE",
+  "where": "error",
+  "message": "no allowed word lengths reach the tolerance: the best tried gives max_abs_diff 0.0510217 > 1e-09 (the widest 0.0510217); the widest plan gives every chosen type 8 bits, the largest in wordlengths [4, 6, 8]: allowing wider word lengths is the first thing to try; at the widest plan, error / tolerance per input set: range: random uniform 5.1e+07, inputs~negated 4.98e+07, inputs 4.92e+07, inputs~reversed 4.92e+07, range: random extremes 4.88e+07, range: worst_case_y_max 4.37e+07, range: step min to max 4.37e+07, range: step max to min 4.37e+07, range: square wave, period 64 4.37e+07, range: all inputs at max 4.06e+07, range: alternating min/max 3.12e+07, range: worst_case_y_min 2.19e+07, range: all inputs at min 2.19e+07; over the tolerance: range: random uniform, inputs~negated, inputs, inputs~reversed, range: random extremes, range: worst_case_y_max, range: step min to max, range: step max to min, range: square wave, period 64, range: all inputs at max, range: alternating min/max, range: worst_case_y_min, range: all inputs at min -- the given input sets themselves miss it: wider word lengths, a type the optimiser does not choose (a filter's internal type, a fixed block), a signal that grows beyond the widest word (an integrator), or the tolerance must change; fxgraph with diagnostics on the widest plan names the blocks that wrap or saturate (with the block_wordlengths caps {\"F\": [2, 16]}: widen them or the tolerance)",
+  "input_sha256": "489d6fcaab147c31eaf5c966c5003700c12835a5e74cd82acc385e2cb4cf7b35",
+  "settings": {
+   "pair_exchange": false,
+   "wide_exchange": true,
+   "multistart": 2,
+   "warm_reopt": false,
+   "c_core": true,
+   "non_default": [],
+   "sha256": "339b07cf5afa806a"
+  },
+  "refusal_kind": "request",
+  "next_step": "even the widest allowed word lengths miss the error tolerance: widen wordlengths / block_wordlengths or loosen the tolerance"
+ }
+}

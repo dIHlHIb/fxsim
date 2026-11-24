@@ -1,0 +1,42 @@
+{
+ "blocks": {
+  "x": {
+   "type": "Inport"
+  },
+  "F": {
+   "type": "DiscreteFir",
+   "Coefficients": "[0.02 0.06 0.16 0.26 0.26 0.16 0.06 0.02]",
+   "CoefDataTypeStr": "fixdt(0,12,13)",
+   "ProductDataTypeStr": "fixdt(1,14,15)",
+   "AccumDataTypeStr": "fixdt(1,16,15)",
+   "OutDataTypeStr": "fixdt(1,12,11)",
+   "RndMeth": "Floor",
+   "SaturateOnIntegerOverflow": "off"
+  },
+  "DS": {
+   "type": "Downsample",
+   "DownsamplingFactor": "4",
+   "SampleOffset": "0",
+   "InitialConditions": "0",
+   "InputProcessing": "Elements as channels (sample based)",
+   "RateOptions": "Allow multirate processing"
+  },
+  "y": {
+   "type": "Outport"
+  }
+ },
+ "lines": [
+  {
+   "src": "x",
+   "dst": "F"
+  },
+  {
+   "src": "F",
+   "dst": "DS"
+  },
+  {
+   "src": "DS",
+   "dst": "y"
+  }
+ ]
+}

@@ -1,0 +1,1177 @@
+#!/usr/bin/env -S python3 -I
+"""fxgraph: AI-native CLI for bit-exact simulation of general fixed-point block diagrams .
+
+stdin: one JSON request (or a JSONL batch, one request per line); stdout: one JSON result per
+request. Schema: docs/en/GRAPH.md. Errors carry a stable code and are appended to
+runs/graph_errors.jsonl (FXGRAPH_ERRLOG overrides the path).
+"""
+import hashlib
+import json
+import os
+import signal
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import fxgraph_lib as G  # noqa: E402
+
+ERRLOG = os.environ.get("FXGRAPH_ERRLOG", os.path.join(ROOT, "runs", "graph_errors.jsonl"))
+# the error reporting contract: every successful run is recorded too (one summary line), and summary-detail results keep the full
+# result on disk under its input hash (same input, same file: retry-safe, no shared state between processes)
+RUNLOG = os.environ.get("FXGRAPH_RUNLOG", os.path.join(ROOT, "runs", "graph_runs.jsonl"))
+RESULTS = os.environ.get("FXGRAPH_RESULTS", os.path.join(ROOT, "runs", "graph_results"))
+import fxcli  # noqa: E402
+
+TIMEOUT_S = float(os.environ.get("FXGRAPH_TIMEOUT_S", "600"))
+MAX_WORK = int(os.environ.get("FXGRAPH_MAX_WORK", str(300_000_000)))  # block-steps per request
+
+
+
+def _ts_text(d, x, v):
+    """a block's sample time as reported: the period, or "[period offset]" (Simulink's notation) with an offset --
+    recordings: Inport SampleTime [0.3 0.1] was reported as 3/10 and the export check expected 0.3."""
+    if v is None:
+        return "constant"
+    o = getattr(d, "mr_offsets", {}).get(x)
+    return "[%s %s]" % (v, o) if o else str(v)
+
+def _inputs(req, d):
+    data = req.get("inputs")
+    if d.inports and not isinstance(data, dict):
+        raise G.GraphError("MISSING_FIELD", "inputs", "inputs object {Inport: {s, wl, fl, ints}} is required")
+    types, ints, n = {}, {}, None
+    for name in d.inports:
+        v = data.get(name)
+        where = "inputs." + name
+        if isinstance(v, dict) and v.get("type") == "boolean":
+            # recorded: boolean Inports (enable / valid signals) as {"type": "boolean", "ints": [0, 1, ...]}
+            extra = sorted(set(v) - {"type", "ints"})
+            if extra:
+                raise G.GraphError("BAD_INPUT", where + "." + extra[0], "unknown field %s; a boolean input is "
+                                   "{\"type\": \"boolean\", \"ints\": [0, 1, ...]}" % extra[0])
+            xs = v.get("ints")
+            if not isinstance(xs, list) or any(x not in (0, 1) or isinstance(x, bool) for x in xs):
+                raise G.GraphError("BAD_INPUT", where + ".ints", "a boolean input takes the integers 0 and 1")
+            if n is not None and len(xs) != n and not d.multirate:
+                raise G.GraphError("BAD_INPUT", where + ".ints", "all inputs must have the same length")
+            n = len(xs)
+            types[name], ints[name] = G.BOOL, list(xs)
+            continue
+        if isinstance(v, dict) and isinstance(v.get("type"), dict) and not ({"s", "wl", "fl"} & set(v)):
+            # fxopt's form {"type": {s, wl, fl}, "ints"} is accepted too
+            v = dict({k: x for k, x in v.items() if k != "type"}, **v["type"])
+        if not isinstance(v, dict) or not isinstance(v.get("ints"), list):
+            raise G.GraphError("MISSING_FIELD", where, "{s, wl, fl, ints} required")
+        extra = sorted(set(v) - {"s", "wl", "fl", "ints"})
+        if extra:
+            raise G.GraphError("BAD_INPUT", where + "." + extra[0], "unknown field %s; an input is {\"s\": 1, \"wl\": 16, "
+                               "\"fl\": 14, \"ints\": [...]} or {\"type\": {\"s\": 1, \"wl\": 16, \"fl\": 14}, "
+                               "\"ints\": [...]}, or {\"type\": \"boolean\", \"ints\": [0, 1, ...]}" % extra[0])
+        for k in ("s", "wl", "fl"):  # integers only; no truthiness, no truncation of 8.9
+            if k not in v:
+                raise G.GraphError("MISSING_FIELD", where + "." + k, "{s, wl, fl, ints} required")
+            if not isinstance(v[k], int) or isinstance(v[k], bool):
+                raise G.GraphError("BAD_TYPE", where + "." + k, "%s must be an integer, got %r" % (k, v[k]))
+        if v["s"] not in (0, 1):
+            raise G.GraphError("BAD_TYPE", where + ".s", "s must be 0 or 1, got %r" % v["s"])
+        t = (v["s"], v["wl"], v["fl"])
+        if not (1 <= t[1] <= G.MAX_WL) or (t[0] and t[1] < 2):
+            raise G.GraphError("BAD_TYPE", where, "word length out of range")
+        lo, hi = (-(1 << (t[1] - 1)), (1 << (t[1] - 1)) - 1) if t[0] else (0, (1 << t[1]) - 1)
+        xs = []
+        for x in v["ints"]:
+            if not isinstance(x, int) or isinstance(x, bool) or not (lo <= x <= hi):
+                raise G.GraphError("BAD_INPUT", where + ".ints", "stored integer out of range or not an integer")
+            xs.append(x)
+        # (a multirate design: every Inport has samples at its own period, so lengths may differ -- fxopt accepts
+        # such inputs, and its solution did not replay here)
+        if n is not None and len(xs) != n and not d.multirate:
+            raise G.GraphError("BAD_INPUT", where + ".ints", "all inputs must have the same length")
+        n = len(xs)
+        types[name], ints[name] = t, xs
+    for name in (data or {}):
+        if name not in d.inports:
+            raise G.GraphError("BAD_INPUT", "inputs." + name, "no Inport named %s" % name)
+    return types, ints, n
+
+
+def _value(d, name, vs):
+    t = d.otype[name]
+    if t == G.BOOL:
+        return {"type": "boolean", "bool": vs}
+    return {"type": d.type_str(name), "s": t[0], "wl": t[1], "fl": t[2], "ints": vs}
+
+
+def _compiled_types(d, vinfo=None):
+    """Compiled type of every block; an identity block the lowering removed (Signal Specification, Reshape, Manual
+    Switch, conj of a real signal: engine/block_lowering.py) has the type of the signal it passes on; a Mux / Selector the
+    vector pass removed has its elements' type when they all share one (otherwise none is reported)."""
+    out = {x: d.type_str(x) for x in d.names}
+    info = getattr(d, "hdl_info", None) or {}
+    import fxhdl
+
+    def typ(s_, sp, where):
+        try:
+            b = fxhdl._port_block(info, s_, sp, where)
+        except G.GraphError:
+            return None
+        return d.type_str(b) if b in d.otype else None
+    for a in info.get("first") or {}:   # a lowered block whose port 1 is carried by an internal block (fxhdl)
+        t = typ(a, 1, "design.blocks." + a)
+        if t is not None:
+            out[a] = t
+    for a, (s_, sp) in (info.get("alias") or {}).items():
+        t = typ(s_, sp, "design.blocks." + a)
+        if t is not None:
+            out[a] = t
+    # a complex block (engine/fxhdl.py _complex) is carried as two real signals; Simulink's compiled type of a
+    # complex signal is its element type, the same for both parts
+    for c, prs in (info.get("cplx_parts") or {}).items():
+        ts = {typ(s_, sp, "design.blocks." + c) for s_, sp in prs if s_ is not None}
+        if len(ts) == 1 and None not in ts and c not in out:
+            out[c] = ts.pop()
+    for m, els in ((vinfo or {}).get("struct") or {}).items():
+        ts = {typ(s_, sp, "design.blocks." + m) for s_, sp in els}
+        if len(ts) == 1 and None not in ts and m not in out:
+            out[m] = ts.pop()
+    # the user's blocks only -- the lowerings' internal blocks (names with a reserved control
+    # character) are not part of the design the caller wrote
+    return {x: v for x, v in out.items() if not any(ch in x for ch in G.RESERVED_CHARS)}
+def _compiled_port_types(d, design, ct=None):
+    """recordings: the compiled type of every output port k >= 2 a line of the request leaves from
+    ({block: {"k": type or None}}; None when the engine cannot name the block carrying that port, so the exporter
+    cannot claim the type was checked)."""
+    info = getattr(d, "hdl_info", None) or {}
+    import fxhdl
+    ct = ct or {}
+    out = {}
+    for ln in (design or {}).get("lines", []) if isinstance(design, dict) else []:
+        try:
+            s_, sp = ln.get("src"), int(ln.get("sport", 1))
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if sp < 2 or not isinstance(s_, str):
+            continue
+        try:
+            b = fxhdl._port_block(info, s_, sp, "design.blocks." + s_)
+        except G.GraphError:
+            b = None
+        t = d.type_str(b) if b is not None and b in d.otype else None
+        dst, dp = ln.get("dst"), ln.get("dport", 1)
+        if t is None and isinstance(dst, str) and dst in getattr(d, "src", {}):
+            # the block the line drives, as compiled: its input port is fed by the engine block carrying the port
+            # (a MATLAB Function's later outputs are compiled into engine blocks of other names, engine/fxmlgen.py)
+            try:
+                b = d.src[dst][int(dp) - 1]
+            except (IndexError, TypeError, ValueError):
+                b = None
+            t = d.type_str(b) if b is not None and b in d.otype else None
+        if t is None and isinstance(dst, str) and dst + "[1]" in getattr(d, "src", {}):
+            # a port carrying a vector (a Bus Selector's vector element) reaches the vector pass's
+            # elements of the block it drives -- its type when every element has the same one
+            ts_ = set()
+            k_ = 1
+            while dst + "[%d]" % k_ in d.src:
+                try:
+                    bb_ = d.src[dst + "[%d]" % k_][int(dp) - 1]
+                except (IndexError, TypeError, ValueError):
+                    bb_ = None
+                ts_.add(d.type_str(bb_) if bb_ is not None and bb_ in d.otype else None)
+                k_ += 1
+            if len(ts_) == 1 and None not in ts_:
+                t = ts_.pop()
+        if t is None and design.get("blocks", {}).get(s_, {}).get("type") == "Demux":
+            # the vector pass removed the Demux: every output port carries an element of its input, whose one
+            # element type _compiled_types reports for the Demux (none when the elements differ)
+            t = ct.get(s_)
+        out.setdefault(s_, {})[str(sp)] = t
+    # a Demux's unconnected outputs are ports Simulink compiles too -- each carries an element
+    # of the input, so every output port takes the Demux's element type (none when _compiled_types has none)
+    for s_, b_ in ((design or {}).get("blocks") or {}).items() if isinstance(design, dict) else []:
+        if not isinstance(b_, dict) or b_.get("type") != "Demux" or any(ch in s_ for ch in G.RESERVED_CHARS):
+            continue
+        txt = str(b_.get("Outputs", "2")).strip()
+        try:
+            k_ = len(txt.strip("[]").replace(",", " ").split()) if txt.startswith("[") else int(float(txt))
+        except ValueError:
+            continue
+        for sp in range(2, k_ + 1):
+            out.setdefault(s_, {}).setdefault(str(sp), ct.get(s_))
+    # an output port no line leaves (an HDL FIFO's unconnected Empty / Full) is still a port
+    # Simulink compiles and the check types -- every further port a lowered block has is reported too
+    further = {s_: list(p_) for s_, p_ in (info.get("ports") or {}).items() if isinstance(p_, dict)}
+    for s_ in (info.get("port2") or {}):
+        further.setdefault(s_, []).append(2)
+    for s_, ports in further.items():
+        if any(ch in s_ for ch in G.RESERVED_CHARS):
+            continue
+        for k in ports:
+            try:
+                b = fxhdl._port_block(info, s_, int(k), "design.blocks." + s_)
+            except (G.GraphError, ValueError):
+                continue
+            if b in d.otype:
+                out.setdefault(s_, {}).setdefault(str(k), d.type_str(b))
+    # an HDL NCO's output ports no line leaves (typically valid) are ports Simulink compiles -- the
+    # exported check found no expected type for DUT/N:2 and ended INCOMPLETE; valid is boolean, sine / cosine take the
+    # output type
+    import fxhdlnco
+    for n_, b_ in (((design or {}).get("blocks") or {}).items() if isinstance(design, dict) else ()):
+        if not isinstance(b_, dict) or b_.get("type") != "HDLNCO" or any(ch in n_ for ch in G.RESERVED_CHARS):
+            continue
+        try:
+            p_ = dict(fxhdlnco.DEFAULTS, **{k: str(v) for k, v in b_.items() if k != "type"})
+            sels_ = fxhdlnco.ports(p_)
+            otype_ = "fixdt(1,%s,%s)" % (p_["OutputWL"].strip(), p_["OutputFL"].strip())
+        except Exception:   # noqa: BLE001
+            continue
+        for k_, sel_ in enumerate(sels_):
+            if k_ == 0 or str(k_ + 1) in (out.get(n_) or {}):
+                continue
+            t_ = "boolean" if sel_ == "valid" else otype_ if sel_ in ("sin", "cos") else None
+            if t_ is not None:
+                out.setdefault(n_, {})[str(k_ + 1)] = t_
+    # a Complex to Real-Imag's port 2 (into a Real-Imag to Complex, or left open) is the imaginary
+    # part of its input -- the complex pass removed the block, so the port had no engine block and was 'unknown'
+    for c_, prs in (info.get("cplx_parts") or {}).items():
+        b_ = ((design or {}).get("blocks") or {}).get(c_) if isinstance(design, dict) else None
+        if not isinstance(b_, dict) or b_.get("type") != "ComplexToRealImag" or len(prs) < 2 or \
+                any(ch in c_ for ch in G.RESERVED_CHARS):
+            continue
+        s2 = prs[1]
+        if s2 and s2[0] is not None:
+            try:
+                bb_ = fxhdl._port_block(info, s2[0], s2[1], "design.blocks." + c_)
+            except G.GraphError:
+                bb_ = None
+            if bb_ in d.otype and out.get(c_, {}).get("2") is None:
+                out.setdefault(c_, {})["2"] = d.type_str(bb_)
+    return out
+
+
+def design_cost(d):
+    """Hardware cost of the design as given: hwbits per block -- the same counting as fxopt's hwbits
+    and baseline.hwbits -- and the resource prediction of the whole design."""
+    import fxgopt_lib as GL
+    import hwcost as H
+    per, total = {}, 0
+    skip, hooked = GL.cost_hooks(d)   # blocks a lowering replaced, costed by their owner (fxgopt_lib.cost_hooks)
+    for o, v in sorted(hooked.items()):
+        bits = GL.hook_cost(d, v)
+        per[o] = {"output_bits": 0, "inner_bits": bits, "hwbits": bits, "explanation": v[1]}
+        total += bits
+    for b in d.names:
+        bt = d.btype[b]
+        if bt == "Outport" or b in skip:
+            continue
+        t = d.otype[b]
+        k = int(d.params[b].get("DelayLength", "1")) if bt == "Delay" else 1
+        ob = k * (1 if t == G.BOOL else t[1])
+        ib = GL.GraphProblem.inner_wl(d, b)
+        per[b] = {"output_bits": ob, "inner_bits": ib, "hwbits": ob + ib}
+        total += ob + ib
+    est = None
+    try:
+        inv = H.design_inventory(d)
+        ab = H.preadd_absorbed(d, inv, H.load_model()["dsp_rule"]) if isinstance(inv, dict) else {}
+        p = H.predict(inv, absorbed_bits=sum(ab.values())) if ab else H.predict(inv)
+        est = {"dsp48e1": p["dsp"], "lut": round(p["lut_dsp"]), "ff": p["ff_dsp"], "lut_nodsp": round(p["lut_nodsp"]),
+               "generic_gates": round(p["gates"]), "dff": p["features"]["reg_bits"],
+               "status": "predicted, not synthesised",
+               "accuracy": "Resource estimates only. Validation data are outside this package. Synthesise your design to measure resource use."}
+    except (G.GraphError, KeyError, TypeError, ValueError) as e:
+        est = {"status": "unavailable", "reason": str(e)[:200]}
+    # cost by the user's design -- a lowering's helper blocks ('<name>\x1d...',
+    # '\x1e', '\x1f') and the elements of a vector block ('G[1]', 'G[2]' ...) are reported under the user block
+    # (recorded sweep of 693 exported designs found these listed on their own); the total is unchanged
+    users = {}
+    for b_, v_ in per.items():
+        o_ = G.user_block_of(b_, d.names)
+        u_ = users.setdefault(o_, {"output_bits": 0, "inner_bits": 0, "hwbits": 0})
+        for k_ in ("output_bits", "inner_bits", "hwbits"):
+            u_[k_] += v_[k_]
+        if "explanation" in v_:
+            u_["explanation"] = v_["explanation"]
+        if o_ != b_:
+            u_["parts"] = u_.get("parts", 0) + 1
+    return {"hwbits": total, "by_block": dict(sorted(users.items())), "hw_estimate": est,
+            "counting": "hwbits = every block's output word length (x the length of a Delay; Outports not counted) + "
+                        "the word lengths inside it: Gain parameter, Sum accumulator, Discrete FIR coefficient x taps + "
+                        "product x taps + accumulator x (1 + states when the state type is the accumulator's), lookup "
+                        "breakpoints x entries + table x entries, multirate FIR coefficient / product x taps + "
+                        "accumulator + input delay line, CIC sections + M x combs; the same counting as fxopt's "
+                        "hwbits and baseline.hwbits"}
+
+
+def _assumed(d, req):
+    """The parameters each of the model's own blocks left out, with the values assumed. Internal blocks of a lowering
+    (names with reserved characters) are not listed; a block that a lowering replaces (recorded HDL blocks, engine/
+    fxhdl.py) is listed under its own name with its own dialog parameters."""
+    # a user block a lowering replaced by an engine block of another type under the same name (a Bias
+    # becomes a Sum) lists its own dialog parameters (below), not the engine block's (AccumDataTypeStr, which Simulink's
+    # Bias does not have)
+    utypes = {x: b.get("type") for x, b in ((req.get("design") or {}).get("blocks") or {}).items()
+              if isinstance(b, dict)} if isinstance(req.get("design"), dict) else {}
+    out = {x: dict(v) for x, v in d.assumed_defaults.items() if v and not any(ch in x for ch in G.RESERVED_CHARS)
+           and utypes.get(x, d.btype.get(x)) == d.btype.get(x)}
+    if isinstance(req.get("design"), dict):   # structural blocks, gone after scalarisation (Selector)
+        import fxvector
+        for x, v in fxvector.structural_assumed(req["design"]).items():
+            out.setdefault(x, {}).update(v)
+    try:
+        import fxhdl
+        extra = getattr(fxhdl, "lab2_assumed_defaults", None)
+    except ImportError:
+        extra = None
+    if extra is not None and isinstance(req.get("design"), dict):
+        for x, v in (extra(req["design"]) or {}).items():
+            if v:
+                out.setdefault(x, {}).update(v)
+    return {x: out[x] for x in sorted(out)}
+
+
+# Prelookup and interpolation each have two supported spellings with different coverage.
+# Try the other spelling when it supports the requested configuration.
+PL_SPELLINGS = ({"PreLookup": "Prelookup", "Interpolation_n-D": "InterpolationUsingPrelookup"},
+                {"Prelookup": "PreLookup", "InterpolationUsingPrelookup": "Interpolation_n-D"})
+
+
+def _pl_other(req):
+    d = req.get("design") if isinstance(req, dict) else None
+    if not isinstance(d, dict) or not isinstance(d.get("blocks"), dict):
+        return None
+    ts = {b.get("type") for b in d["blocks"].values() if isinstance(b, dict)}
+    for m in PL_SPELLINGS:
+        if ts & set(m) and not ts & set(m.values()):
+            blocks = {n: (dict(b, type=m[b["type"]]) if isinstance(b, dict) and b.get("type") in m else b)
+                      for n, b in d["blocks"].items()}
+            return dict(req, design=dict(d, blocks=blocks))
+    return None
+
+
+def handle(req):
+    try:
+        return _handle(req)
+    except G.GraphError as e:
+        # (a parameter one rule set's table does not list -- the engine's Prelookup dialog names the recorded one does not
+        # take -- is a refusal of that rule set, not of the request)
+        alt = _pl_other(req) if e.code == "UNSUPPORTED" or (e.code == "BAD_PARAM" and "unknown parameter" in
+                                                             e.message) else None
+        if alt is None:
+            raise
+        try:
+            res = _handle(alt)
+        except G.GraphError:
+            raise e
+        pl_ = {n for n, b in alt["design"]["blocks"].items() if isinstance(b, dict) and b.get("type") in (
+            "PreLookup", "Interpolation_n-D", "Prelookup", "InterpolationUsingPrelookup")}
+        if any(n.split("\x1d")[0] in pl_ for n in (res.get("ignored_parameters") or {})):
+            # the other rule set took a parameter it does not use as ignored (PortDimensions,
+            # InternalRulePriority on a Prelookup ...) -- Simulink refuses those; the first refusal stands
+            raise e
+        return res
+
+
+def _handle(req):
+    if not isinstance(req, dict):
+        raise G.GraphError("BAD_JSON", "stdin", "request must be a JSON object")
+    if req.get("catalogue") is True:   # machine-readable block catalogue
+        G.check_request_fields(req, ("catalogue",))
+        return {"status": "ok", "blocks": G.catalogue(),
+                "note": "parameter names as accepted in design JSON; defaults = the value of a parameter left out; "
+                        "required = no default; must_write = left out, the library default is refused"}
+    G.check_request_fields(req, ("design", "inputs", "hw", "nsteps", "engine", "outputs", "stop_time", "diagnostics", "cost", "detail"))
+    t0 = time.monotonic()
+    design = req.get("design")
+    if os.environ.get("FXSIM_TRUSTED_CALLER") != "fxopt-verify":
+        # user JSON may not carry reserved names, internal parameters or internal block types;
+        # fxopt's own re-simulation of its lowered / scalarised solution is the one trusted caller
+        G.check_user_design(design)
+    if isinstance(design, dict) and isinstance(design.get("lines"), list):
+        # the lowering passes (enabled / triggered subsystems, complex, ...) rewrite lines before the
+        # Design's own check, so an input driven by two lines was answered (the later line won); no Simulink model
+        # can hold it (AddLineDestAlreadyConnected)
+        seen_ = {}
+        for i_, ln in enumerate(design["lines"]):
+            if isinstance(ln, dict) and isinstance(ln.get("dst"), str):
+                try:
+                    key_ = (ln["dst"], int(ln.get("dport", 1)))
+                except (TypeError, ValueError):
+                    continue
+                if key_ in seen_:
+                    raise G.GraphError("BAD_CONNECTION", "design.lines[%d]" % i_, "%s input %d is driven twice "
+                                       "(lines %d and %d; Simulink cannot connect a second line to an input port)"
+                                       % (key_[0], key_[1], seen_[key_], i_))
+                seen_[key_] = i_
+    if isinstance(design, dict) and isinstance(design.get("blocks"), dict):
+        # floating-point signals: designs inside the recorded domain run on the float
+        # path (Python only); everything else goes on to the fixed-point engine as before
+        import fxfloatsim
+        if fxfloatsim.looks_float(req, design):
+            try:
+                fr = fxfloatsim.handle(req, design, G.fc._asic(req.get("hw")))
+            except fxfloatsim.FloatError as e:
+                raise G.GraphError(e.code, e.where or "design", e.message)
+            if fr is not None:
+                return fr
+    import fxvector
+    if isinstance(design, dict) and isinstance(design.get("blocks"), dict) and \
+            os.environ.get("FXSIM_TRUSTED_CALLER") != "fxopt-verify":
+        fxvector.check_ports(design)
+        _bl = design["blocks"]
+        for n_, b_ in _bl.items():
+            if isinstance(b_, dict) and b_.get("type") == "BusAssignment" and "SampleTime" in b_:
+                # Bus Assignment has no SampleTime (Simulink set_param: ParamUnknown); it was ignored
+                raise G.GraphError("BAD_PARAM", "design.blocks.%s.SampleTime" % n_, "Bus Assignment has no parameter "
+                                   "SampleTime (Simulink rejects it); it inherits its rate")
+        if any(isinstance(b_, dict) and b_.get("type") == "BusAssignment" for b_ in _bl.values()) and any(
+                isinstance(b_, dict) and (b_.get("type") in G.MR_BLOCKS or str(b_.get("SampleTime", "-1")).strip()
+                                          not in ("-1", "1", "", "[1 0]", "[1,0]")) for b_ in _bl.values()):
+            # an assigned signal at another period than the element it replaces stops Simulink
+            # (BusComp_SampleTimeError); Bus Assignment was recorded single-rate only
+            raise G.GraphError("UNSUPPORTED", "design.blocks." + sorted(n_ for n_, b_ in _bl.items() if isinstance(
+                b_, dict) and b_.get("type") == "BusAssignment")[0], "a Bus Assignment in a design with more than one "
+                               "rate: an assigned signal at another period stops Simulink (BusComp_SampleTimeError); "
+                               "Bus Assignment was recorded single-rate only")
+        import fxhdl as _fxh
+        _fxh.complex_consumer_check(design)   # 
+    inferred = {}
+    if isinstance(design, dict) and isinstance(design.get("blocks"), dict) and isinstance(req.get("inputs"), dict):
+        # an Inport without PortDimensions fed as x[1] .. x[w] (w >= 2, nothing under x itself) is a vector input of
+        # width w -- as Simulink takes a From Workspace's width from its data; a model read from .slx carries none
+        keys = set(req["inputs"])
+        blocks = None
+        for n_, b in design["blocks"].items():
+            if not isinstance(b, dict) or b.get("type") != "Inport" or "PortDimensions" in b or n_ in keys:
+                continue
+            w = 0
+            while "%s[%d]" % (n_, w + 1) in keys:
+                w += 1
+            if w >= 2:
+                blocks = blocks or dict(design["blocks"])
+                blocks[n_] = dict(b, PortDimensions=str(w))
+                inferred[n_] = w
+        if blocks is not None:
+            design = dict(design, blocks=blocks)
+    _vinfo = None
+    if isinstance(design, dict) and isinstance(design.get("blocks"), dict) and fxvector.has_vectors(design):
+        import fxhdl as _fxhdl
+        _fxhdl.complex_mix_check(design)   # recordings (before the vector pass)
+        design, _vinfo = fxvector.scalarise(design)   # vector signals: element k of block B is "B[k]"
+    d = G.Design(design, req.get("hw"))
+    types, ints, n = _inputs(req, d)
+    nsteps = req.get("nsteps", n)
+    if nsteps is None and "stop_time" in req:
+        # recorded / recordings (a counter -> Downsample, no Inport): the request was told to give nsteps here and
+        # stop_time by the multirate branch -- a design without Inports could not run at all. With stop_time the
+        # multirate branch decides; a single-rate design is told to use nsteps there
+        nsteps = 1
+    if nsteps is None:
+        raise G.GraphError("MISSING_FIELD", "nsteps", "nsteps is required when the design has no Inport (stop_time for "
+                           "a multirate design)")
+    if not isinstance(nsteps, int) or isinstance(nsteps, bool) or not (1 <= nsteps <= G.MAX_STEPS):
+        raise G.GraphError("LIMIT_EXCEEDED", "nsteps", "1..%d steps" % G.MAX_STEPS)
+    if n is not None and nsteps > n:
+        raise G.GraphError("BAD_INPUT", "nsteps", "nsteps exceeds the input length %d" % n)
+    # count the expanded slots (Discrete FIR taps, Delay(N) stages, helper slots), not only the blocks
+    if nsteps * len(d.slots) > MAX_WORK:
+        raise G.GraphError("LIMIT_EXCEEDED", "nsteps", "steps x expanded slots (%d) exceeds %d (FXGRAPH_MAX_WORK)"
+                           % (len(d.slots), MAX_WORK))
+    d.allow_runtime_diag = True   # a Multiport Switch that stops Simulink stops this run too
+    d.compile(types)
+    want = req.get("outputs", "outports")
+    # the hidden Outports of Assertion blocks (engine/block_lowering.py) are internal: their failures are reported in
+    # assertion_failures, not as outputs
+    user_outs = [x for x in d.outports if not x.startswith("\x1d")]
+    if want == "outports":
+        rec = user_outs
+    elif want == "all":
+        # recordings: internal blocks of a lowering (names with reserved characters, e.g. "\x1dDe1/d1") are
+        # not the model's own and are not listed
+        rec = [x for x in d.names if d.btype[x] != "Outport" and not any(ch in x for ch in G.RESERVED_CHARS)] + \
+            user_outs
+    elif isinstance(want, list) and all(isinstance(x, str) for x in want):
+        for x in want:
+            if x not in d.btype:
+                raise G.GraphError("BAD_PARAM", "outputs", "unknown block %r" % x)
+        rec = want
+    else:
+        raise G.GraphError("BAD_PARAM", "outputs", "outports, all, or a list of block names")
+    diag_on = req.get("diagnostics", False)
+    if not isinstance(diag_on, bool):
+        raise G.GraphError("BAD_PARAM", "diagnostics", "true or false")
+    cost_on = req.get("cost", False)
+    if not isinstance(cost_on, bool):
+        raise G.GraphError("BAD_PARAM", "cost", "true or false")
+    if d.multirate:
+        if cost_on:
+            raise G.GraphError("UNSUPPORTED", "cost", "the cost report is for single-rate designs only (fxopt's "
+                               "baseline.hwbits costs a multirate design as given)")
+        return _handle_multirate(req, d, ints, n, rec, t0, _vinfo, design, types)
+    if "stop_time" in req:
+        raise G.GraphError("BAD_PARAM", "stop_time", "only for multirate designs (use nsteps)")
+    eng = req.get("engine", "auto")
+    if eng not in ("auto", "c", "python"):
+        raise G.GraphError("BAD_PARAM", "engine", "auto, c or python")
+    # recorded item 0: diagnostics on the C core wherever the design runs there -- equal
+    # to the Python reference on every design of the lane corpora (the regression check: 2,893 designs, outputs,
+    # compiled types and every diagnostics field); engine python keeps the reference
+    use_c = eng != "python" and d.vm_ok and os.path.exists(G.CORE)
+    if eng == "c" and not use_c:
+        # recordings (the error reporting contract): the cause and the block, one at a time -- the first block that
+        # keeps the design off the C core (the diagnostic uses "> 126-bit intermediates" for the width cause)
+        if not os.path.exists(G.CORE):
+            raise G.GraphError("UNSUPPORTED_WIDTH", "engine", "the C core is not built: run sh engine/build.sh once")
+        vw = getattr(d, "vm_why", None)
+        if vw and not any(ch in vw[0] for ch in G.RESERVED_CHARS):
+            raise G.GraphError("UNSUPPORTED_WIDTH", "design.blocks." + vw[0], "engine c: block %s: %s; use engine "
+                               "auto or python" % (vw[0], G.Design.VM_WHY.get(vw[1], vw[1])))
+        if vw:   # an internal block of a lowering: named by the user's block it belongs to
+            # an internal name either follows its block ("B\x1dprev") or leads with the marker ("\x1eB/d1", recorded)
+            own = vw[0].split("\x1d")[0].split("\x1e")[0].split("\x1f")[0].split("[")[0] or \
+                vw[0].lstrip("".join(G.RESERVED_CHARS)).split("/")[0].split("\x1d")[0].split("[")[0]
+            raise G.GraphError("UNSUPPORTED_WIDTH", "design.blocks." + own, "engine c: block %s (its internal "
+                               "part): %s; use engine auto or python" % (own, G.Design.VM_WHY.get(vw[1], vw[1])))
+        raise G.GraphError("UNSUPPORTED_WIDTH", "engine", "engine c: this design runs on the Python path only; "
+                           "use engine auto or python")
+    t1 = time.monotonic()
+    diag = None
+    watch = _mps_ctrl_watch(d)
+    rec_user, rec = rec, list(rec) + [x for x in dict.fromkeys(watch.values()) if x not in rec]
+    if use_c and diag_on:
+        logs, diag = d.run_diagnostics_c(ints, nsteps, rec, TIMEOUT_S)
+        # (as on the Python path: a lowering's internal blocks reported under the user's block)
+        diag = _fold_internal_blocks(d, diag, (req.get("design") or {}).get("blocks") or {})
+    elif use_c:
+        logs, _ = G.run_fast(d, ints, nsteps, rec, TIMEOUT_S)
+    elif diag_on:
+        logs, diag = d.run_diagnostics(ints, nsteps, rec)
+        diag = _fold_internal_blocks(d, diag, (req.get("design") or {}).get("blocks") or {})
+    else:
+        logs = d.run(ints, nsteps, rec)
+    t2 = time.monotonic()
+    ctrl_logs = {x: logs[x] for x in watch.values()}
+    rec = rec_user
+    out = {"status": "ok",
+           "compiled_types": _compiled_types(d, _vinfo),
+           "compiled_port_types": _compiled_port_types(d, req.get("design"), _compiled_types(d, _vinfo)),
+           # accepted Simulink parameters without effect here: check them if one was meant to matter
+           "ignored_parameters": {x: v for x, v in sorted(d.ignored_params.items()) if v},
+           # the parameters each block left out and the values assumed (Simulink library defaults for JSON designs)
+           "assumed_defaults": _assumed(d, req),   # the model's own blocks only
+           # the error reporting contract: parameters not used as written (rounded to their type, or saturated; Simulink warns)
+           "parameter_quantization": _pq(d, req),
+           # the warnings Simulink gives on this design (recorded rules), and shapes not yet recorded
+           "simulink_warnings": _sim_warnings(d, ctrl_logs),
+           "accumulator_types": {x: "fixdt(%d,%d,%d)" % t for x, t in sorted(getattr(d, "acc_types", {}).items())
+                                 if ((req.get("design") or {}).get("blocks", {}).get(x) or {}).get("type", "Sum") == "Sum"},
+           # a Discrete FIR's types inside the block
+           # (one coefficient: the accumulator is not used and there are no states)
+           "internal_types": {x: {k_: v_ for k_, v_ in zip(("coefficient", "product", "accumulator", "state"),
+                                                         ("fixdt(%d,%d,%d)" % tuple(t) for t in ts))
+                                  if len(d.param_record(x).coefs) > 1 or k_ in ("coefficient", "product")}
+                              for x, ts in sorted(getattr(d, "fir_types", {}).items())
+                              if not any(ch in x for ch in G.RESERVED_CHARS)},
+           "schedule": d.order,
+           "outputs": {x: _value(d, x, logs[x]) for x in rec},
+           "metrics": {"nsteps": nsteps, "nblocks": len(d.names), "engine": "c" if use_c and not getattr(d, "c_fallback", False) else "python"},
+           # the target the inheritance rules used
+           # (passable back as "hw" unchanged; hw_default says it was not given -- recorded: a marker inside broke export)
+           "hw": dict(req.get("hw") or {}) or {"ProdHWDeviceType": "Intel->x86-64 (Windows64)"},
+           "hw_default": not req.get("hw"),
+           "timing_ms": {"compile": round((t1 - t0) * 1e3, 3), "run": round((t2 - t1) * 1e3, 3)}}
+    if getattr(d, "assert_events", None) is not None and (getattr(d, "hdl_info", None) or {}).get("assertions"):
+        # Assertion blocks that do not stop the run (StopWhenAssertionFail off): the steps whose input was zero, as
+        # often as Simulink warns
+        out["assertion_failures"] = {x: v for x, v in sorted(d.assert_events.items())}
+    if inferred:
+        out["inferred_port_dimensions"] = inferred   # Inport widths taken from the input data (see handle)
+    if cost_on:
+        out["cost"] = design_cost(d)
+    if diag is not None:
+        # events at the same step are ordered as the blocks execute (Simulink names the first
+        # block to overflow in its execution order), not by name
+        rank = d.tie_rank() if hasattr(d, "tie_rank") else {x: i for i, x in enumerate(getattr(d, "order", None) or ())}
+
+        def rk(x):
+            return rank.get(x, rank.get(str(x).split("[")[0], len(rank)))
+        wr = sorted((x for x in diag if diag[x]["wraps"]), key=lambda x: (diag[x]["first_wrap_step"], rk(x), x))
+        sa = sorted((x for x in diag if diag[x]["saturations"]), key=lambda x: (diag[x]["first_saturation_step"], rk(x),
+                                                                                 x))
+        out["diagnostics"] = {
+            "summary": {"blocks_wrapped": wr, "blocks_saturated": sa,
+                        "total_wraps": sum(diag[x]["wraps"] for x in diag),
+                        "total_saturations": sum(diag[x]["saturations"] for x in diag),
+                        "blocks_divided_by_zero": sorted(x for x in diag if diag[x]["divisions_by_zero"]),
+                        "first_event": min(([diag[x]["first_wrap_step"], x, "wrap"] for x in wr) if not sa else
+                                           [[diag[x]["first_wrap_step"], x, "wrap"] for x in wr] +
+                                           [[diag[x]["first_saturation_step"], x, "saturation"] for x in sa],
+                                           key=lambda e: (e[0], rk(e[1]), e[1]), default=None)},
+            "definition": "an event = a value leaving the type of one of the block's quantisation points (its output, "
+                          "accumulator, product or cast) at that step, then wrapped or saturated as the block "
+                          "specifies (a Discrete-Time Integrator's state update at the step it was made); a block can count "
+                          "several per step; a counter's designed wrap-around is not an event; "
+                          "a division by zero (saturated by the dividend's sign) is counted apart; min / max = the block's output "
+                          "over the run",
+            "blocks": diag}
+    return out
+
+
+def _mr_c(spec, hw, types, ints, st, rec, per, d):
+    """Multirate on the C core: the design lowered to the
+    base step (engine/fxlower.py -- checked against the multirate recordings by the regression check), its inputs held between their
+    hits, run by the C interpreter; each recorded block's carrier read at that block's own hit times. Returns
+    {block: (times, values)} as fxmultirate.run, or None when the lowering or the C core does not take the design
+    (the Python path then answers)."""
+    import fxlower as LW
+    from fractions import Fraction
+    if spec is None or types is None or not os.path.exists(G.CORE) or os.environ.get("FXGRAPH_MR_PYTHON"):
+        return None
+    import fxmultirate as MR
+    MR.precheck(d, ints, st)   # (the Python path's refusals first -- they raise, they are not fallen back from)
+    try:
+        low, info = LW.lower(spec, hw, types)
+        dl = G.Design(low, hw)
+        dl.compile({k: types[k] for k in dl.inports if k in types})
+    except Exception:  # noqa: BLE001 -- a design the lowering does not take (recorded lowered blocks, refusals):
+        return None    # the Python path answers it, as before
+    if not dl.vm_ok or any(k not in ints for k in dl.inports):
+        return None
+    base, car = info["base"], info["carrier"]
+    if any(x not in car or per.get(x) is None or car[x] not in dl.names for x in rec):
+        return None   # (a block the lowering renamed or a constant: the Python path)
+    nsteps = int(Fraction(st) / base) + 1
+    if nsteps * max(1, len(dl.slots)) > MAX_WORK:
+        return None
+    ins = LW.expand_inputs(info, {k: ints[k] for k in dl.inports}, nsteps)
+    try:
+        logs_c, _ns = G.run_fast(dl, ins, nsteps, sorted({car[x] for x in rec}))
+    except G.GraphError:
+        return None
+    out = {}
+    offs = getattr(d, "mr_offsets", {}) or {}
+    for x in rec:
+        P, o = Fraction(per[x]), Fraction(offs.get(x, 0) or 0)
+        ts, t = [], o
+        while t <= st:
+            ts.append(t)
+            t += P
+        seq = logs_c.get(car[x])
+        if seq is None or any(int(t_ / base) >= len(seq) or (t_ / base).denominator != 1 for t_ in ts):
+            return None   # (a hit off the base grid or past the run: the Python path)
+        out[x] = (ts, [seq[int(t_ / base)] for t_ in ts])
+    return out
+
+
+def _handle_multirate(req, d, ints, n, rec, t0, vinfo=None, spec=None, types=None):
+    """multirate designs run on the C core through the single-rate lowering when it takes them (_mr_c), else on
+    the Python reference path (engine/fxmultirate.py). Inputs are samples at each Inport's own period; outputs carry
+    their sample times (exact rationals as strings)."""
+    import fxmultirate as MR
+    from fractions import Fraction
+    eng = req.get("engine", "auto")
+    if eng not in ("auto", "c", "python"):
+        raise G.GraphError("BAD_PARAM", "engine", "auto, c or python")
+    if "nsteps" in req:
+        raise G.GraphError("BAD_PARAM", "nsteps", "multirate designs take stop_time (seconds), not nsteps")
+    per = MR.rates(d)
+    import fxhdl
+    fxhdl.check_control_rates(req.get("design") or {}, per, d.mr_offsets)
+    for blocks_, where_ in getattr(d, "same_types", []):
+        # recordings (the reviewer's Rate Transition variant on main): a Mux of signals at different rates is one
+        # vector at the fastest rate in Simulink (the slow element held); the scalar lowering kept each element at
+        # its own rate -- silently wrong, refused
+        ts_ = sorted({d.type_str(x) for x in blocks_ if x in getattr(d, "otype", {})})
+        if len(ts_) > 1:
+            # the mixed-type Mux check ran in single-rate designs only (Simulink: InputPortDataTypeMismatch)
+            raise G.GraphError("UNSUPPORTED", where_, "a Mux of signals with different data types (%s): Simulink "
+                               "rejected every recorded case (InputPortDataTypeMismatch); convert the "
+                               "inputs to one type first" % ", ".join(ts_))
+        rs_ = {per.get(x) for x in blocks_ if per.get(x) is not None}   # constants join any rate
+        if len(rs_) > 1:
+            raise G.GraphError("UNSUPPORTED", where_, "Mux of signals at different sample times (%s) is not supported "
+                               "(Simulink runs the vector at the fastest rate); bring the inputs to one rate first "
+                               "with Rate Transition blocks" % ", ".join(sorted(str(r) for r in rs_)))
+    st = req.get("stop_time")
+    if st is None:
+        if not d.inports:
+            raise G.GraphError("MISSING_FIELD", "stop_time", "stop_time is required")
+        st = min((len(ints[x]) - 1) * per[x] for x in d.inports)
+    else:
+        try:
+            st = Fraction(str(st))
+        except (ValueError, ZeroDivisionError):
+            raise G.GraphError("BAD_PARAM", "stop_time", "number or rational string required")
+        if st < 0:
+            raise G.GraphError("BAD_PARAM", "stop_time", "must be >= 0")
+    t1 = time.monotonic()
+    diag = None
+    engine_used = "python-multirate"
+    if req.get("diagnostics"):
+        # the error reporting contract for multirate designs: the same per-block events and ranges, first times in seconds
+        # (counted at each block's own hits: the Python path; the lowered C run repeats held values)
+        if eng == "c":
+            raise G.GraphError("UNSUPPORTED", "engine", "multirate diagnostics are computed on the Python path only; "
+                               "use engine auto or python")
+        logs, diag = MR.run_diagnostics(d, ints, st, rec)
+        diag = _fold_internal_blocks(d, diag, (req.get("design") or {}).get("blocks") or {})
+    else:
+        # SolverMode Auto (a previous version: an Upsample delays by one slow sample): recorded C lowering is the
+        # SingleTasking timing, so an Auto design stays on the Python multirate path, which implements Auto
+        auto_ = str((req.get("hw") or {}).get("SolverMode", "SingleTasking")).strip() == "Auto"
+        logs = _mr_c(spec, req.get("hw"), types, ints, st, rec, per, d) if eng != "python" and not auto_ else None
+        if logs is not None:
+            engine_used = "c-lowered"
+        elif eng == "c":
+            raise G.GraphError("UNSUPPORTED", "engine", "this multirate design is not lowered to the C core (its "
+                               "lowering or the core does not take it); it runs on the Python path: use engine auto")
+        else:
+            logs = MR.run(d, ints, st, rec)
+    t2 = time.monotonic()
+    outs = {}
+    for x in rec:
+        ts, vs = logs[x]
+        o = _value(d, x, vs)
+        o["t"] = [str(t) for t in ts]
+        o["period"] = str(per[x]) if per[x] is not None else "constant"
+        if getattr(d, "mr_offsets", {}).get(x):
+            # an Inport [period offset] runs on the offset grid; the offset was dropped from the report
+            o["offset"] = str(d.mr_offsets[x])
+        outs[x] = o
+    # recordings (recorded): the vector blocks the vector pass removed (a Tapped Delay in a slow domain) keep their
+    # elements' type here too, as on the single-rate path (the export's check was left INCOMPLETE without it)
+    return {"status": "ok", "compiled_types": _compiled_types(d, vinfo),
+            "compiled_port_types": _compiled_port_types(d, req.get("design"), _compiled_types(d, vinfo)),
+            "ignored_parameters": {x: v for x, v in sorted(d.ignored_params.items()) if v},
+           # the parameters each block left out and the values assumed (Simulink library defaults for JSON designs)
+           "assumed_defaults": _assumed(d, req),   # the model's own blocks only
+            "parameter_quantization": _pq(d, req),
+            "simulink_warnings": _sim_warnings(d),
+            "sample_times": {x: _ts_text(d, x, v) for x, v in sorted(per.items())},
+            "schedule": d.order, "outputs": outs,
+            "metrics": {"stop_time": str(st), "nblocks": len(d.names), "engine": engine_used},
+            "timing_ms": {"compile": round((t1 - t0) * 1e3, 3), "run": round((t2 - t1) * 1e3, 3)},
+            **({"diagnostics": _mr_diag(diag, sorted(d.tie_rank(), key=d.tie_rank().get) if hasattr(d, "tie_rank")
+                                       else getattr(d, "order", None))} if diag is not None else {})}
+
+
+def _fold_internal_blocks(d, diag, user_blocks):
+    """Diagnostics speak of the user's blocks only. A block the engine added while lowering a user block (an HDL
+    Counter, RAM, FIFO, FIR or NCO, a MATLAB Function, a Bias, a reset Delay, a vector element copy -- its name
+    starts with a reserved character) is folded into the user block it belongs to (the longest user block name it
+    starts with): its wraps / saturations / divisions by zero are added there, the first steps are the earliest.
+    The internal blocks of an HDL Counter or an HDL NCO are dropped instead: their counter / phase-accumulator wraps
+    are the block's design, as a Counter Free-Running's wrap is not an event (
+    the NCO mixer example reported 288 wraps in '\\x1dN/l/sum', an HDL Counter in its 'C/up' and 'C/down')."""
+    from fractions import Fraction
+    designed = ("HDLCounter", "HDLNCO")
+    users = sorted((u for u in user_blocks if u[:1] not in G.RESERVED_CHARS), key=len, reverse=True)
+
+    subsystems = sorted({u.rsplit("/", 1)[0] for u in users if "/" in u}, key=len, reverse=True)
+
+    def internal(x):
+        return any(c in x for c in G.RESERVED_CHARS)
+
+    def owner(x):
+        bare = x.lstrip("".join(G.RESERVED_CHARS))
+        cut = min([bare.index(c) for c in G.RESERVED_CHARS if c in bare] + [len(bare)])
+        for u in users:      # a Tapped Delay's element copies are named <block><reserved>d1/...
+            if bare == u or bare.startswith(u + "/") or bare.startswith(u + "[") or bare[:cut] == u:
+                return u
+        for p_ in subsystems:   # an enabled subsystem's enable / reset helpers (<S>/es/...): the subsystem
+            if bare.startswith(p_ + "/"):
+                return p_
+        return None
+    out = {x: dict(v) for x, v in diag.items() if not internal(x)}
+    for x, v in diag.items():
+        if not internal(x):
+            continue
+        u = owner(x)
+        if u is None:
+            if v.get("wraps") or v.get("saturations") or v.get("divisions_by_zero"):
+                out[x.replace("\x1d", "/").replace("\x1e", "/").replace("\x1f", "/").lstrip("/")] = dict(v)
+            continue
+        if (user_blocks.get(u) or {}).get("type") in designed:
+            continue
+        e = out.setdefault(u, {"wraps": 0, "saturations": 0, "divisions_by_zero": 0})
+        for k in ("wraps", "saturations", "divisions_by_zero"):
+            e[k] = e.get(k, 0) + v.get(k, 0)
+        for k in [k for k in v if k.startswith("first_")]:
+            if v[k] is not None and (e.get(k) is None or Fraction(str(v[k])) < Fraction(str(e[k]))):
+                e[k] = v[k]
+            e.setdefault(k, v[k])
+    return out
+
+
+def _mr_diag(diag, order=None):
+    """Multirate diagnostics in the single-rate layout, event times in seconds (exact rationals as strings)."""
+    from fractions import Fraction
+
+    def tk(x, kind):
+        return Fraction(diag[x]["first_%s_time" % kind])
+    rank = {x: i for i, x in enumerate(order or ())}   # ties in execution order
+
+    def rk(x):
+        return rank.get(x, rank.get(str(x).split("[")[0], len(rank)))
+    wr = sorted((x for x in diag if diag[x]["wraps"]), key=lambda x: (tk(x, "wrap"), rk(x), x))
+    sa = sorted((x for x in diag if diag[x]["saturations"]), key=lambda x: (tk(x, "saturation"), rk(x), x))
+    ev = [[diag[x]["first_wrap_time"], x, "wrap"] for x in wr] + \
+        [[diag[x]["first_saturation_time"], x, "saturation"] for x in sa]
+    return {"summary": {"blocks_wrapped": wr, "blocks_saturated": sa,
+                        "total_wraps": sum(diag[x]["wraps"] for x in diag),
+                        "total_saturations": sum(diag[x]["saturations"] for x in diag),
+                        "blocks_divided_by_zero": sorted(x for x in diag if diag[x]["divisions_by_zero"]),
+                        "first_event": min(ev, key=lambda e: (Fraction(e[0]), rk(e[1]), e[1])) if ev else None},
+            "definition": "as for single-rate designs (an event = a value leaving the type of one of the block's "
+                          "quantisation points, then wrapped or saturated as the block specifies), with first times in "
+                          "seconds; a CIC filter's integrator and section wraps are its design, not events; min / max = "
+                          "the block's output over the run",
+            "blocks": {x: v for x, v in sorted(diag.items()) if not any(ch in x for ch in G.RESERVED_CHARS)}}
+
+
+def _pq(d, req=None):
+    """The model's own blocks' parameter notes (fxgraph_lib._param_note), keyed by the parameter's location. A Tapped
+    Delay's stages (vector pass: Unit Delays <name>\x1dd<k>) report on its vinit, element j of a
+    vector vinit as vinit[j]."""
+    import re
+    ub = ((req or {}).get("design") or {}).get("blocks") if isinstance(req, dict) else None
+    ub = ub if isinstance(ub, dict) else {}
+    out = {}
+    for k, v in sorted((getattr(d, "param_notes", None) or {}).items()):
+        if not any(ch in k for ch in G.RESERVED_CHARS):
+            out[k] = v
+            continue
+        m = re.match(r"design\.blocks\.([^\x1d\x1e\x1f]+)\x1dd\d+\.InitialCondition$", k)
+        b = ub.get(m.group(1)) if m else None
+        if not isinstance(b, dict) or b.get("type") not in ("TappedDelay", "TappedDelayEnabledSynchronous"):
+            continue
+        vv = str(b.get("vinit", "0.0")).strip()
+        if not vv.startswith("["):
+            out.setdefault("design.blocks.%s.vinit" % m.group(1), dict(v, written=vv))
+            continue
+        try:
+            import fxvector
+            vals = fxvector._ints_or_vals(vv, "design.blocks.%s.vinit" % m.group(1))
+        except Exception:  # noqa: BLE001 -- the design compiled with this vinit; an unreadable note is left out
+            continue
+        for j, x in enumerate(vals, start=1):
+            if repr(float(x)) == v.get("written") or G._fmt_num(x) == v.get("written"):
+                out.setdefault("design.blocks.%s.vinit[%d]" % (m.group(1), j), dict(v, written=G._fmt_num(x)))
+    return dict(sorted(out.items()))
+
+
+def _owner(x):
+    """The model's own block an internal name belongs to ("W\x1d2" -> "W", "S[1]" -> "S")."""
+    return x.split("\x1d")[0].split("\x1e")[0].split("\x1f")[0].split("[")[0] or \
+        x.lstrip("".join(G.RESERVED_CHARS)).split("/")[0].split("\x1d")[0].split("[")[0]
+
+
+def _mps_ctrl_watch(d):
+    """Multiport Switches whose out-of-range control Simulink warns about at run time (DiagnosticForDefault Warning):
+    {block: control signal}; the run records these signals too."""
+    w = {n: d.src[n][0] for n in d.names if d.btype[n] == "MultiportSwitch" and d.src[n] and
+         d.src[n][0] is not None and (d.params.get(n) or {}).get("DiagnosticForDefault", "None") == "Warning"}
+    for n in d.names:   # Shift Arithmetic with the shift from a port and the out-of-range check warning: the shift
+        p = d.params.get(n) or {}
+        if d.btype[n] == "ShiftArithmetic" and str(p.get("BitShiftNumberSource", "Dialog")) == "Input port" and \
+                str(p.get("CheckOORBitShift", "off")) == "on" and \
+                str(p.get("DiagnosticForOORShift", "Warning")) == "Warning" and len(d.src[n]) > 1 and \
+                d.src[n][1] is not None:
+            w[n] = d.src[n][1]
+    return w
+
+
+def _mps_ports(p):
+    """The control values that select a data port of a Multiport Switch."""
+    if p.get("DataPortOrder") == "Specify indices":
+        return set(G.fc.mps_indices(p)) if hasattr(G, "fc") else set()
+    base = 0 if str(p.get("DataPortOrder", "")).startswith("Zero") else 1
+    return set(range(base, base + int(p.get("Inputs", "2"))))
+
+
+# a recorded rule answers only the shapes its recordings cover; anything else is listed as
+# unchecked with the design to record. Coverage:
+SW_THRESHOLDS = (-1.0, -0.5, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0)   # boolean-control Switch thresholds recorded
+MPS_CTRLS = {(0, 1, 0): 6, (0, 2, 0): 6, (0, 4, 0): 4, (0, 8, 0): 4, (1, 8, 0): 4, (1, 16, 0): 4}   # control -> max ports
+MPS_BOOL_PORTS = 4
+
+
+def _sim_warnings(d, ctrl_logs=None):
+    """recordings (the error reporting contract): the warnings Simulink gives on this accepted design -- "expected": a recorded
+    rule says Simulink warns; "unchecked": a shape it may warn on that the recordings do not cover (with the design to
+    record). The values are not affected; an export check that fails on any warning reads this."""
+    from fractions import Fraction
+    exp, unch = [], {}
+    seen = set()
+
+    def add(block, wid, when, **kw):
+        if (block, wid) not in seen:
+            seen.add((block, wid))
+            exp.append(dict(block=block, id=wid, when=when, **kw))
+
+    def note(block, why):
+        unch.setdefault(block, []).append(why)
+    for n in d.names:
+        bt, p = d.btype[n], d.params.get(n) or {}
+        src = d.src.get(n) or []
+        if bt == "ShiftArithmetic" and str(p.get("BitShiftNumberSource", "Dialog")) == "Input port" and \
+                str(p.get("CheckOORBitShift", "off")) == "on" and \
+                str(p.get("DiagnosticForOORShift", "Warning")) == "Warning":
+            # recordings (16 Warning designs): once per block, at the
+            # first step whose net shift is outside 0 .. 31 (Left / Right) or -31 .. 31 (Bidirectional); the values
+            # are those of the check off
+            own = _owner(n)
+            if ctrl_logs is None or len(src) < 2 or src[1] not in ctrl_logs:
+                note(own, "DiagnosticForOORShift Warning: Simulink warns once at run time (ShiftOutOfRange) if the "
+                          "shift leaves the range; not evaluated on this path (multirate)")
+                continue
+            lo_ = -31 if str(p.get("BitShiftDirection", "Bidirectional")) == "Bidirectional" else 0
+            for step, v in enumerate(ctrl_logs[src[1]]):
+                if not lo_ <= int(v) <= 31:
+                    add(own, "Simulink:blocks:ShiftOutOfRange", "run", first_step=step, shift_value=str(int(v)))
+                    break
+            continue
+        if bt not in ("Switch", "MultiportSwitch"):
+            continue
+        own, vec = _owner(n), any(ch in n for ch in G.RESERVED_CHARS) or "[" in n
+        if bt == "Switch" and len(src) > 1 and src[1] is not None and d.otype.get(src[1]) == G.BOOL:
+            crit = p.get("Criteria", "u2 >= Threshold")
+            if crit == "u2 ~= 0":
+                continue
+            try:
+                th = float(str(p.get("Threshold", "0")).strip())
+            except ValueError:
+                th = None
+            if vec or th not in SW_THRESHOLDS:
+                note(own, "Switch with a boolean control, %s and threshold %s%s: Simulink ignores the threshold and "
+                          "may warn SwitchIgnoringThreshold; recorded for scalar Switches with thresholds %s only -- "
+                          "record this Switch to cover it" % (crit, p.get("Threshold"), " on a vector" if vec else "",
+                                                               ", ".join("%g" % x for x in SW_THRESHOLDS)))
+                continue
+            # a boolean control ignores the threshold
+            # (the block acts as u2 ~= 0); Simulink warns, once at compile and once as the simulation starts, unless
+            # the criterion already means u2 ~= 0 on {0, 1}
+            if (not 0 <= th < 1) if crit == "u2 > Threshold" else (not 0 < th <= 1):
+                add(own, "Simulink:blocks:SwitchIgnoringThreshold", "compile")
+        elif bt == "MultiportSwitch" and src and src[0] is not None:
+            ct = d.otype.get(src[0])
+            k = int(p.get("Inputs", "2")) if str(p.get("Inputs", "2")).strip().isdigit() else None
+            contiguous = p.get("DataPortOrder") in ("Zero-based contiguous", "One-based contiguous")
+            maxk = MPS_BOOL_PORTS if ct == G.BOOL else MPS_CTRLS.get(tuple(ct) if ct else None)
+            if p.get("DataPortOrder") == "Specify indices" and not vec and ct in ((0, 8, 0), (0, 16, 0), (1, 8, 0)):
+                # recordings (18): with DiagnosticForDefault Warning a control matching no index
+                # warns MPSwitchInvalidControlPortValue once at run time (9 / 9); None gives nothing (9 / 9); every
+                # recorded index was representable by its control type
+                ix = G.fc.mps_indices(p)
+                lo, hi = (0, (1 << ct[1]) - 1) if not ct[0] else (-(1 << (ct[1] - 1)), (1 << (ct[1] - 1)) - 1)
+                if not all(lo <= x <= hi for x in ix):
+                    note(own, "Multiport Switch 'Specify indices' with an index its control %s cannot represent: "
+                              "not recorded -- record this switch to cover it" % d.type_str(src[0]))
+                    continue
+                if p.get("DiagnosticForDefault", "None") == "Warning":
+                    if ctrl_logs is None or src[0] not in ctrl_logs:
+                        note(own, "DiagnosticForDefault Warning: Simulink warns once at run time "
+                                  "(MPSwitchInvalidControlPortValue) if the control matches no index; not evaluated "
+                                  "on this path (multirate)")
+                        continue
+                    for step, v in enumerate(ctrl_logs[src[0]]):
+                        if int(v) not in ix:
+                            add(own, "Simulink:blocks:MPSwitchInvalidControlPortValue", "run", first_step=step,
+                                control_value=str(int(v)))
+                            break
+                continue
+            if vec or not contiguous or k is None or maxk is None or not 2 <= k <= maxk:
+                note(own, "Multiport Switch with control %s, %s, %s data ports%s: whether Simulink warns (dead ports, "
+                          "or an out-of-range control with DiagnosticForDefault Warning) is recorded for scalar "
+                          "zero- / one-based switches with boolean, ufix1 / ufix2 (up to 6 ports), uint8 / int8 / "
+                          "ufix4 / int16 (up to 4 ports) controls only -- record this switch to cover it"
+                     % (d.type_str(src[0]) if ct else "?", p.get("DataPortOrder"), p.get("Inputs"),
+                        " on a vector" if vec else ""))
+                continue
+            ports = _mps_ports(p)
+            # a control type that cannot represent some data port's index warns
+            # MPSwitchDeadPorts (compile, and once as the simulation starts), whatever DiagnosticForDefault says
+            lo, hi = (0, 1) if ct == G.BOOL else \
+                ((-(1 << (ct[1] - 1)), (1 << (ct[1] - 1)) - 1) if ct[0] else (0, (1 << ct[1]) - 1))
+            dead = sorted(x for x in ports if not lo <= x <= hi)
+            if dead:
+                add(own, "Simulink:blocks:MPSwitchDeadPorts", "compile", dead_indices=dead)
+            if p.get("DiagnosticForDefault", "None") == "Warning":
+                # once per block, at run time, when the control first leaves the range
+                # (Simulink's message names the value, not the step; the step here is the engine's)
+                if ctrl_logs is None or src[0] not in ctrl_logs:
+                    note(own, "DiagnosticForDefault Warning: Simulink warns once at run time "
+                              "(MPSwitchControlInputOORIndexValue) if the control leaves the range; not evaluated on "
+                              "this path (multirate)")
+                    continue
+                for step, v in enumerate(ctrl_logs[src[0]]):
+                    if int(v) not in ports:
+                        add(own, "Simulink:blocks:MPSwitchControlInputOORIndexValue", "run", first_step=step,
+                            control_value=str(int(v)))
+                        break
+    return {"expected": sorted(exp, key=lambda e: (e["block"], e["id"])),
+            "unchecked": [{"block": b, "why": "; ".join(v)} for b, v in sorted(unch.items())]}
+
+
+
+
+def _err(code, where, message, sha):
+    e = {"status": "error", "code": code, "where": where, "message": message, "input_sha256": sha}
+    G.with_next_step(e)
+    try:
+        os.makedirs(os.path.dirname(ERRLOG), exist_ok=True)
+        with open(ERRLOG, "a") as f:
+            f.write(json.dumps(e) + "\n")
+    except OSError:
+        pass
+    return e
+
+
+class _Timeout(Exception):
+    pass
+
+
+def _mem_limit():
+    """Per-run memory limit (without one a large request was killed by the kernel with no
+    structured answer). FX_MEM_BYTES, default 4 GiB; exceeding it is reported as OOM."""
+    try:
+        import resource
+        lim = int(os.environ.get("FX_MEM_BYTES", str(4 << 30)))
+        resource.setrlimit(resource.RLIMIT_DATA, (lim, lim))
+    except Exception:  # noqa: BLE001 -- a platform without the limit still answers
+        pass
+
+
+def _real(n, f):
+    """n * 2^-f as a float without converting a huge stored integer first (a 1087-bit Sum output crashed
+    the summary with OverflowError); beyond the float range: +-inf is not JSON, so the nearest finite float."""
+    from fractions import Fraction
+    try:
+        return float(Fraction(n) / (Fraction(2) ** f) if f >= 0 else Fraction(n) * (Fraction(2) ** -f))
+    except OverflowError:
+        return 1.7976931348623157e308 if n > 0 else -1.7976931348623157e308
+
+
+def _summary(res):
+    """The first layer of an ok result: per output its type, length and real-value range; the diagnostics / cost /
+    assumed-defaults / ignored-parameters headlines (details in the full result)."""
+    outs = {}
+    for name, v in (res.get("outputs") or {}).items():
+        if "bool" in v:
+            xs = v["bool"]
+            outs[name] = {"type": "boolean", "steps": len(xs), "ones": sum(xs)}
+        elif "hex" in v:
+            # a floating-point output (the float path): vals hold null for NaN / Inf -- the range over the finite ones
+            xs = [x for x in (v.get("vals") or []) if x is not None]
+            outs[name] = {"type": v.get("type"), "steps": len(v["hex"])}
+            if xs:
+                outs[name].update(min=min(xs), max=max(xs))
+            if v.get("vals") and v["vals"][-1] is not None:
+                outs[name]["last"] = v["vals"][-1]
+        else:
+            xs, f = v.get("ints") or [], v.get("fl", 0)
+            outs[name] = {"type": v.get("type"), "steps": len(xs)}
+            if xs:
+                outs[name].update(min=_real(min(xs), f), max=_real(max(xs), f), last=_real(xs[-1], f))
+        # Preserve the clock of each multirate output in its summary.
+        for k_ in ("period", "offset"):
+            if k_ in v:
+                outs[name][k_] = v[k_]
+    sm = {"outputs": outs, "blocks": (res.get("metrics") or {}).get("nblocks"),
+          "engine": (res.get("metrics") or {}).get("engine"),
+          "blocks_with_assumed_defaults": sorted(res.get("assumed_defaults") or {}),
+          "blocks_with_ignored_parameters": sorted(res.get("ignored_parameters") or {}),
+          "parameters_quantized": len(res.get("parameter_quantization") or {}),
+          "simulink_warnings": len((res.get("simulink_warnings") or {}).get("expected") or []),
+          "simulink_warnings_unchecked": len((res.get("simulink_warnings") or {}).get("unchecked") or [])}
+    if "diagnostics" in res:
+        sm["diagnostics"] = res["diagnostics"]["summary"]
+    if "cost" in res:
+        sm["hwbits"] = res["cost"]["hwbits"]
+    return sm
+
+
+def _layered(req, res, sha):
+    """ok result -> the response: summary first; with detail "summary" only the summary and the path of the full
+    result (written under its input hash)."""
+    res = dict({"status": "ok", "summary": _summary(res)}, **{k: v for k, v in res.items() if k != "status"})
+    if req.get("detail", "full") == "summary":
+        os.makedirs(RESULTS, exist_ok=True)
+        path = os.path.join(RESULTS, sha + ".json")
+        tmp = "%s.%d.tmp" % (path, os.getpid())
+        with open(tmp, "w") as f:
+            json.dump(res, f)
+        os.replace(tmp, path)
+        res = {"status": "ok", "summary": res["summary"], "hw": res.get("hw"), "hw_default": res.get("hw_default"),
+               "full_result": os.path.relpath(path, ROOT) if path.startswith(ROOT) else path,
+               "detail": "summary: outputs, compiled types, schedule, diagnostics and cost per block are in "
+                         "full_result (or ask again without detail)", "input_sha256": sha}
+    try:
+        os.makedirs(os.path.dirname(RUNLOG), exist_ok=True)
+        with open(RUNLOG, "a") as f:
+            f.write(json.dumps({"status": "ok", "input_sha256": sha, "time": round(time.time(), 3),
+                                "summary": res["summary"]}) + "\n")
+    except OSError:
+        pass
+    return res
+
+
+def main():
+    rc_args = fxcli.reject_arguments("fxgraph", ERRLOG)   # stdin only
+    if rc_args is not None:
+        return rc_args
+    _mem_limit()
+    data = sys.stdin.buffer.read().decode("utf-8", "replace")
+    lines = [l for l in data.split("\n") if l.strip()]
+    if len(lines) > 1:
+        # one pretty-printed request (several lines, as docs/en/GRAPH.md shows it) is one request;
+        # otherwise every line is a request of a JSONL batch
+        try:
+            if isinstance(json.loads(data), dict):
+                lines = [data.strip()]
+        except ValueError:
+            pass
+    if not lines:
+        sys.stdout.write(json.dumps(_err("BAD_JSON", "stdin", "empty input", hashlib.sha256(b"").hexdigest())) + "\n")
+        return 1   # a request error like any other (it gave 2, the code of argument errors)
+
+    def on_alarm(*_):
+        raise _Timeout()
+    if hasattr(signal, "SIGALRM"):
+        signal.signal(signal.SIGALRM, on_alarm)
+    rc = 0
+    for line in lines:
+        sha = hashlib.sha256(line.encode("utf-8", "replace")).hexdigest()
+        try:
+            if hasattr(signal, "SIGALRM"):
+                signal.setitimer(signal.ITIMER_REAL, TIMEOUT_S)
+            try:
+                req = json.loads(line)
+            except ValueError as e:
+                raise G.GraphError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+            if isinstance(req, dict) and req.get("detail", "full") not in ("full", "summary"):
+                raise G.GraphError("BAD_PARAM", "detail", "full or summary")
+            res = handle(req)
+            res["input_sha256"] = sha
+            res = _layered(req, res, sha)
+        except G.GraphError as e:
+            import error_locations   # located on the request's own block
+            res, rc = _err(e.code, *error_locations.user_loc(locals().get("req"), e.where, e.message), sha=sha), 1
+        except _Timeout:
+            res, rc = _err("TIMEOUT", "run", "request exceeded %gs (FXGRAPH_TIMEOUT_S)" % TIMEOUT_S, sha), 1
+        except MemoryError:
+            res, rc = _err("OOM", "run", "out of memory", sha), 1
+        except Exception as e:  # noqa: BLE001 -- always answer with a structured record
+            res, rc = _err("INTERNAL", type(e).__name__, str(e)[:500], sha), 1
+        finally:
+            if hasattr(signal, "SIGALRM"):
+                signal.setitimer(signal.ITIMER_REAL, 0)
+        sys.stdout.write(json.dumps(res) + "\n")
+        sys.stdout.flush()
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

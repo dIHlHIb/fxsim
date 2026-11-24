@@ -1,0 +1,108 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/11_multirate_firdec.json",
+ "exit_code": 0,
+ "wall_s": 0.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "outputs": {
+    "y": {
+     "type": "fixdt(1,32,29)",
+     "steps": 16,
+     "min": 0.0,
+     "max": 0.8928680419921875,
+     "last": 0.8928680419921875
+    }
+   },
+   "blocks": 3,
+   "engine": "c-lowered",
+   "blocks_with_assumed_defaults": [
+    "F",
+    "y"
+   ],
+   "blocks_with_ignored_parameters": [
+    "F"
+   ],
+   "parameters_quantized": 0,
+   "simulink_warnings": 0,
+   "simulink_warnings_unchecked": 0
+  },
+  "compiled_types": {
+   "F": "fixdt(1,32,29)",
+   "x": "fixdt(1,16,14)",
+   "y": "fixdt(1,32,29)"
+  },
+  "compiled_port_types": {},
+  "ignored_parameters": {
+   "F": [
+    "InputProcessing"
+   ]
+  },
+  "assumed_defaults": {
+   "F": {
+    "accumDataTypeStr": "Inherit: Inherit via internal rule",
+    "accumMode": "Inherit via internal rule",
+    "filtStruct": "Direct form",
+    "firstCoeffDataTypeStr": "Inherit: Same word length as input",
+    "firstCoeffMode": "Same word length as input",
+    "outputBufInitCond": "0",
+    "overflowMode": "off",
+    "prodOutputDataTypeStr": "Inherit: Inherit via internal rule",
+    "prodOutputMode": "Inherit via internal rule",
+    "roundingMode": "Floor"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "parameter_quantization": {},
+  "simulink_warnings": {
+   "expected": [],
+   "unchecked": []
+  },
+  "sample_times": {
+   "F": "2",
+   "x": "1",
+   "y": "2"
+  },
+  "schedule": [
+   "x",
+   "F",
+   "y"
+  ],
+  "outputs": {
+   "y": {
+    "type": "fixdt(1,32,29)",
+    "s": 1,
+    "wl": 32,
+    "fl": 29,
+    "ints": [
+     0,
+     24117248,
+     72146944,
+     119455744,
+     "... 12 more"
+    ],
+    "t": [
+     "0",
+     "2",
+     "4",
+     "6",
+     "... 12 more"
+    ],
+    "period": "2"
+   }
+  },
+  "metrics": {
+   "stop_time": "31",
+   "nblocks": 3,
+   "engine": "c-lowered"
+  },
+  "timing_ms": {
+   "compile": 50.136,
+   "run": 57.748
+  },
+  "input_sha256": "399b4e7f9a271481bfa872e29526152be013b093b2842d8400145c50d6ea3503"
+ }
+}

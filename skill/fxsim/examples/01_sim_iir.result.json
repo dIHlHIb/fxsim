@@ -1,0 +1,196 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/01_sim_iir.json",
+ "exit_code": 0,
+ "wall_s": 1.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items. The hardware accuracy field uses the current estimate notice.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "outputs": {
+    "y": {
+     "type": "fixdt(1,20,16)",
+     "steps": 48,
+     "min": -1.6440887451171875,
+     "max": 1.6844329833984375,
+     "last": 0.8413848876953125
+    }
+   },
+   "blocks": 5,
+   "engine": "c",
+   "blocks_with_assumed_defaults": [
+    "A",
+    "S",
+    "y"
+   ],
+   "blocks_with_ignored_parameters": [],
+   "parameters_quantized": 0,
+   "simulink_warnings": 0,
+   "simulink_warnings_unchecked": 0,
+   "diagnostics": {
+    "blocks_wrapped": [],
+    "blocks_saturated": [],
+    "total_wraps": 0,
+    "total_saturations": 0,
+    "blocks_divided_by_zero": [],
+    "first_event": null
+   },
+   "hwbits": 124
+  },
+  "compiled_types": {
+   "A": "fixdt(1,20,16)",
+   "D": "fixdt(1,20,16)",
+   "S": "fixdt(1,20,16)",
+   "x": "fixdt(1,16,14)",
+   "y": "fixdt(1,20,16)"
+  },
+  "compiled_port_types": {},
+  "ignored_parameters": {},
+  "assumed_defaults": {
+   "A": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "S": {
+    "AccumDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "parameter_quantization": {},
+  "simulink_warnings": {
+   "expected": [],
+   "unchecked": []
+  },
+  "accumulator_types": {
+   "S": "fixdt(1,32,16)"
+  },
+  "internal_types": {},
+  "schedule": [
+   "D",
+   "A",
+   "x",
+   "S",
+   "y"
+  ],
+  "outputs": {
+   "y": {
+    "type": "fixdt(1,20,16)",
+    "s": 1,
+    "wl": 20,
+    "fl": 16,
+    "ints": [
+     0,
+     6508,
+     17641,
+     31730,
+     "... 44 more"
+    ]
+   }
+  },
+  "metrics": {
+   "nsteps": 48,
+   "nblocks": 5,
+   "engine": "c"
+  },
+  "hw": {
+   "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+  },
+  "hw_default": true,
+  "timing_ms": {
+   "compile": 392.331,
+   "run": 6.039
+  },
+  "cost": {
+   "hwbits": 124,
+   "by_block": {
+    "A": {
+     "output_bits": 20,
+     "inner_bits": 16,
+     "hwbits": 36
+    },
+    "D": {
+     "output_bits": 20,
+     "inner_bits": 0,
+     "hwbits": 20
+    },
+    "S": {
+     "output_bits": 20,
+     "inner_bits": 32,
+     "hwbits": 52
+    },
+    "x": {
+     "output_bits": 16,
+     "inner_bits": 0,
+     "hwbits": 16
+    }
+   },
+   "hw_estimate": {
+    "dsp48e1": 1,
+    "lut": 33,
+    "ff": 0,
+    "lut_nodsp": 65,
+    "generic_gates": 259,
+    "dff": 20,
+    "status": "predicted, not synthesised",
+    "accuracy": "Resource estimates only. Validation data are outside this package. Synthesise your design to measure resource use."
+   },
+   "counting": "hwbits = every block's output word length (x the length of a Delay; Outports not counted) + the word lengths inside it: Gain parameter, Sum accumulator, Discrete FIR coefficient x taps + product x taps + accumulator x (1 + states when the state type is the accumulator's), lookup breakpoints x entries + table x entries, multirate FIR coefficient / product x taps + accumulator + input delay line, CIC sections + M x combs; the same counting as fxopt's hwbits and baseline.hwbits"
+  },
+  "diagnostics": {
+   "summary": {
+    "blocks_wrapped": [],
+    "blocks_saturated": [],
+    "total_wraps": 0,
+    "total_saturations": 0,
+    "blocks_divided_by_zero": [],
+    "first_event": null
+   },
+   "definition": "an event = a value leaving the type of one of the block's quantisation points (its output, accumulator, product or cast) at that step, then wrapped or saturated as the block specifies (a Discrete-Time Integrator's state update at the step it was made); a block can count several per step; a counter's designed wrap-around is not an event; a division by zero (saturated by the dividend's sign) is counted apart; min / max = the block's output over the run",
+   "blocks": {
+    "D": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,20,16)",
+     "min": -1.6440887451171875,
+     "max": 1.6844329833984375,
+     "stored_min": -107747,
+     "stored_max": 110391
+    },
+    "A": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,20,16)",
+     "min": -1.2330780029296875,
+     "max": 1.2633209228515625,
+     "stored_min": -80811,
+     "stored_max": 82793
+    },
+    "S": {
+     "wraps": 0,
+     "saturations": 0,
+     "first_wrap_step": null,
+     "first_saturation_step": null,
+     "divisions_by_zero": 0,
+     "first_division_by_zero_step": null,
+     "type": "fixdt(1,20,16)",
+     "min": -1.6440887451171875,
+     "max": 1.6844329833984375,
+     "stored_min": -107747,
+     "stored_max": 110391
+    }
+   }
+  },
+  "input_sha256": "24ca2e108b49de8b67b66dfcd1f5ba62eef0d5ebe40a49157261c9f383a16dc7"
+ }
+}

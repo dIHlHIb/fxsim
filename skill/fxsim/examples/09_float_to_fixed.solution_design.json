@@ -1,0 +1,60 @@
+{
+ "blocks": {
+  "x": {
+   "type": "Inport"
+  },
+  "B": {
+   "type": "Gain",
+   "Gain": "0.3",
+   "ParamDataTypeStr": "fixdt(0,10,11)",
+   "OutDataTypeStr": "fixdt(1,12,12)"
+  },
+  "S": {
+   "type": "Sum",
+   "Inputs": "++",
+   "AccumDataTypeStr": "fixdt(1,14,13)",
+   "OutDataTypeStr": "fixdt(1,14,13)"
+  },
+  "D": {
+   "type": "UnitDelay",
+   "InitialCondition": "0"
+  },
+  "A": {
+   "type": "Gain",
+   "Gain": "0.7",
+   "ParamDataTypeStr": "fixdt(0,10,10)",
+   "OutDataTypeStr": "fixdt(1,14,13)"
+  },
+  "y": {
+   "type": "Outport"
+  }
+ },
+ "lines": [
+  {
+   "src": "x",
+   "dst": "B"
+  },
+  {
+   "src": "B",
+   "dst": "S",
+   "dport": 1
+  },
+  {
+   "src": "A",
+   "dst": "S",
+   "dport": 2
+  },
+  {
+   "src": "S",
+   "dst": "D"
+  },
+  {
+   "src": "D",
+   "dst": "A"
+  },
+  {
+   "src": "S",
+   "dst": "y"
+  }
+ ]
+}

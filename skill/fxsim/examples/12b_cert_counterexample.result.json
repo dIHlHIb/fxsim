@@ -1,0 +1,147 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxcert < <skill dir>/examples/12b_cert_counterexample.json",
+ "exit_code": 0,
+ "wall_s": 0.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "overflow": "bounded",
+   "error": "violated",
+   "overflow_witness": null,
+   "max_error_over_tolerance": 1.01125,
+   "worst": {
+    "outport": "y",
+    "input_set": 0,
+    "at_sample": 21
+   },
+   "sets_outside_input_ranges": [],
+   "outports_not_judged": []
+  },
+  "overflow": {
+   "contract": {
+    "inputs": {
+     "x": {
+      "type": "fixdt(1,16,14)",
+      "stored_min": -14746,
+      "stored_max": 14745
+     }
+    },
+    "initial_state": "design",
+    "horizon": "unbounded",
+    "overflow_definition": "any quantisation point (cast after rounding, accumulator partial sum, product step, left shift) outside its type, wrapping or saturating",
+    "explicit_saturation_blocks": "value operation, not an overflow",
+    "lookup_table_fraction": "the interpolation fraction always saturates by the block's definition (it reaches 1 at the last breakpoint); not an overflow",
+    "parameters": "constants, gains, coefficients, table values, limits and initial values are quantised to their types once, when the design is compiled (nearest, saturating, as Simulink does); the certificate is about the design so compiled -- a parameter that saturated there is not reported as an overflow",
+    "counters": "a counter wraps or resets by definition; not an overflow"
+   },
+   "fingerprint": "639a09f5b6b186e781655966c3be4642da7799483500f4bcc8e0267e933b8098",
+   "status": "bounded",
+   "loops": [],
+   "points_checked": 24,
+   "points_not_proven": [],
+   "reasons": [],
+   "slot_bounds": {
+    "F": [
+     -7378,
+     7368
+    ],
+    "F/p0": [
+     -148,
+     147
+    ],
+    "F/p1": [
+     -443,
+     442
+    ],
+    "F/p2": [
+     -1180,
+     1179
+    ],
+    "F/p3": [
+     -1918,
+     1916
+    ],
+    "F/p4": [
+     -1918,
+     1916
+    ],
+    "F/p5": [
+     -1180,
+     1179
+    ],
+    "F/p6": [
+     -443,
+     442
+    ],
+    "F/p7": [
+     -148,
+     147
+    ],
+    "F/z1": [
+     -14746,
+     14745
+    ],
+    "F/z2": [
+     -14746,
+     14745
+    ],
+    "F/z3": [
+     -14746,
+     14745
+    ],
+    "F/z4": [
+     -14746,
+     14745
+    ],
+    "F/z5": [
+     -14746,
+     14745
+    ],
+    "F/z6": [
+     -14746,
+     14745
+    ],
+    "F/z7": [
+     -14746,
+     14745
+    ],
+    "x": [
+     -14746,
+     14745
+    ],
+    "y": [
+     -7378,
+     7368
+    ]
+   },
+   "claim": "no quantisation point wraps or saturates for any input sequence inside input_ranges, at any time step, from the stated initial state"
+  },
+  "error": {
+   "status": "violated",
+   "reference": "ideal double-precision simulation of the same graph",
+   "metric": "max_abs_diff per outport, each input set judged on its own",
+   "input_sets": [
+    {
+     "input_set": 0,
+     "samples": 31,
+     "outports": {
+      "y": {
+       "max_abs_diff": 0.0009875488281250178,
+       "at_sample": 21,
+       "tolerance": 0.0009765625,
+       "within": false
+      }
+     },
+     "inside_input_ranges": true
+    }
+   ],
+   "outports_not_judged": {},
+   "claim": "at least one input set exceeds a tolerance (see outports)"
+  },
+  "input_sha256": "b4308add345754945dde693f98b86a587a7d0938ee25299b02c78fcbe8cd125f",
+  "run": {
+   "elapsed_s": 0.023
+  }
+ }
+}

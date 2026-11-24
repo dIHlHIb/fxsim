@@ -1,0 +1,15 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/23_err_inherited_loop_type_mismatch.json",
+ "exit_code": 1,
+ "wall_s": 0.2,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "TYPE_MISMATCH",
+  "where": "design.blocks.S",
+  "message": "inherited data types around a cycle are inconsistent: an input of S was resolved as fixdt(1,16,14) but is driven by fixdt(1,32,28) from A",
+  "input_sha256": "ae9a15155ed47366f3431bab8129d0362214532ed9d0c5bd7abaf8a6ebb8fc9d",
+  "refusal_kind": "simulink_rejects",
+  "next_step": "the inherited types disagree as they would in Simulink: give one of the blocks named in the message an explicit output type"
+ }
+}

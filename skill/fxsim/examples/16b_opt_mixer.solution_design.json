@@ -1,0 +1,36 @@
+{
+ "blocks": {
+  "x": {
+   "type": "Inport"
+  },
+  "c": {
+   "type": "Inport"
+  },
+  "M": {
+   "type": "Product",
+   "Inputs": "**",
+   "OutDataTypeStr": "fixdt(1,12,11)",
+   "RndMeth": "Floor",
+   "SaturateOnIntegerOverflow": "off"
+  },
+  "y": {
+   "type": "Outport"
+  }
+ },
+ "lines": [
+  {
+   "src": "x",
+   "dst": "M",
+   "dport": 1
+  },
+  {
+   "src": "c",
+   "dst": "M",
+   "dport": 2
+  },
+  {
+   "src": "M",
+   "dst": "y"
+  }
+ ]
+}

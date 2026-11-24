@@ -1,0 +1,650 @@
+#!/usr/bin/env -S python3 -I
+"""fxapprox: lookup-table function approximation -- the breakpoints, the number of points and the table values of a
+1-D Lookup Table (linear interpolation, clip) for a named function, an input type and range and an absolute error
+tolerance, with the smallest storage it finds (recordings
+approximation; Fixed-Point Designer's FunctionApproximation is the original's counterpart).
+
+stdin: one JSON request; stdout: one JSON result. Every candidate's error is computed by the engine's bit-exact
+Lookup1D (C core) on every stored input value of the input type inside the range -- exhaustive; a double-precision
+estimate only chooses where to try. A table is never reported as meeting the tolerance on the estimate alone.
+
+Request:
+  function     one of FUNCTIONS (names only; no code is evaluated), or
+  reference    {"block": Lookup1D parameters}: compress that table -- the tolerance is against its bit-exact output
+  input        {"type": {"s", "wl", "fl"}, "min": lo, "max": hi}  (at most 2^20 stored values in range)
+  output       {"type": {"s", "wl", "fl"}}  optional: the Lookup output type; default the table type of each candidate
+  error        {"max_abs": t}
+  spacing      list of "explicit", "even", "pow2"  (default all three)
+  wordlengths  word lengths for breakpoints and table (default 8 .. 16)
+  rounding     the block's RndMeth (default "Floor")
+  time_budget_s  (default 60)
+Result: the Lookup1D parameters to drop into a design (block), memory_bits {total, breakpoints, table} (explicit:
+points x (breakpoint + table word); even spacing: points x table word + 2 x breakpoint word -- the first point and
+the spacing, as Fixed-Point Designer counts them), the worst error and its input, the candidates tried."""
+import collections
+import hashlib
+import json
+import math
+import os
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import fxcli  # noqa: E402
+import fxgraph_lib as G  # noqa: E402
+
+ERRLOG = os.path.join(ROOT, "runs", "approx_errors.jsonl")
+MAX_INPUTS = 1 << 20
+
+FUNCTIONS = {
+    "sqrt": (math.sqrt, lambda x: x >= 0),
+    "rsqrt": (lambda x: 1.0 / math.sqrt(x), lambda x: x > 0),
+    "reciprocal": (lambda x: 1.0 / x, lambda x: x != 0),
+    "exp": (math.exp, lambda x: True),
+    "log": (math.log, lambda x: x > 0),
+    "log2": (math.log2, lambda x: x > 0),
+    "sin": (math.sin, lambda x: True),
+    "cos": (math.cos, lambda x: True),
+    "tanh": (math.tanh, lambda x: True),
+    "atan": (math.atan, lambda x: True),
+    "sigmoid": (lambda x: 1.0 / (1.0 + math.exp(-x)), lambda x: True),
+}
+
+
+class ApproxError(Exception):
+    def __init__(self, code, where, message):
+        super().__init__(message)
+        self.code, self.where, self.message = code, where, message
+
+
+def _type(v, where):
+    if not isinstance(v, dict) or set(v) != {"s", "wl", "fl"} or v["s"] not in (0, 1) or \
+            not all(isinstance(v[k], int) and not isinstance(v[k], bool) for k in v) or not 1 <= v["wl"] <= 64:
+        raise ApproxError("BAD_PARAM", where, "{\"s\": 0|1, \"wl\": 1..64, \"fl\": integer} required")
+    return v["s"], v["wl"], v["fl"]
+
+
+def _num(v, where):
+    if not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(v):
+        raise ApproxError("BAD_PARAM", where, "finite number required")
+    return float(v)
+
+
+def _fit_type(lo, hi, w, signed=None):
+    """The finest-precision fixdt with word w holding [lo, hi]."""
+    s = 1 if (lo < 0 if signed is None else signed) else 0
+    if not s:
+        lo = max(lo, 0.0)   # an unsigned type cannot hold a negative value: its low end is 0
+    m = max(abs(lo), abs(hi))
+    ib = 1 if s else 0
+    while True:   # integer bits (sign included): the range must hold lo and hi
+        f = w - ib
+        q = 2.0 ** -f
+        tmax = ((1 << (w - 1)) - 1) * q if s else ((1 << w) - 1) * q
+        tmin = -(1 << (w - 1)) * q if s else 0.0
+        if tmin <= lo and hi <= tmax:
+            return (s, w, f)
+        ib += 1
+        if ib > w + 1100 or m == 0:
+            return (s, w, f)
+
+
+def _intermediate(table, tab_t, out_t):
+    """The interpolation's working type: at least the output's precision (it is not stored, so it costs no memory --
+    the original's log2 table meets its tolerance only so: 1.37x with the table type, 1.0x with the output's), wide
+    enough for the table values; signed for a falling table (an unsigned intermediate other than the table type with a
+    falling table is not recorded)."""
+    falling = any(b < a for a, b in zip(table, table[1:]))
+    s = 1 if (tab_t[0] or falling or min(table) < 0) else 0   # a centred value may dip below 0
+    f = max(out_t[2], tab_t[2])
+    t = _fit_type(min(min(table), 0.0) if s else min(table), max(table), 2, signed=bool(s))
+    ib = t[1] - t[2]   # integer bits (sign included) the table values need
+    w = ib + f
+    if w > 64 or (not s and (w, f) == (tab_t[1], tab_t[2])):
+        return tab_t if not falling or tab_t[0] else (1, tab_t[1] + 1, tab_t[2])
+    return (s, max(w, 2), f)
+
+
+def _clip(table, t):
+    """Table values inside the table type's range (a centred value just outside it stops a default
+    Simulink model with a parameter overflow error; the engine saturates it to the same stored value)."""
+    s, w, f = t
+    q = 2.0 ** -f
+    tmin = (-(1 << (w - 1)) if s else 0) * q
+    tmax = (((1 << (w - 1)) - 1) if s else ((1 << w) - 1)) * q
+    return [min(max(v, tmin), tmax) for v in table]
+
+
+def _fixdt(t):
+    return "fixdt(%d,%d,%d)" % t
+
+
+def _vec(v):
+    return "[" + " ".join(repr(float(x)) for x in v) + "]"
+
+
+def _bp_type_refused(ev, bp_t, tab_t, out_t, lo, hi, rm):
+    """Whether the engine refuses a block with this breakpoint type when compiled (no simulation): a two-point table
+    over [lo, hi] with the plan's types."""
+    q = 2.0 ** -bp_t[2]
+    b0, b1 = math.floor(lo / q) * q, math.ceil(hi / q) * q
+    if b1 <= b0:
+        b1 = b0 + q
+    p = ev.block([b0, b1], [0.0, 0.0], bp_t, tab_t, out_t, rm)
+    spec = {"blocks": {"x": {"type": "Inport"}, "L": p, "y": {"type": "Outport"}},
+            "lines": [{"src": "x", "dst": "L"}, {"src": "L", "dst": "y"}]}
+    try:
+        G.Design(spec).compile({"x": ev.in_t})
+    except G.GraphError:
+        return True
+    return False
+
+
+class Evaluator:
+    """Bit-exact error of a Lookup1D on every stored input value (fxgraph C core)."""
+
+    def __init__(self, fn, in_t, ints, out_t):
+        self.fn, self.in_t, self.ints, self.out_t = fn, in_t, ints, out_t
+        self.xs = [math.ldexp(i, -in_t[2]) for i in ints]
+        self.ys = [fn(x) for x in self.xs]
+        self.evals = 0
+        self.refusals = collections.Counter()   # the engine's reasons for refused candidate blocks
+
+    def block(self, bps, table, bp_t, tab_t, out_t, rm, even=None):
+        p = {"type": "Lookup1D", "InterpMethod": "Linear point-slope", "ExtrapMethod": "Clip",
+             # (no UseLastTableValue: fxgraph ignores it on the host and listed it in ignored_parameters)
+             "Table": _vec(_clip(table, tab_t)), "TableDataTypeStr": _fixdt(tab_t),
+             "BreakpointsForDimension1DataTypeStr": _fixdt(bp_t), "OutDataTypeStr": _fixdt(out_t), "RndMeth": rm,
+             # an interpolated value just past the output range (centred table values) saturates instead of wrapping
+             # the interpolation works in the table's type (the library default 'Same as output' may not hold the
+             # table values when the output type is finer)
+             # (a falling table with an unsigned intermediate other than the table type is not recorded -- recordings
+             # -- so a falling table interpolates in the signed type one bit wider)
+             "IntermediateResultsDataTypeStr": _fixdt(_intermediate(table, tab_t, out_t)),
+             "SaturateOnIntegerOverflow": "on"}
+        if even is None:
+            p["BreakpointsSpecification"] = "Explicit values"
+            p["BreakpointsForDimension1"] = _vec(bps)
+        else:
+            p["BreakpointsSpecification"] = "Even spacing"
+            p["BreakpointsForDimension1FirstPoint"] = repr(float(even[0]))
+            p["BreakpointsForDimension1Spacing"] = repr(float(even[1]))
+        return p
+
+    def error(self, p):
+        """(max |y - f(x)|, x at it) or None when the engine refuses the block."""
+        self.evals += 1
+        spec = {"blocks": {"x": {"type": "Inport"}, "L": p, "y": {"type": "Outport"}},
+                "lines": [{"src": "x", "dst": "L"}, {"src": "L", "dst": "y"}]}
+        try:
+            d = G.Design(spec)
+            d.compile({"x": self.in_t})
+            if d.vm_ok:
+                y = G.run_fast(d, {"x": self.ints}, len(self.ints), ["y"])[0]["y"]
+            else:
+                y = d.run({"x": self.ints}, len(self.ints), ["y"])["y"]
+            fo = d.otype["y"][2]
+        except G.GraphError as e:
+            self.refusals["%s: %s" % (e.code, e.message)] += 1
+            return None
+        worst, at = -1.0, 0
+        self.last_signed = [math.ldexp(v, -fo) - r for v, r in zip(y, self.ys)]   # for the table refinement
+        for k, e in enumerate(self.last_signed):
+            if abs(e) > worst:
+                worst, at = abs(e), k
+        return worst, self.xs[at]
+
+    def refine(self, bps, table):
+        """Table values moved to centre the bit-exact error of each segment (after a run of error()): each value by
+        the mean of the adjacent segments' (max + min) / 2 of y - f (a minimax step on the exact error)."""
+        mid = []
+        k, n = 0, len(self.xs)
+        for a, b in zip(bps, bps[1:]):
+            lo_, hi_ = None, None
+            while k < n and self.xs[k] < b:
+                if self.xs[k] >= a:
+                    e = self.last_signed[k]
+                    lo_ = e if lo_ is None else min(lo_, e)
+                    hi_ = e if hi_ is None else max(hi_, e)
+                k += 1
+            mid.append(0.0 if lo_ is None else (lo_ + hi_) / 2)
+        out = []
+        for j, t in enumerate(table):
+            adj = [mid[i] for i in (j - 1, j) if 0 <= i < len(mid)]
+            out.append(t - (sum(adj) / len(adj) if adj else 0.0))
+        return out
+
+
+def _grid(lo, hi, t):
+    """Representable breakpoint values of type t: first point at or below lo, last at or above hi (clipped to t)."""
+    s, w, f = t
+    q = 2.0 ** -f
+    tmin = (-(1 << (w - 1)) if s else 0) * q
+    tmax = (((1 << (w - 1)) - 1) if s else ((1 << w) - 1)) * q
+    a = max(tmin, math.floor(lo / q) * q)
+    b = min(tmax, math.ceil(hi / q) * q)
+    return a, b, q
+
+
+def _seg_dev(fn, xs, ys, a, b):
+    """(min, max) of f(x) - chord(x) over the sample xs in [a, b], the chord through (a, f(a)) and (b, f(b))."""
+    fa, fb = fn(a), fn(b)
+    sl = (fb - fa) / (b - a) if b > a else 0.0
+    lo_, hi_ = 0.0, 0.0
+    for x, y in zip(xs, ys):
+        if a <= x <= b:
+            e = y - (fa + (x - a) * sl)
+            lo_, hi_ = min(lo_, e), max(hi_, e)
+    return lo_, hi_
+
+
+def _seg_err(fn, xs, ys, a, b):
+    """The interpolation error of the segment once its chord is shifted to the middle of its deviation band (the
+    table values move off f(breakpoint): half the band instead of all of it)."""
+    lo_, hi_ = _seg_dev(fn, xs, ys, a, b)
+    return (hi_ - lo_) / 2
+
+
+def centred_table(ev, bps):
+    """Table values: f at each breakpoint plus the mean of the adjacent segments' centring shifts (a convex or concave
+    function's chord lies on one side of it; shifting by half the band halves the error)."""
+    stride = max(1, len(ev.xs) // 4096)
+    xs, ys = ev.xs[::stride] + [ev.xs[-1]], ev.ys[::stride] + [ev.ys[-1]]
+    shift = []
+    for a, b in zip(bps, bps[1:]):
+        lo_, hi_ = _seg_dev(ev.fn, xs, ys, a, b)
+        shift.append((lo_ + hi_) / 2)
+    out = []
+    for k, bp in enumerate(bps):
+        adj = [shift[j] for j in (k - 1, k) if 0 <= j < len(shift)]
+        out.append(ev.fn(bp) + (sum(adj) / len(adj) if adj else 0.0))
+    return out
+
+
+def explicit_breakpoints(ev, lo, hi, bp_t, target):
+    """Greedy segmentation on the breakpoint grid: each segment as long as the double interpolation error stays
+    within target (checked on a strided sample of the inputs)."""
+    a, b, q = _grid(lo, hi, bp_t)
+    stride = max(1, len(ev.xs) // 4096)
+    xs, ys = ev.xs[::stride] + [ev.xs[-1]], ev.ys[::stride] + [ev.ys[-1]]
+    bps = [a]
+    while bps[-1] < b:
+        start = bps[-1]
+        lo_k, hi_k = 1, int(round((b - start) / q))
+        if _seg_err(ev.fn, xs, ys, start, start + hi_k * q) <= target:
+            bps.append(start + hi_k * q)
+            break
+        while lo_k < hi_k:   # largest k with the segment error within target
+            mid = (lo_k + hi_k + 1) // 2
+            if _seg_err(ev.fn, xs, ys, start, start + mid * q) <= target:
+                lo_k = mid
+            else:
+                hi_k = mid - 1
+        bps.append(start + lo_k * q)
+        if len(bps) > 4096:
+            return None
+    return bps
+
+
+def _reference(ref, in_t, ints):
+    """(f, output type) of a reference Lookup1D block: its bit-exact output on every input (fxgraph); f(x) between
+    input values interpolates those outputs linearly (only to place breakpoints -- errors are against the outputs)."""
+    import bisect
+    if not isinstance(ref, dict) or set(ref) != {"block"} or not isinstance(ref["block"], dict) or \
+            ref["block"].get("type") != "Lookup1D":
+        raise ApproxError("BAD_PARAM", "reference", "{\"block\": {\"type\": \"Lookup1D\", ...}} required (a 1-D Lookup "
+                          "Table with its parameters, as in a design)")
+    spec = {"blocks": {"x": {"type": "Inport"}, "L": ref["block"], "y": {"type": "Outport"}},
+            "lines": [{"src": "x", "dst": "L"}, {"src": "L", "dst": "y"}]}
+    try:
+        d = G.Design(spec)
+        d.compile({"x": in_t})
+        y = G.run_fast(d, {"x": ints}, len(ints), ["y"])[0]["y"] if d.vm_ok else \
+            d.run({"x": ints}, len(ints), ["y"])["y"]
+    except G.GraphError as e:
+        raise ApproxError("REFERENCE_UNSUPPORTED", "reference." + e.where.replace("design.blocks.L", "block"),
+                          "the reference block cannot be simulated bit-exactly: %s: %s" % (e.code, e.message))
+    ot = d.otype["y"]
+    if ot == G.BOOL:
+        raise ApproxError("REFERENCE_UNSUPPORTED", "reference.block", "a boolean output")
+    xs = [math.ldexp(i, -in_t[2]) for i in ints]
+    ys = [math.ldexp(v, -ot[2]) for v in y]
+
+    def f(x):
+        k = bisect.bisect_left(xs, x)
+        if k <= 0:
+            return ys[0]
+        if k >= len(xs):
+            return ys[-1]
+        x0, x1 = xs[k - 1], xs[k]
+        return ys[k - 1] + (ys[k] - ys[k - 1]) * (x - x0) / (x1 - x0)
+    f.y = ys
+    return f, tuple(ot)
+
+
+def solve(req):
+    t0 = time.monotonic()
+    allowed = {"function", "reference", "input", "output", "error", "spacing", "wordlengths", "rounding",
+               "time_budget_s"}
+    if not isinstance(req, dict):
+        raise ApproxError("BAD_JSON", "stdin", "request must be a JSON object")
+    extra = set(req) - allowed
+    if extra:
+        raise ApproxError("BAD_PARAM", sorted(extra)[0], "unknown request field (accepted: %s)" % ", ".join(sorted(allowed)))
+    if ("function" in req) == ("reference" in req):
+        raise ApproxError("BAD_PARAM", "function", "give either function (a named function) or reference (a Lookup1D "
+                          "block to compress)")
+    ref = req.get("reference")
+    name = req.get("function") if ref is None else "the reference table"
+    if ref is None and name not in FUNCTIONS:
+        raise ApproxError("BAD_PARAM", "function", "one of %s" % ", ".join(sorted(FUNCTIONS)))
+    fn, dom = FUNCTIONS[name] if ref is None else (None, lambda x: True)
+    inp = req.get("input")
+    if not isinstance(inp, dict) or "type" not in inp or set(inp) - {"type", "min", "max"} or \
+            (ref is None and set(inp) != {"type", "min", "max"}) or (("min" in inp) != ("max" in inp)):
+        raise ApproxError("BAD_PARAM", "input", "{\"type\": {s, wl, fl}, \"min\": lo, \"max\": hi} required (with a "
+                          "reference, min / max may be left out: the whole input type)")
+    in_t = _type(inp["type"], "input.type")
+    if "min" in inp:
+        lo, hi = _num(inp["min"], "input.min"), _num(inp["max"], "input.max")
+    else:
+        lo = math.ldexp(-(1 << (in_t[1] - 1)) if in_t[0] else 0, -in_t[2])
+        hi = math.ldexp(((1 << (in_t[1] - 1)) - 1) if in_t[0] else ((1 << in_t[1]) - 1), -in_t[2])
+    il, ih = math.ceil(lo * 2.0 ** in_t[2]), math.floor(hi * 2.0 ** in_t[2])
+    tmin = -(1 << (in_t[1] - 1)) if in_t[0] else 0
+    tmax = (1 << (in_t[1] - 1)) - 1 if in_t[0] else (1 << in_t[1]) - 1
+    if not (tmin <= il <= ih <= tmax):
+        raise ApproxError("BAD_PARAM", "input", "the range holds no stored value of the input type, or exceeds it")
+    if ih - il + 1 > MAX_INPUTS:
+        raise ApproxError("UNSUPPORTED", "input", "%d input values in the range: the exhaustive check is limited to "
+                          "%d; narrow the range or the input type" % (ih - il + 1, MAX_INPUTS))
+    ints = list(range(il, ih + 1))
+    for i in (il, ih):
+        if not dom(math.ldexp(i, -in_t[2])):
+            raise ApproxError("BAD_PARAM", "input", "%s is not defined at %g" % (name, math.ldexp(i, -in_t[2])))
+    bad = next((i for i in ints if not dom(math.ldexp(i, -in_t[2]))), None)
+    if bad is not None:
+        # a range whose ends are in the domain but which crosses a point outside it (reciprocal on
+        # [-1, 1] holds 0) ended in INTERNAL ZeroDivisionError
+        raise ApproxError("BAD_PARAM", "input", "%s is not defined at %g, which lies inside the range [%g, %g]: "
+                          "split the range at that point and approximate each side on its own"
+                          % (name, math.ldexp(bad, -in_t[2]), math.ldexp(il, -in_t[2]), math.ldexp(ih, -in_t[2])))
+    err = req.get("error")
+    if not isinstance(err, dict) or set(err) != {"max_abs"}:
+        raise ApproxError("BAD_PARAM", "error", "{\"max_abs\": t} required")
+    tol = _num(err["max_abs"], "error.max_abs")
+    if tol <= 0:
+        raise ApproxError("BAD_PARAM", "error.max_abs", "positive number required")
+    spacing = req.get("spacing", ["explicit", "even", "pow2"])
+    if not isinstance(spacing, list) or not spacing or set(spacing) - {"explicit", "even", "pow2"}:
+        raise ApproxError("BAD_PARAM", "spacing", "a non-empty list of \"explicit\", \"even\", \"pow2\"")
+    wls = req.get("wordlengths", list(range(8, 17)))
+    if not isinstance(wls, list) or not wls or not all(isinstance(w, int) and not isinstance(w, bool) and 2 <= w <= 32
+                                                       for w in wls):
+        raise ApproxError("BAD_PARAM", "wordlengths", "a non-empty list of integers 2..32")
+    wls = sorted(set(wls))
+    rm = req.get("rounding", "Floor")
+    if rm not in ("Floor", "Ceiling", "Zero", "Nearest", "Round", "Convergent", "Simplest"):
+        raise ApproxError("BAD_PARAM", "rounding", "a Simulink rounding method")
+    budget = _num(req.get("time_budget_s", 60), "time_budget_s")
+    out_given = _type(req["output"]["type"], "output.type") if isinstance(req.get("output"), dict) and \
+        "type" in req["output"] else None
+    if "output" in req and out_given is None:
+        raise ApproxError("BAD_PARAM", "output", "{\"type\": {s, wl, fl}} required")
+
+    if ref is not None:
+        fn, ref_out = _reference(ref, in_t, ints)
+        if out_given is None:
+            out_given = ref_out   # the reference block's own output type
+    ev = Evaluator(fn, in_t, ints, out_given)
+    if ref is not None:
+        ev.ys = [fn.y[k] for k in range(len(ints))]   # the reference's bit-exact outputs, not an interpolation
+    ymin, ymax = min(ev.ys), max(ev.ys)
+    if out_given is None:
+        # default output type: the function's range at the largest allowed word length (the original's
+        # FunctionApproximation needs an OutputType; a coarse output would swallow the tolerance)
+        out_given = _fit_type(min(ymin, 0.0) if ymin < 0 else ymin, ymax, max(wls))
+    # breakpoints are placed where the target changes: past the inputs over which it is constant at its first or
+    # last value (a reference table clips there) the block clips to its end point as well, so the breakpoint type
+    # need not cover the whole input range (every input is still checked exactly)
+    lo_req, hi_req = lo, hi
+    i0, i1 = 0, len(ev.ys) - 1
+    while i0 < i1 and ev.ys[i0 + 1] == ev.ys[0]:
+        i0 += 1
+    while i1 > i0 and ev.ys[i1 - 1] == ev.ys[-1]:
+        i1 -= 1
+    if i1 > i0:
+        lo, hi = ev.xs[i0], ev.xs[i1]
+    best, tried, cut = None, [], False
+
+    def consider(kind, bp_t, tab_t, bps, even, centre=True):
+        nonlocal best
+        out_t = out_given or tab_t
+        if not all(dom(b) for b in bps):   # a power-of-2 grid can start outside the function's domain (rsqrt at 0)
+            return None
+        try:
+            table = centred_table(ev, bps) if centre else [fn(b) for b in bps]
+        except (ValueError, ZeroDivisionError, OverflowError):
+            return None
+        if not all(math.isfinite(v) for v in table):
+            return None
+        p = ev.block(bps, table, bp_t, tab_t, out_t, rm, even)
+        r = ev.error(p)
+        if r is None:
+            return None
+        for _ in range(4):   # close a near miss by centring the exact error per segment
+            if r[0] <= tol or r[0] > 1.6 * tol:
+                break
+            table2 = ev.refine(bps, table)
+            p2 = ev.block(bps, table2, bp_t, tab_t, out_t, rm, even)
+            r2 = ev.error(p2)
+            if r2 is None or r2[0] >= r[0]:
+                break
+            table, p, r = table2, p2, r2
+        n = len(bps)
+        mem_bp = n * bp_t[1] if kind == "explicit" else 2 * bp_t[1]   # even / pow2: first point and spacing
+        mem = {"total": mem_bp + n * tab_t[1], "breakpoints": mem_bp, "table": n * tab_t[1]}
+        ok = r[0] <= tol
+        tried.append({"spacing": kind, "points": n, "breakpoint_type": _fixdt(bp_t), "table_type": _fixdt(tab_t),
+                      "memory_bits": mem["total"], "max_abs_error": r[0], "feasible": ok})
+        if ok and (best is None or mem["total"] < best["memory_bits"]["total"]):
+            best = {"block": p, "memory_bits": mem, "max_abs_error": r[0], "at_input": r[1], "spacing": kind,
+                    "points": n}
+        return r[0]
+
+    bp_cache = {}
+    skipped = collections.Counter()   # why word-length pairs were not tried (NO_SOLUTION says why)
+    for tab_w in wls:
+        for bp_w in wls:
+            if time.monotonic() - t0 > budget:
+                cut = True
+                break
+            tab_t = _fit_type(min(ymin, 0.0) if ymin < 0 else ymin, ymax, tab_w)
+            out_t = out_given or tab_t
+            # (recordings #11) no pruning on the quantisation steps: acceptance is max |error| <= tol, and a table / output
+            # step at or above tol does not rule a solution out -- values the types hold exactly give error 0 (a
+            # two-point sqrt table on [0, 1] with integer output and tol 1 LSB); every candidate is checked bit-exactly
+            bp_t = _fit_type(lo, hi, bp_w, signed=lo < 0)
+            if not bp_t[0] and _bp_type_refused(ev, bp_t, tab_t, out_t, lo, hi, rm):
+                # an unsigned breakpoint type the engine refuses (the fraction rule of
+                # unsigned breakpoints is recorded only where they inherit the input type) -- the signed type of the
+                # same word follows the recorded signed rule
+                bp_t = _fit_type(lo, hi, bp_w, signed=True)
+            ga, gb, _ = _grid(lo, hi, bp_t)
+            if not (dom(ga) and dom(gb)):   # a coarse grid can reach 0 (reciprocal, log2)
+                skipped["the breakpoint grid of %s reaches outside %s's domain (%g or %g)" % (_fixdt(bp_t), name, ga, gb)] += 1
+                continue
+            budget_bits = best["memory_bits"]["total"] if best else None
+            if "explicit" in spacing:
+                alpha = 0.95
+                for _ in range(10):
+                    room = tol - 2.0 ** -out_t[2]
+                    if room <= 0:
+                        # the output step alone may use the whole tolerance; place for the full tolerance and let the
+                        # bit-exact check decide (exactly representable values need no room)
+                        room = tol
+                    key = (bp_t, round(alpha * room, 15))
+                    if key not in bp_cache:   # the placement depends on the breakpoint type and the target only
+                        try:
+                            bp_cache[key] = explicit_breakpoints(ev, lo, hi, bp_t, alpha * room)
+                        except (ValueError, ZeroDivisionError, OverflowError) as e:
+                            skipped["explicit breakpoints of %s: %s" % (_fixdt(bp_t), e)] += 1
+                            bp_cache[key] = None
+                    bps = bp_cache[key]
+                    if bps is None or (budget_bits and len(bps) * (bp_w + tab_w) >= budget_bits):
+                        break
+                    e = consider("explicit", bp_t, tab_t, bps, None)
+                    if e is not None and e <= tol:
+                        break
+                    alpha *= 0.85
+            if "even" in spacing:
+                a, b, q = _grid(lo, hi, bp_t)
+
+                def even_bps(n):
+                    sp = math.ceil((b - a) / (n - 1) / q) * q
+                    if sp <= 0:
+                        return None
+                    pts = [a + k * sp for k in range(n)]
+                    _, tmax_, _ = _grid(pts[-1], pts[-1], bp_t)
+                    return pts if pts[-1] <= tmax_ + 1e-300 else None
+                lo_n, hi_n, good = 2, 2, None
+
+                def even_cap():   # the most points that could still beat the best plan so far
+                    return 4096 if best is None else (best["memory_bits"]["total"] - 2 * bp_w - 1) // tab_w
+                while True:   # doubling (up to the cap), then bisection on the number of points
+                    cap = min(4096, even_cap())
+                    if cap < 2 or lo_n >= cap:
+                        break
+                    n_ = min(hi_n, cap)
+                    pts = even_bps(n_)
+                    if pts is not None and consider("even", bp_t, tab_t, pts, (pts[0], pts[1] - pts[0])) is not None \
+                            and tried[-1]["feasible"]:
+                        good = n_
+                        break
+                    if n_ == cap:
+                        break
+                    lo_n, hi_n = n_, hi_n * 2
+                if good is not None:
+                    while lo_n + 1 < good:
+                        mid = (lo_n + good) // 2
+                        pts = even_bps(mid)
+                        if pts is not None and consider("even", bp_t, tab_t, pts, (pts[0], pts[1] - pts[0])) is not \
+                                None and tried[-1]["feasible"]:
+                            good = mid
+                        else:
+                            lo_n = mid
+            if "pow2" in spacing:
+                # even power-of-2 spacing (the index is a bit slice, no divider): the coarsest spacing 2^k that
+                # meets the tolerance, first point on the 2^k grid at or below the range
+                a, b, q = _grid(lo, hi, bp_t)
+                k = math.floor(math.log2(max(b - a, q)))
+                while 2.0 ** k >= q:
+                    sp = 2.0 ** k
+                    first = math.floor(a / sp) * sp
+                    n = int(math.ceil((b - first) / sp)) + 1
+                    pts = [first + j * sp for j in range(n)]
+                    _, tmax_, _ = _grid(pts[-1], pts[-1], bp_t)
+                    if pts[-1] > tmax_ + 1e-300:   # the type's top: the last inputs clip to the last point (checked)
+                        pts = pts[:-1]
+                        n -= 1
+                        _, tmax_, _ = _grid(pts[-1], pts[-1], bp_t)
+                    lo_ok = _grid(first, first, bp_t)[0] == first
+                    cap = 4096 if best is None else (best["memory_bits"]["total"] - 2 * bp_w - 1) // tab_w
+                    if n > cap:   # finer spacings only add points: none of them beats the best plan
+                        break
+                    if n >= 2 and lo_ok and pts[-1] <= tmax_ + 1e-300 and n <= 4096:
+                        if consider("pow2", bp_t, tab_t, pts, (first, sp)) is not None and tried[-1]["feasible"]:
+                            break
+                    k -= 1
+        if cut:
+            break
+    if best is None:
+        if cut:   # (recordings #11) not a proof: the search stopped early
+            msg = ("no table with linear interpolation was found for max_abs %g for %s on [%g, %g] with word lengths %s "
+                   "before the time budget ran out (%d candidates checked bit-exactly); a larger time_budget_s searches "
+                   "further" % (tol, name, lo_req, hi_req, wls, len(tried)))
+        else:
+            msg = ("no table with linear interpolation meets max_abs %g for %s on [%g, %g] with word lengths %s among "
+                   "the %d candidates checked bit-exactly (every table / breakpoint word-length pair, up to 4096 points)"
+                   % (tol, name, lo_req, hi_req, wls, len(tried)))
+        raise ApproxError("NO_SOLUTION", "error.max_abs", msg + _refusal_note(ev) + _skip_note(skipped))
+    feas = sorted((c for c in tried if c["feasible"]), key=lambda c: c["memory_bits"])
+    return {"status": "ok", "function": name, "interpolation": "Linear point-slope", "extrapolation": "Clip",
+            "block": best["block"], "spacing": best["spacing"], "points": best["points"],
+            "memory_bits": best["memory_bits"],
+            "memory_rule": "explicit: points x (breakpoint + table word); even spacing: points x table word + 2 x "
+                           "breakpoint word (first point and spacing)",
+            "max_abs_error": best["max_abs_error"], "tolerance": tol,
+            "error_over_tolerance": round(best["max_abs_error"] / tol, 6), "at_input": best["at_input"],
+            "checked": {"inputs": len(ints), "method": "every stored input value of the input type in [min, max], "
+                        "bit-exact (fxgraph Lookup1D)"},
+            "search": {"candidates_checked": len(tried), "feasible": len(feas), "budget_exhausted": cut,
+                       "best_per_spacing": {k: next(({kk: c[kk] for kk in ("points", "breakpoint_type", "table_type",
+                                                                            "memory_bits", "max_abs_error")}
+                                                     for c in feas if c["spacing"] == k), None) for k in spacing}}}
+
+
+def _skip_note(skipped):
+    if not skipped:
+        return ""
+    return "; not tried: " + " | ".join("%s (x%d)" % (m[:200], c) for m, c in skipped.most_common(3))
+
+
+def _refusal_note(ev):
+    """The engine's reasons for the candidates it refused (NO_SOLUTION must say when fxgraph refuses
+    every candidate instead of the tolerance ruling them out)."""
+    n = sum(ev.refusals.values())
+    if not n:
+        return ""
+    top = ev.refusals.most_common(2)
+    return "; fxgraph refused %d candidate block%s, e.g. %s" % (
+        n, "" if n == 1 else "s", " | ".join("%s (x%d)" % (m[:300], c) for m, c in top))
+
+
+def main():
+    rc_args = fxcli.reject_arguments("fxapprox", ERRLOG)
+    if rc_args is not None:
+        return rc_args
+    raw = sys.stdin.buffer.read()
+    sha = hashlib.sha256(raw).hexdigest()
+    t0 = time.monotonic()
+    try:
+        try:
+            req = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            raise ApproxError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+        out, rc = solve(req), 0
+    except ApproxError as e:
+        out, rc = {"status": "error", "code": e.code, "where": e.where, "message": e.message}, 1
+    except MemoryError:
+        out, rc = {"status": "error", "code": "OOM", "where": "run", "message": "out of memory"}, 1
+    except Exception as e:  # noqa: BLE001 -- always answer with structured JSON
+        out, rc = {"status": "error", "code": "INTERNAL", "where": type(e).__name__, "message": str(e)[:500]}, 1
+    out["input_sha256"] = sha
+    out["run"] = {"elapsed_s": round(time.monotonic() - t0, 3)}
+    if out.get("status") != "ok":
+        # every error carries refusal_kind / next_step (README), fxapprox's own codes included
+        if out.get("code") == "NO_SOLUTION":
+            out["refusal_kind"], out["next_step"] = "request", (
+                "no table meets max_abs within the limits given: allow a larger table (more breakpoints), wider "
+                "table / output word lengths, or a looser max_abs; the message lists which word-length pairs were "
+                "not tried and why")
+        elif out.get("code") == "REFERENCE_UNSUPPORTED":
+            out["refusal_kind"], out["next_step"] = "not_supported", (
+                "Use a supported numeric Lookup1D reference. Check the block setting and input type named in the diagnostic, then retry the reference block with fxgraph.")
+        G.with_next_step(out)
+    if out.get("status") != "ok":
+        try:
+            os.makedirs(os.path.dirname(ERRLOG), exist_ok=True)
+            with open(ERRLOG, "a") as f:
+                f.write(json.dumps(dict(out, time=time.time())) + "\n")
+        except OSError:
+            pass
+    sys.stdout.write(json.dumps(out) + "\n")
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

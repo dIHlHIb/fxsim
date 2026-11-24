@@ -1,0 +1,52 @@
+{
+ "blocks": {
+  "x": {
+   "type": "Inport"
+  },
+  "G": {
+   "type": "Gain",
+   "Gain": "2.5",
+   "ParamDataTypeStr": "fixdt(0,6,4)",
+   "OutDataTypeStr": "fixdt(1,14,11)"
+  },
+  "SAT": {
+   "type": "Saturation",
+   "UpperLimit": "1.5",
+   "LowerLimit": "-1.5",
+   "OutDataTypeStr": "fixdt(1,12,10)"
+  },
+  "L": {
+   "type": "Lookup1D",
+   "BreakpointsForDimension1": "[-1.5 -1 -0.5 0 0.5 1 1.5]",
+   "Table": "[-0.905 -0.762 -0.462 0 0.462 0.762 0.905]",
+   "BreakpointsForDimension1DataTypeStr": "fixdt(1,6,4)",
+   "TableDataTypeStr": "fixdt(1,12,11)",
+   "OutDataTypeStr": "fixdt(1,12,11)",
+   "InterpMethod": "Linear point-slope",
+   "ExtrapMethod": "Clip",
+   "IntermediateResultsDataTypeStr": "fixdt(1,12,11)",
+   "FractionDataTypeStr": "fixdt(0,10,9)"
+  },
+  "y": {
+   "type": "Outport"
+  }
+ },
+ "lines": [
+  {
+   "src": "x",
+   "dst": "G"
+  },
+  {
+   "src": "G",
+   "dst": "SAT"
+  },
+  {
+   "src": "SAT",
+   "dst": "L"
+  },
+  {
+   "src": "L",
+   "dst": "y"
+  }
+ ]
+}

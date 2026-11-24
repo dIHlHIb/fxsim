@@ -1,0 +1,52 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/02_overflow_summary.json",
+ "exit_code": 0,
+ "wall_s": 0.3,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "outputs": {
+    "y": {
+     "type": "fixdt(1,16,15)",
+     "steps": 48,
+     "min": -0.975921630859375,
+     "max": 0.962310791015625,
+     "last": 0.37896728515625
+    }
+   },
+   "blocks": 5,
+   "engine": "c",
+   "blocks_with_assumed_defaults": [
+    "A",
+    "S",
+    "y"
+   ],
+   "blocks_with_ignored_parameters": [],
+   "parameters_quantized": 0,
+   "simulink_warnings": 0,
+   "simulink_warnings_unchecked": 0,
+   "diagnostics": {
+    "blocks_wrapped": [
+     "S"
+    ],
+    "blocks_saturated": [],
+    "total_wraps": 6,
+    "total_saturations": 0,
+    "blocks_divided_by_zero": [],
+    "first_event": [
+     6,
+     "S",
+     "wrap"
+    ]
+   }
+  },
+  "hw": {
+   "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+  },
+  "hw_default": true,
+  "full_result": "runs/graph_results/04cefe78d00be6866c6069f691d6d22ba318acabbffd6ec4eeee31f2fc3db8f0.json",
+  "detail": "summary: outputs, compiled types, schedule, diagnostics and cost per block are in full_result (or ask again without detail)",
+  "input_sha256": "04cefe78d00be6866c6069f691d6d22ba318acabbffd6ec4eeee31f2fc3db8f0"
+ }
+}

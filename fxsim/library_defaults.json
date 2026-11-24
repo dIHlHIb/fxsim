@@ -1,0 +1,180 @@
+{
+  "CICDecimation": {
+    "RateOptions": "Enforce single-rate processing"
+  },
+  "Constant": {
+    "OutDataTypeStr": "Inherit: Inherit from 'Constant value'",
+    "SampleTime": "inf",
+    "Value": "1"
+  },
+  "CounterLimited": {
+    "tsamp": "-1",
+    "uplimit": "7"
+  },
+  "Delay": {
+    "DelayLength": "2",
+    "DelayLengthSource": "Dialog",
+    "ExternalReset": "None",
+    "InitialCondition": "0.0",
+    "InitialConditionSource": "Dialog",
+    "InputProcessing": "Elements as channels (sample based)",
+    "PreventDirectFeedthrough": "off",
+    "SampleTime": "-1",
+    "ShowEnablePort": "off"
+  },
+  "DiscreteFir": {
+    "AccumDataTypeStr": "Inherit: Inherit via internal rule",
+    "CoefDataTypeStr": "Inherit: Same word length as input",
+    "CoefSource": "Dialog parameters",
+    "Coefficients": "[0.5 0.5]",
+    "FilterStructure": "Direct form",
+    "InitialStates": "0",
+    "OutDataTypeStr": "Inherit: Same as input",
+    "ProductDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SampleTime": "-1",
+    "SaturateOnIntegerOverflow": "off",
+    "StateDataTypeStr": "Inherit: Same as accumulator",
+    "TapSumDataTypeStr": "Inherit: Inherit via internal rule"
+  },
+  "Downsample": {
+    "AllowArbitraryFixedInput": "on",
+    "DownsamplingFactor": "2",
+    "InitialConditions": "0",
+    "InputProcessing": "Columns as channels (frame based)",
+    "RateOptions": "Enforce single-rate processing",
+    "SampleOffset": "0"
+  },
+  "FIRDecimation": {
+    "FilterSource": "Auto",
+    "framing": "Enforce single-rate processing"
+  },
+  "FIRInterpolation": {
+    "FilterSource": "Auto",
+    "L": "3",
+    "framing": "Enforce single-rate processing"
+  },
+  "Gain": {
+    "Gain": "1",
+    "OutDataTypeStr": "Inherit: Inherit via internal rule",
+    "ParamDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+  },
+  "HDLNCO": {
+    "DitherSource": "Property",
+    "PhaseIncrementSource": "Input port"
+  },
+  "Inport": {
+    "OutDataTypeStr": "Inherit: auto",
+    "SampleTime": "-1"
+  },
+  "Lookup1D": {
+    "BreakpointsForDimension1": "[-5:5]",
+    "BreakpointsForDimension1DataTypeStr": "Inherit: Same as corresponding input",
+    "BreakpointsForDimension1FirstPoint": "1",
+    "BreakpointsForDimension1Spacing": "1",
+    "BreakpointsSpecification": "Explicit values",
+    "ExtrapMethod": "Linear",
+    "FractionDataTypeStr": "Inherit: Inherit via internal rule",
+    "InputSameDT": "on",
+    "IntermediateResultsDataTypeStr": "Inherit: Same as output",
+    "InternalRulePriority": "Speed",
+    "InterpMethod": "Linear point-slope",
+    "NumberOfTableDimensions": "1",
+    "OutDataTypeStr": "Inherit: Same as first input",
+    "RndMeth": "Simplest",
+    "SaturateOnIntegerOverflow": "off",
+    "Table": "tanh([-5:5])",
+    "TableDataTypeStr": "Inherit: Same as output"
+  },
+  "MinMax": {
+    "Function": "min",
+    "Inputs": "1"
+  },
+  "Mux": {
+    "DisplayOption": "bar",
+    "Inputs": "2"
+  },
+  "Outport": {
+    "OutDataTypeStr": "Inherit: auto"
+  },
+  "Product": {
+    "InputSameDT": "off",
+    "Inputs": "2",
+    "OutDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+  },
+  "RateTransition": {
+    "OutPortSampleTimeOpt": "Specify"
+  },
+  "Repeat": {
+    "FactorSource": "Dialog parameter",
+    "InputProcessing": "Columns as channels (frame based)",
+    "N": "5",
+    "Nmax": "16",
+    "RateOptions": "Enforce single-rate processing",
+    "ic": "0",
+    "mode": "Unused parameter value"
+  },
+  "Saturation": {
+    "LowerLimit": "-0.5",
+    "OutDataTypeStr": "Inherit: Same as input",
+    "RndMeth": "Floor",
+    "UpperLimit": "0.5"
+  },
+  "Selector": {
+    "IndexMode": "One-based",
+    "IndexOptions": "Index vector (dialog)",
+    "Indices": "[1 3]",
+    "InputPortWidth": "3",
+    "NumberOfDimensions": "1",
+    "OutputSizes": "1",
+    "RuntimeRangeChecks": "on",
+    "SampleTime": "-1"
+  },
+  "ShiftArithmetic": {
+    "BinPtShiftNumber": "0",
+    "BitShiftDirection": "Bidirectional",
+    "BitShiftNumber": "8",
+    "BitShiftNumberSource": "Dialog",
+    "CheckOORBitShift": "off",
+    "DiagnosticForOORShift": "None"
+  },
+  "Sum": {
+    "AccumDataTypeStr": "Inherit: Inherit via internal rule",
+    "InputSameDT": "off",
+    "Inputs": "|++",
+    "OutDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+  },
+  "Switch": {
+    "AllowDiffInputSizes": "off",
+    "Criteria": "u2 > Threshold",
+    "InputSameDT": "off",
+    "OutDataTypeStr": "Inherit: Inherit via internal rule",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off",
+    "Threshold": "0"
+  },
+  "TappedDelay": {
+    "DelayOrder": "Oldest",
+    "NumDelays": "4",
+    "includeCurrent": "off",
+    "samptime": "-1",
+    "vinit": "0.0"
+  },
+  "UnaryMinus": {
+    "SaturateOnIntegerOverflow": "off"
+  },
+  "UnitDelay": {
+    "InitialCondition": "0",
+    "SampleTime": "-1"
+  },
+  "Upsample": {
+    "RateOptions": "Enforce single-rate processing",
+    "UpsamplingFactor": "3"
+  }
+}

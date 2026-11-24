@@ -1,0 +1,414 @@
+{
+ "A": {
+  "asic": {
+   "in": [
+    "[0, 16, 0]",
+    "[0, 8, 0]",
+    "[1, 8, 4]"
+   ],
+   "locked_values": {
+    "param": [
+     "fixdt(1,8,5)"
+    ],
+    "rnd": [
+     "Convergent",
+     "Floor",
+     "Nearest",
+     "Zero"
+    ],
+    "shape": [
+     "2x3"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)",
+    "fixdt(0,32,2)"
+   ],
+   "param": [
+    "fixdt(1,12,5)",
+    "fixdt(1,16,8)"
+   ],
+   "recorded_cells": 11,
+   "recorded_cells_in_grid": 5,
+   "rnd": [
+    "Round",
+    "Simplest"
+   ],
+   "sat": [
+    "off",
+    "on"
+   ],
+   "shape": [
+    "1x2",
+    "3x4"
+   ],
+   "widened_grid_cells": 96
+  },
+  "host": {
+   "in": [
+    "[0, 16, 0]",
+    "[0, 8, 0]",
+    "[1, 8, 4]"
+   ],
+   "locked_values": {
+    "out": [
+     "fixdt(0,32,1)",
+     "fixdt(0,32,3)"
+    ],
+    "param": [
+     "fixdt(1,16,10)",
+     "fixdt(1,8,6)"
+    ],
+    "rnd": [
+     "Ceiling"
+    ],
+    "shape": [
+     "2x2",
+     "4x4"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)",
+    "fixdt(0,32,2)"
+   ],
+   "param": [
+    "fixdt(1,12,5)",
+    "fixdt(1,16,8)",
+    "fixdt(1,8,5)"
+   ],
+   "recorded_cells": 50,
+   "recorded_cells_in_grid": 36,
+   "rnd": [
+    "Convergent",
+    "Floor",
+    "Nearest",
+    "Round",
+    "Simplest",
+    "Zero"
+   ],
+   "sat": [
+    "off",
+    "on"
+   ],
+   "shape": [
+    "1x2",
+    "2x3",
+    "3x4"
+   ],
+   "widened_grid_cells": 648
+  }
+ },
+ "B": {
+  "asic": {
+   "in": [
+    "[0, 16, 0]",
+    "[0, 8, 0]"
+   ],
+   "locked_values": {
+    "out": [
+     "fixdt(0,32,1)",
+     "fixdt(0,32,3)",
+     "fixdt(0,32,6)"
+    ],
+    "param": [
+     "fixdt(1,16,1)",
+     "fixdt(1,16,2)",
+     "fixdt(1,16,3)",
+     "fixdt(1,16,6)",
+     "fixdt(1,8,1)",
+     "fixdt(1,8,3)",
+     "fixdt(1,8,6)"
+    ],
+    "shape": [
+     "1x2",
+     "3x3"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,2)",
+    "fixdt(0,32,4)"
+   ],
+   "param": [
+    "fixdt(1,16,4)",
+    "fixdt(1,8,2)"
+   ],
+   "recorded_cells": 12,
+   "recorded_cells_in_grid": 0,
+   "rnd": [
+    "Floor"
+   ],
+   "sat": [
+    "off",
+    "on"
+   ],
+   "shape": [],
+   "widened_grid_cells": 0
+  },
+  "host": {
+   "in": [
+    "[0, 16, 0]",
+    "[0, 8, 0]"
+   ],
+   "locked_values": {
+    "in": [
+     "[0, 12, 0]",
+     "[0, 16, 2]"
+    ],
+    "out": [
+     "fixdt(0,32,1)",
+     "fixdt(0,32,3)",
+     "fixdt(0,32,5)",
+     "fixdt(0,32,6)",
+     "fixdt(0,32,7)"
+    ],
+    "param": [
+     "fixdt(1,16,1)",
+     "fixdt(1,16,2)",
+     "fixdt(1,16,3)",
+     "fixdt(1,16,6)",
+     "fixdt(1,8,0)",
+     "fixdt(1,8,1)",
+     "fixdt(1,8,3)",
+     "fixdt(1,8,5)",
+     "fixdt(1,8,6)",
+     "fixdt(1,8,7)"
+    ],
+    "rnd": [
+     "Nearest",
+     "Zero"
+    ],
+    "shape": [
+     "1x2",
+     "2x3"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,2)",
+    "fixdt(0,32,4)"
+   ],
+   "param": [
+    "fixdt(1,16,4)",
+    "fixdt(1,8,2)"
+   ],
+   "recorded_cells": 24,
+   "recorded_cells_in_grid": 0,
+   "rnd": [
+    "Floor"
+   ],
+   "sat": [
+    "off",
+    "on"
+   ],
+   "shape": [],
+   "widened_grid_cells": 0
+  }
+ },
+ "C": {
+  "asic": {
+   "in": [],
+   "locked_values": {
+    "in": [
+     "[0, 16, 0]",
+     "[0, 8, 0]",
+     "[1, 16, 4]",
+     "[1, 8, 0]"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)"
+   ],
+   "param": [
+    "Inherit: Inherit via internal rule"
+   ],
+   "recorded_cells": 4,
+   "recorded_cells_in_grid": 0,
+   "rnd": [
+    "Floor"
+   ],
+   "sat": [
+    "on"
+   ],
+   "shape": [
+    "2x3"
+   ],
+   "widened_grid_cells": 0
+  },
+  "host": {
+   "in": [
+    "[0, 12, 2]",
+    "[0, 16, 0]",
+    "[0, 8, 0]",
+    "[1, 16, 0]",
+    "[1, 16, 4]",
+    "[1, 8, 0]"
+   ],
+   "locked_values": {
+    "in": [
+     "[0, 32, 0]",
+     "[0, 8, 4]",
+     "[1, 32, 0]"
+    ],
+    "out": [
+     "fixdt(0,32,2)"
+    ],
+    "sat": [
+     "off"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)"
+   ],
+   "param": [
+    "Inherit: Inherit via internal rule"
+   ],
+   "recorded_cells": 21,
+   "recorded_cells_in_grid": 16,
+   "rnd": [
+    "Floor",
+    "Nearest"
+   ],
+   "sat": [
+    "on"
+   ],
+   "shape": [
+    "1x2",
+    "2x3"
+   ],
+   "widened_grid_cells": 24
+  }
+ },
+ "D": {
+  "asic": {
+   "in": [],
+   "locked_values": {
+    "in": [
+     "[0, 8, 0]"
+    ],
+    "out": [
+     "fixdt(0,32,0)"
+    ],
+    "param": [
+     "fixdt(1,10,0)"
+    ],
+    "rnd": [
+     "Floor"
+    ],
+    "sat": [
+     "on"
+    ],
+    "shape": [
+     "2x3"
+    ]
+   },
+   "out": [],
+   "param": [],
+   "recorded_cells": 1,
+   "recorded_cells_in_grid": 0,
+   "rnd": [],
+   "sat": [],
+   "shape": [],
+   "widened_grid_cells": 0
+  },
+  "host": {
+   "in": [
+    "[0, 24, 0]",
+    "[0, 8, 0]",
+    "[1, 16, 0]",
+    "[1, 8, 0]"
+   ],
+   "locked_values": {
+    "in": [
+     "[0, 12, 0]",
+     "[1, 24, 0]"
+    ],
+    "param": [
+     "fixdt(0,24,0)",
+     "fixdt(1,14,0)",
+     "fixdt(1,8,0)"
+    ],
+    "rnd": [
+     "Nearest",
+     "Zero"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)"
+   ],
+   "param": [
+    "fixdt(0,16,0)",
+    "fixdt(1,10,0)",
+    "fixdt(1,32,0)"
+   ],
+   "recorded_cells": 30,
+   "recorded_cells_in_grid": 23,
+   "rnd": [
+    "Floor"
+   ],
+   "sat": [
+    "off",
+    "on"
+   ],
+   "shape": [
+    "1x2",
+    "2x3"
+   ],
+   "widened_grid_cells": 48
+  }
+ },
+ "E": {
+  "host": {
+   "in": [
+    "[0, 8, 0]",
+    "[1, 16, 8]"
+   ],
+   "locked_values": {
+    "in": [
+     "[1, 8, 4]"
+    ],
+    "out": [
+     "fixdt(1,8,2)"
+    ],
+    "param": [
+     "fixdt(1,8,5)"
+    ],
+    "rnd": [
+     "Nearest"
+    ],
+    "sat": [
+     "off"
+    ],
+    "shape": [
+     "1x12",
+     "1x6",
+     "2x5",
+     "4x5",
+     "5x2",
+     "7x2"
+    ]
+   },
+   "out": [
+    "fixdt(0,32,0)",
+    "fixdt(1,16,4)"
+   ],
+   "param": [
+    "fixdt(1,16,8)",
+    "fixdt(1,8,0)"
+   ],
+   "recorded_cells": 21,
+   "recorded_cells_in_grid": 12,
+   "rnd": [
+    "Floor"
+   ],
+   "sat": [
+    "on"
+   ],
+   "shape": [
+    "1x5",
+    "1x8",
+    "3x5",
+    "6x2"
+   ],
+   "widened_grid_cells": 32
+  }
+ }
+}

@@ -1,0 +1,310 @@
+{
+ "combos": {
+  "off|Either": {
+   "asic": [
+    false
+   ],
+   "enable_types": [],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    16,
+    24,
+    32,
+    33,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "off|Falling": {
+   "asic": [
+    false
+   ],
+   "enable_types": [],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    16,
+    24,
+    32,
+    33,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "off|Level": {
+   "asic": [
+    false
+   ],
+   "enable_types": [],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    16,
+    24,
+    32,
+    33,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "off|Level hold": {
+   "asic": [
+    false
+   ],
+   "enable_types": [],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    16,
+    24,
+    32,
+    33,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "off|Rising": {
+   "asic": [
+    false
+   ],
+   "enable_types": [],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    15,
+    16,
+    17,
+    20,
+    24,
+    31,
+    32,
+    33,
+    40,
+    48,
+    63,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": [
+    1,
+    64
+   ]
+  },
+  "on|Either": {
+   "asic": [
+    false
+   ],
+   "enable_types": [
+    "boolean"
+   ],
+   "lengths": [
+    2,
+    5,
+    33
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "on|Falling": {
+   "asic": [
+    false
+   ],
+   "enable_types": [
+    "boolean"
+   ],
+   "lengths": [
+    2,
+    5,
+    33
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "on|Level": {
+   "asic": [
+    false,
+    true
+   ],
+   "enable_types": [
+    "boolean",
+    [
+     0,
+     8,
+     0
+    ]
+   ],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    15,
+    16,
+    17,
+    20,
+    24,
+    31,
+    32,
+    33,
+    40,
+    48,
+    63,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": [
+    1,
+    64
+   ]
+  },
+  "on|Level hold": {
+   "asic": [
+    false
+   ],
+   "enable_types": [
+    "boolean"
+   ],
+   "lengths": [
+    2,
+    5,
+    33
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  },
+  "on|None": {
+   "asic": [
+    false,
+    true
+   ],
+   "enable_types": [
+    "boolean",
+    [
+     0,
+     8,
+     0
+    ]
+   ],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    15,
+    16,
+    17,
+    20,
+    24,
+    31,
+    32,
+    33,
+    40,
+    48,
+    63,
+    64
+   ],
+   "reset_types": [],
+   "span": [
+    1,
+    64
+   ]
+  },
+  "on|Rising": {
+   "asic": [
+    false,
+    true
+   ],
+   "enable_types": [
+    "boolean"
+   ],
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    16,
+    24,
+    32,
+    33,
+    64
+   ],
+   "reset_types": [
+    "boolean"
+   ],
+   "span": null
+  }
+ },
+ "data_wl": [
+  8,
+  32
+ ]
+}

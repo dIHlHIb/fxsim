@@ -1,0 +1,381 @@
+#!/usr/bin/env -S python3 -I
+"""fxcert: certify a given fixed-point design (no optimisation) -- recordings.
+
+stdin: one JSON request
+  {"design": {blocks, lines}, "hw": {...}?,
+   "input_ranges": {Inport: {"type": {s, wl, fl}, "min": lo, "max": hi}},     (overflow proof)
+   "initial_state": "design" | "any",
+   "input_sets": [{Inport: {"ints": [...]} | {"kind": "sine", ...}} | {"inputs": {...}, "tolerance_scale": k}, ...]?,
+                 (error check, optional; k: that set's tolerance multiple, e.g. 16 for a full-scale stress set)
+   "error": {"max_abs": tol, "outports": {name: tol}}?}
+stdout: one JSON result, "summary" first (both verdicts, the overflow witness's block / step, the worst error over
+tolerance and where, the sets outside input_ranges, the outports not judged). Overflow and error are separate:
+  overflow.status  bounded | unknown | violated (a witness sequence overflows) | unsupported
+                   (bounded is a proof over every sequence inside the ranges)
+  error.status     sampled (every set and outport within tolerance) | violated | not_checked
+Passing input sets never turns overflow into bounded, and a proven overflow never says anything about error.
+error.input_sets[k].inside_input_ranges is false when set k has samples outside the quantised input_ranges: its
+error figures are still exact for that sequence, but the overflow verdict does not cover it.
+Errors: {"status": "error", "code", "where", "message", "input_sha256", "refusal_kind", "next_step"}, appended to
+runs/cert_errors.jsonl."""
+import hashlib
+import json
+import math
+from fractions import Fraction
+import os
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import fxgraph_lib as G  # noqa: E402
+import fxopt_lib as L  # noqa: E402
+import fxprove as P  # noqa: E402
+from fxgopt_lib import _ints_from_spec  # noqa: E402
+
+ERRLOG = os.path.join(ROOT, "runs", "cert_errors.jsonl")
+import fxcli  # noqa: E402
+
+
+
+OBSERVED = []   # overflows seen on input sets inside input_ranges (filled by check_error, read by run)
+
+
+def SIM(d, seq, n, rec):  # bit-exact simulation (separate name so tests can inject faults)
+    return d.run(seq, n, rec)
+
+
+def REF(d, seq, n, rec):  # ideal double reference
+    return d.run_double(seq, n, rec)
+
+
+def ranges(req, d):
+    spec = req.get("input_ranges")
+    if not isinstance(spec, dict) or not spec:
+        raise L.OptError("MISSING_FIELD", "input_ranges", "object {Inport: {type, min, max}} required")
+    missing = sorted(set(d.inports) - set(spec))
+    if missing:
+        raise L.OptError("MISSING_FIELD", "input_ranges." + missing[0], "range of every Inport required")
+    extra = sorted(set(spec) - set(d.inports))
+    if extra:
+        raise L.OptError("BAD_PARAM", "input_ranges." + extra[0], "no Inport named %s" % extra[0])
+    types, ints = {}, {}
+    for x in d.inports:
+        e, where = spec[x], "input_ranges." + x
+        if not isinstance(e, dict):
+            raise L.OptError("BAD_PARAM", where, "{type, min, max} required")
+        L.check_fields(e, ("type", "min", "max"), where)
+        s, w, f = L.strict_type(e.get("type"), where + ".type")
+        if not 2 <= w <= 64:
+            raise L.OptError("BAD_PARAM", where + ".type.wl", "2..64 required")
+        lo, hi = L.strict_number(e, "min", where), L.strict_number(e, "max", where)
+        ilo, ihi = L.stored_range(lo, hi, f)
+        tlo, thi = P.trange(s, w)
+        if ilo > ihi:
+            raise L.OptError("BAD_PARAM", where, "empty range (min > max, or no representable value inside)")
+        if ilo < tlo or ihi > thi:
+            raise L.OptError("BAD_PARAM", where, "range does not fit the input type")
+        types[x], ints[x] = (s, w, f), (ilo, ihi)
+    return types, ints
+
+
+def check_error(req, d, types, ints):
+    sets = req.get("input_sets")
+    err0 = req.get("error")
+    if isinstance(err0, dict):
+        # error.outports [1] was not checked when no input sets were given
+        L.check_fields(err0, ("max_abs", "outports"), "error")
+        if err0.get("outports") is not None and not isinstance(err0.get("outports"), dict):
+            raise L.OptError("BAD_PARAM", "error.outports", "object {Outport: tolerance} required")
+    elif err0 is not None:
+        raise L.OptError("BAD_PARAM", "error", "object {max_abs, outports} required")
+    if sets is None:
+        return {"status": "not_checked", "claim": "no input sets given; nothing is claimed about the error"}
+    if not isinstance(sets, list) or not sets or len(sets) > 64:
+        raise L.OptError("BAD_PARAM", "input_sets", "list of 1..64 input definitions required")
+    err = req.get("error")
+    if not isinstance(err, dict):
+        raise L.OptError("MISSING_FIELD", "error", "error tolerances required with input_sets")
+    L.check_fields(err, ("max_abs", "outports"), "error")
+    tols = {}
+    per = err.get("outports")
+    if per is not None and not isinstance(per, dict):
+        # a list of names was ignored and every outport judged against max_abs
+        raise L.OptError("BAD_PARAM", "error.outports", "object {Outport: tolerance} required")
+    not_judged, unlisted = [], []
+    for o in d.outports:
+        v = per.get(o) if isinstance(per, dict) and o in per else err.get("max_abs")
+        if v is None and isinstance(per, dict):
+            unlisted.append(o)   # recordings -B: not listed and no max_abs -- not judged, and said so
+            continue
+        if d.otype[o] == G.BOOL and not (isinstance(per, dict) and o in per):
+            # max_abs covers the numeric outports; a boolean one has no error metric and is left out (it used
+            # to refuse the whole request) -- named in the result
+            not_judged.append(o)
+            continue
+        if not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(v) or v <= 0:
+            raise L.OptError("BAD_PARAM", "error", "positive finite tolerance required for outport %s" % o)
+        tols[o] = float(v)
+    if isinstance(per, dict):
+        for o in per:
+            if o not in d.outports:
+                raise L.OptError("BAD_PARAM", "error.outports." + o, "no Outport named %s" % o)
+    if not tols:
+        raise L.OptError("BAD_PARAM", "error", "no outport to judge")
+    results, worst_status = [], "sampled"
+    for k, ins in enumerate(sets):
+        where = "input_sets[%d]" % k
+        scale = 1.0
+        if L.is_set_wrapper(ins, d.inports):
+            # An omitted scale uses the request tolerance.
+            scale = ins.get("tolerance_scale", 1)
+            if not isinstance(scale, (int, float)) or isinstance(scale, bool) or not math.isfinite(scale) or \
+                    scale <= 0 or not isinstance(ins.get("inputs"), dict) or set(ins) - {"inputs", "tolerance_scale"}:
+                raise L.OptError("BAD_PARAM", where, "{\"inputs\": {Inport: definition}, \"tolerance_scale\": "
+                                 "positive number} required")
+            scale, ins = float(scale), ins["inputs"]
+        if not isinstance(ins, dict):
+            raise L.OptError("BAD_PARAM", where, "object {Inport: definition} required")
+        extra = sorted(set(ins) - set(d.inports))
+        if extra:
+            raise L.OptError("BAD_INPUT", where + "." + extra[0], "no Inport named %s" % extra[0])
+        seq, n = {}, None
+        for x in d.inports:
+            spec = dict(ins.get(x)) if isinstance(ins.get(x), dict) else ins.get(x)
+            if isinstance(spec, dict) and not any(k in spec for k in ("type", "s", "wl", "fl")):
+                # the type may be left out (it is input_ranges'); fxgraph's form {s, wl, fl, ints} is taken as it is
+                # (the type was added beside s / wl / fl and the set refused as giving it twice)
+                spec["type"] = {"s": types[x][0], "wl": types[x][1], "fl": types[x][2]}
+            t, xs = _ints_from_spec(x, spec, where)
+            if t != types[x]:
+                raise L.OptError("BAD_INPUT", where + "." + x, "type differs from input_ranges")
+            if n is not None and len(xs) != n:
+                raise L.OptError("BAD_INPUT", where + "." + x, "all inputs of one set must have the same length")
+            n = len(xs)
+            seq[x] = xs
+        outside = [x for x in d.inports if min(seq[x]) < ints[x][0] or max(seq[x]) > ints[x][1]]
+        got = SIM(d, seq, n, list(tols))
+        if not outside:
+            # the overflows this set produces (inside input_ranges: a witness against "unknown");
+            # fxopt reports them since recordings, fxcert did not
+            try:
+                _l, diag_ = d.run_diagnostics(seq, n, [])
+            except Exception:   # noqa: BLE001 -- a diagnostics failure must not hide the error result
+                diag_ = {}
+            for blk, ev in sorted(diag_.items()):
+                for kind in ("wrap", "saturation"):
+                    if ev.get(kind + "s"):
+                        OBSERVED.append({"input_set": k, "block": blk, "kind": kind, "count": ev[kind + "s"],
+                                         "first_step": ev.get("first_%s_step" % kind)})
+        ref = REF(d, {x: [math.ldexp(v, -types[x][2]) for v in seq[x]] for x in d.inports}, n, list(tols))
+        ports = {}
+        for o, tl in tols.items():
+            tl = tl * scale   # this set's tolerance_scale
+            # a result is only judged when both sides are complete and finite
+            if o not in got or o not in ref:
+                raise L.OptError("VERIFY_FAILED", where, "outport %s missing from the simulation" % o)
+            if len(got[o]) != n or len(ref[o]) != n:
+                raise L.OptError("VERIFY_FAILED", where + "." + o, "outport %s: %d fixed-point and %d reference "
+                                 "samples, expected %d" % (o, len(got[o]), len(ref[o]), n))
+            if d.otype[o] == G.BOOL:
+                raise L.OptError("UNSUPPORTED", "error.outports." + o, "boolean outport has no error metric")
+            fl = d.otype[o][2]
+            bad = next((i for i, b in enumerate(ref[o]) if not math.isfinite(b)), None)
+            if bad is not None:
+                raise L.OptError("REFERENCE_NOT_FINITE", where + "." + o, "the ideal reference of outport %s is %r "
+                                 "at sample %d (division by zero?); no error can be judged" % (o, ref[o][bad], bad))
+            # recordings -C: an output with more than 53 significant bits is compared exactly (as fxopt's re-check
+            # and the error search do after recordings); through double, 2^60 + 1 read as 2^60
+            diffs = [abs(math.ldexp(a, -fl) - b) if -(1 << 53) < a < (1 << 53) else
+                     float(abs(Fraction(a) / (Fraction(2) ** fl) - Fraction(b))) for a, b in zip(got[o], ref[o])]
+            md = max(diffs)
+            if not math.isfinite(md):
+                raise L.OptError("VERIFY_FAILED", where + "." + o, "non-finite error")
+            ports[o] = {"max_abs_diff": md, "at_sample": diffs.index(md), "tolerance": tl, "within": md <= tl}
+            if md > tl:
+                worst_status = "violated"
+        results.append(dict({"input_set": k, "samples": n, "outports": ports, "inside_input_ranges": not outside},
+                            **({"tolerance_scale": scale} if scale != 1 else {})))
+    judged_txt = "every judged outport" if (not_judged or unlisted) else "every outport"
+    claim = ("%s within its tolerance on every input set above (bit-exact); nothing is claimed for "
+             "other sequences" % judged_txt if worst_status == "sampled" else
+             "at least one input set exceeds a tolerance (see outports)")
+    nj = {o: "boolean outport: no error metric" for o in not_judged}
+    nj.update({o: "not listed in error.outports and no error.max_abs: not judged" for o in unlisted})
+    return {"status": worst_status, "reference": "ideal double-precision simulation of the same graph",
+            "metric": "max_abs_diff per outport, each input set judged on its own", "input_sets": results,
+            "outports_not_judged": nj,
+            "claim": claim + ("; outports not judged: %s (outports_not_judged)" % ", ".join(sorted(nj)) if nj else "")}
+
+
+def run(req):
+    if not isinstance(req, dict):
+        raise L.OptError("BAD_JSON", "stdin", "request must be a JSON object")
+    L.check_fields(req, ("design", "hw", "input_ranges", "initial_state", "input_sets", "error", "modular"), "")
+    if req.get("modular", True) not in (True, False):
+        raise L.OptError("BAD_PARAM", "modular", "true (the default: proven wrap-around regions are certified as "
+                         "fxopt optimises them) or false (every wrap counts as overflow)")
+    init = req.get("initial_state", "design")
+    if init not in ("design", "any"):
+        raise L.OptError("BAD_PARAM", "initial_state", '"design" or "any"')
+    G.check_user_design(req.get("design"))
+    import fxvector
+    fxvector.refuse_vectors(req.get("design"), "fxcert")
+    d = G.Design(req.get("design"), req.get("hw"))
+    if d.multirate:   # the error check simulates single-rate (a multirate design crashed with INTERNAL)
+        raise L.OptError("UNSUPPORTED", "design", "fxcert does not certify multirate designs yet")
+    if not d.inports:
+        raise L.OptError("UNSUPPORTED", "design", "design needs at least one Inport")
+    types, ints = ranges(req, d)
+    d.compile(types)
+    mods = modular_regions(req, init)
+    proof = P.prove(req["design"], req.get("hw"), types, ints, init,
+                    modular=[m for m in mods if m["proven"]] and [m["_json"] for m in mods if m["proven"]] or None)
+    if mods:
+        # the wraps fxopt intends (its modular_regions) are re-proven here from the design alone,
+        # not taken from fxopt's answer; only a region whose proof holds is exempt
+        proof["modular_regions"] = [{k: v for k, v in m.items() if k != "_json"} for m in mods]
+        proof["wraps_intended_in"] = sorted(b for m in mods if m["proven"] for b in m["blocks"])
+    claims = {"bounded": "no quantisation point wraps or saturates for any input sequence inside input_ranges, "
+                         "at any time step, from the stated initial state",
+              "unknown": "not proven (conservative bounds exceed some types); this is not a proof that an "
+                         "overflow happens",
+              "violated": "an input sequence inside input_ranges overflows a quantisation point (see witness)",
+              "unsupported": "the design contains elements without a range proof"}
+    proof["claim"] = claims[proof["status"]]
+    if proof.get("wraps_intended_in"):
+        proof["claim"] += ("; except the Sums of modular_regions (proven), which wrap by design: two's-complement "
+                           "arithmetic there is exact modulo 2^integer_bits and every value leaving the region is "
+                           "proven to fit its type, so the wraps change no value leaving it")
+    del OBSERVED[:]
+    err = check_error(req, d, types, ints)
+    intended = set(proof.get("wraps_intended_in") or [])
+    hits = [e for e in OBSERVED if e["block"] not in intended]
+    if hits:
+        hits.sort(key=lambda e: (e["input_set"], e["first_step"] if isinstance(e["first_step"], int) else 0, e["block"]))
+        proof["observed_overflows"] = hits[:40]
+        if proof["status"] == "bounded":
+            raise L.OptError("VERIFY_FAILED", "overflow", "the range proof says bounded but input set %d overflows "
+                             "block %s (%d %ss from step %s)" % (hits[0]["input_set"], hits[0]["block"],
+                                                                 hits[0]["count"], hits[0]["kind"],
+                                                                 hits[0]["first_step"]))
+        if proof["status"] in ("unknown", "unsupported"):
+            w_ = hits[0]
+            proof["status"] = "violated"
+            proof["witness"] = {"input_set": w_["input_set"], "block": w_["block"], "kind": w_["kind"],
+                                "count": w_["count"], "step": w_["first_step"],
+                                "how_to_replay": "run the design in fxgraph with diagnostics on that input set"}
+            proof["claim"] = ("input set %d, inside input_ranges, overflows block %s (%d %ss from step %s); the design "
+                              "is NOT overflow-free for these ranges (see witness and observed_overflows)"
+                              % (w_["input_set"], w_["block"], w_["count"], w_["kind"], w_["first_step"]))
+    return {"status": "ok", "summary": _summary(proof, err), "overflow": proof, "error": err}
+
+
+def modular_regions(req, init):
+    """The design's wrap-around regions (engine/fxmodular.py: + / - Sums and delays with a feedback loop, every
+    input a fixed-point Inport, finite impulse response out), each with "proven": every Sum has the same ib integer
+    bits and every leaving value, widened by the rounding error bound, fits ib bits.
+    None with modular false or initial_state any (the proof assumes the chain starts at rest, recordings)."""
+    if req.get("modular", True) is False or init == "any":
+        return []
+    import fxmodular as M
+    out = []
+    blocks = req["design"]["blocks"]
+    for r in M.regions(req):
+        ibs = [t[1] - t[2] for m in r["sums"] for k in ("OutDataTypeStr", "AccumDataTypeStr")
+               for t in [M._fixdt((blocks.get(m) or {}).get(k))] if t is not None]
+        # every Sum of the region (outputs and accumulators) must have the same integer bits -- a
+        # wider exit Sum does not undo a narrower Sum's wrap (recordings call 09 with comb C widened: y 1024 became -3072)
+        ib = ibs[0] if len(ibs) == 2 * len(r["sums"]) and len(set(ibs)) == 1 else None
+        ok, eb = M.fits(r, blocks, ib) if ib is not None else (False, None)
+        e = {"blocks": r["blocks"], "integer_bits": ib, "inputs": r["inputs"], "proven": bool(ok)}
+        if ok:
+            r = dict(r, ib=ib)
+            e["leaving"] = {x: {"min": float(b[0]), "max": float(b[1]), "rounding_error_bound": float(eb[x])}
+                            for x, b in r["exact_bounds"].items()}
+            e["_json"] = M.jsonable(r)
+        else:
+            e["proof"] = ("none: a Sum type of the region is inherited or unsigned, or the Sums do not all have the "
+                          "same integer bits (a wider Sum does not undo a narrower one's wrap)" if ib is None or eb is None
+                          else
+                          "none: a value leaving the region, widened by the rounding error bound, does not fit %d "
+                          "integer bits" % ib) + " -- its wraps count as overflow"
+        out.append(e)
+    return out
+
+
+def _summary(proof, err):
+    """the first layer, as fxgraph and fxopt give it -- the two verdicts and what
+    decides them; the details follow under overflow / error."""
+    w = proof.get("witness") or {}
+    worst = None
+    for k, r in enumerate(err.get("input_sets") or []):
+        for o, v in r["outports"].items():
+            ratio = v["max_abs_diff"] / v["tolerance"]
+            if worst is None or ratio > worst[0]:
+                worst = (ratio, o, k, v["at_sample"])
+    return {"overflow": proof["status"], "error": err.get("status"),
+            **({"wraps_intended_in": proof["wraps_intended_in"]} if proof.get("wraps_intended_in") else {}),
+            "overflow_witness": {k: w.get(k) for k in ("block", "step") if k in w} or None,
+            "max_error_over_tolerance": round(worst[0], 6) if worst else None,
+            "worst": {"outport": worst[1], "input_set": worst[2], "at_sample": worst[3]} if worst else None,
+            "sets_outside_input_ranges": [r["input_set"] for r in err.get("input_sets") or []
+                                          if not r.get("inside_input_ranges", True)],
+            "outports_not_judged": sorted(err.get("outports_not_judged") or [])}
+
+
+def _mem_limit():
+    """Per-run memory limit (without one a large request was killed by the kernel with no
+    structured answer). FX_MEM_BYTES, default 4 GiB; exceeding it is reported as OOM."""
+    try:
+        import resource
+        lim = int(os.environ.get("FX_MEM_BYTES", str(4 << 30)))
+        resource.setrlimit(resource.RLIMIT_DATA, (lim, lim))
+    except Exception:  # noqa: BLE001 -- a platform without the limit still answers
+        pass
+
+
+def main():
+    rc_args = fxcli.reject_arguments("fxcert", ERRLOG)   # stdin only
+    if rc_args is not None:
+        return rc_args
+    _mem_limit()
+    raw = sys.stdin.buffer.read()
+    sha = hashlib.sha256(raw).hexdigest()
+    t0 = time.monotonic()
+    try:
+        try:
+            req = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            raise L.OptError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+        out, rc = run(req), 0
+    except (L.OptError, G.GraphError) as e:
+        out, rc = {"status": "error", "code": e.code, "where": e.where, "message": e.message}, 1
+    except MemoryError:
+        out, rc = {"status": "error", "code": "OOM", "where": "run", "message": "out of memory (FX_MEM_BYTES)"}, 1
+    except Exception as e:  # noqa: BLE001 -- always answer with structured JSON
+        out, rc = {"status": "error", "code": "INTERNAL", "where": type(e).__name__, "message": str(e)[:500]}, 1
+    out["input_sha256"] = sha
+    if out.get("status") == "ok":
+        out["run"] = {"elapsed_s": round(time.monotonic() - t0, 3)}
+    else:
+        G.with_next_step(out)
+        try:
+            os.makedirs(os.path.dirname(ERRLOG), exist_ok=True)
+            with open(ERRLOG, "a") as f:
+                f.write(json.dumps(dict(out, time=time.time())) + "\n")
+        except OSError:
+            pass
+    try:
+        text = json.dumps(out, allow_nan=False)
+    except ValueError:  # never emit NaN / Infinity
+        out = {"status": "error", "code": "INTERNAL", "where": "result", "message": "non-finite number in result",
+               "input_sha256": sha}
+        text, rc = json.dumps(out), 1
+    sys.stdout.write(text + "\n")
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

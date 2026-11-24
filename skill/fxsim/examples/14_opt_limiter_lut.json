@@ -1,0 +1,71 @@
+{
+ "design": {
+  "blocks": {
+   "x": {
+    "type": "Inport"
+   },
+   "G": {
+    "type": "Gain",
+    "Gain": "2.5",
+    "ParamDataTypeStr": "fixdt(1,16,13)",
+    "OutDataTypeStr": "fixdt(1,20,16)"
+   },
+   "SAT": {
+    "type": "Saturation",
+    "UpperLimit": "1.5",
+    "LowerLimit": "-1.5",
+    "OutDataTypeStr": "Inherit: Same as input"
+   },
+   "L": {
+    "type": "Lookup1D",
+    "BreakpointsForDimension1": "[-1.5 -1 -0.5 0 0.5 1 1.5]",
+    "Table": "[-0.905 -0.762 -0.462 0 0.462 0.762 0.905]",
+    "BreakpointsForDimension1DataTypeStr": "fixdt(1,16,13)",
+    "TableDataTypeStr": "fixdt(1,16,14)",
+    "OutDataTypeStr": "fixdt(1,16,14)",
+    "InterpMethod": "Linear point-slope",
+    "ExtrapMethod": "Clip"
+   },
+   "y": {
+    "type": "Outport"
+   }
+  },
+  "lines": [
+   {
+    "src": "x",
+    "dst": "G"
+   },
+   {
+    "src": "G",
+    "dst": "SAT"
+   },
+   {
+    "src": "SAT",
+    "dst": "L"
+   },
+   {
+    "src": "L",
+    "dst": "y"
+   }
+  ]
+ },
+ "inputs": {
+  "x": {
+   "kind": "sine",
+   "amplitude": 0.9,
+   "omega": 0.01,
+   "n": 4096,
+   "type": {
+    "s": 1,
+    "wl": 16,
+    "fl": 14
+   }
+  }
+ },
+ "error": {
+  "max_abs": 0.001953125
+ },
+ "time_budget_s": 20,
+ "time_limit_s": 200,
+ "workers": 2
+}

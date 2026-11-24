@@ -1,0 +1,15 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxgraph < <skill dir>/examples/20_err_typo_param.json",
+ "exit_code": 1,
+ "wall_s": 0.2,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "BAD_PARAM",
+  "where": "design.blocks.A.RndMet",
+  "message": "unknown parameter RndMet for Gain",
+  "input_sha256": "54fff3f41c0648f8acd848481923398d0f4a76020fb1cd05af158170580cbfe7",
+  "refusal_kind": "request",
+  "next_step": "the request itself is malformed at where: fix that field (the message says what is accepted)"
+ }
+}

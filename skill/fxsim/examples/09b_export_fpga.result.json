@@ -1,0 +1,73 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxexport < <skill dir>/examples/09b_export_fpga.json",
+ "exit_code": 0,
+ "note": "Output captured from this example. Absolute paths use <fxsim tree root>.",
+ "stdout": {
+  "status": "ok",
+  "model": "iir1_fpga",
+  "files": {
+   "check_iir1_fpga.m": "b4b7ad008e6dfd0f879dba2567c2916cdfd0c9f2d01b1e66421398cb03381bbf",
+   "iir1_fpga.slx": "b003522ae5226d702b8619f4bffd6f3b05bb7725c98f98446730dbdd5819fae2",
+   "iir1_fpga_io.json": "dd34473e51160349df90a2fa1cbf875c34c5ec784efa60e4285c265aa7db97e7",
+   "manifest.json": "0ee61ad5da9062c08e31de6a06dbc7688a24dc844b1abbb5fb1ba55cd9227ef1"
+  },
+  "blocks": 6,
+  "multirate": false,
+  "hw_profile": "asic",
+  "outputs": [
+   {
+    "port": "y",
+    "root_block": "y",
+    "width": 1,
+    "samples": 300,
+    "type": "1,14,13",
+    "period": 1.0,
+    "offset": 0.0
+   }
+  ],
+  "roundtrip": {
+   "blocks": 6,
+   "lines": 6,
+   "params_compared": 17,
+   "outputs_equal": [
+    "y"
+   ],
+   "reader_assumed_defaults": {
+    "x": [
+     "SampleTime"
+    ]
+   },
+   "reader_ignored_parameters": {
+    "y": [
+     "OutDataTypeStr"
+    ]
+   }
+  },
+  "unobserved_templates": [],
+  "dropped_parameters": {},
+  "assumed_defaults": {
+   "A": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "B": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "S": {
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "y": {
+    "OutDataTypeStr": "Inherit: auto"
+   }
+  },
+  "out": "runs/export/iir1_fpga",
+  "out_abs": "<fxsim tree root>/runs/export/iir1_fpga",
+  "check_command": "cd('<fxsim tree root>/runs/export/iir1_fpga'); r = check_iir1_fpga; fprintf('FXSIM_VERDICT %s\\n', r.verdict)",
+  "check_batch_command": "matlab -batch \"cd('<fxsim tree root>/runs/export/iir1_fpga'); r = check_iir1_fpga; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "check_batch_command_here": "matlab -batch \"r = check_iir1_fpga; fprintf('FXSIM_VERDICT %s\\n', r.verdict)\"",
+  "verdicts": "PASS: every sample and every compiled type equal; FAIL: a difference (first_diff says where); INCOMPLETE: every compared sample equal but something could not be compared (reason says what) -- only PASS verifies the package. The script prints one JSON line and returns it as r; the commands then print 'FXSIM_VERDICT <verdict>'. Read that line: the process status can be 0 after a failed model check on macOS with MATLAB R2026b",
+  "input_sha256": "ae1821a0331837fde009346e50f2c2a2cff5a24c48d8804ec2f868c96d13d218"
+ }
+}

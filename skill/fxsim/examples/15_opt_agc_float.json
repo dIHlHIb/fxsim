@@ -1,0 +1,115 @@
+{
+ "design": {
+  "blocks": {
+   "x": {
+    "type": "Inport"
+   },
+   "P": {
+    "type": "Product",
+    "Inputs": "**",
+    "OutDataTypeStr": "double"
+   },
+   "AB": {
+    "type": "Abs",
+    "OutDataTypeStr": "double"
+   },
+   "R": {
+    "type": "Constant",
+    "Value": "0.5",
+    "OutDataTypeStr": "double"
+   },
+   "E": {
+    "type": "Sum",
+    "Inputs": "+-",
+    "AccumDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "MU": {
+    "type": "Gain",
+    "Gain": "0.02",
+    "ParamDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "GS": {
+    "type": "Sum",
+    "Inputs": "++",
+    "AccumDataTypeStr": "double",
+    "OutDataTypeStr": "double"
+   },
+   "GD": {
+    "type": "UnitDelay",
+    "InitialCondition": "1"
+   },
+   "y": {
+    "type": "Outport"
+   }
+  },
+  "lines": [
+   {
+    "src": "x",
+    "dst": "P",
+    "dport": 1
+   },
+   {
+    "src": "GD",
+    "dst": "P",
+    "dport": 2
+   },
+   {
+    "src": "P",
+    "dst": "AB"
+   },
+   {
+    "src": "R",
+    "dst": "E",
+    "dport": 1
+   },
+   {
+    "src": "AB",
+    "dst": "E",
+    "dport": 2
+   },
+   {
+    "src": "E",
+    "dst": "MU"
+   },
+   {
+    "src": "MU",
+    "dst": "GS",
+    "dport": 1
+   },
+   {
+    "src": "GD",
+    "dst": "GS",
+    "dport": 2
+   },
+   {
+    "src": "GS",
+    "dst": "GD"
+   },
+   {
+    "src": "P",
+    "dst": "y"
+   }
+  ]
+ },
+ "inputs": {
+  "x": {
+   "kind": "sine",
+   "amplitude": 0.25,
+   "omega": 0.3,
+   "n": 4096,
+   "type": {
+    "s": 1,
+    "wl": 16,
+    "fl": 14
+   }
+  }
+ },
+ "error": {
+  "max_abs": 0.00390625
+ },
+ "time_budget_s": 20,
+ "time_limit_s": 240,
+ "workers": 2
+}

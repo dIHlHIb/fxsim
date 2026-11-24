@@ -1,0 +1,655 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxopt < <skill dir>/examples/07_slx_opt.json",
+ "exit_code": 0,
+ "wall_s": 83.1,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items. The hardware accuracy field uses the current estimate notice.",
+ "stdout": {
+  "status": "ok",
+  "summary": {
+   "hwbits": 518,
+   "baseline_hwbits": null,
+   "max_abs_diff": 0.000902564209852505,
+   "tolerance": 0.0009765625,
+   "max_error_over_tolerance": 0.950364,
+   "max_error_over_tolerance_from": "error search on the final plan",
+   "overflow": "bounded",
+   "error": "sampled",
+   "warnings": [
+    "ERROR_BOUND_SAMPLED"
+   ],
+   "modular_blocks": [],
+   "binding": {
+    "outport": "y",
+    "input_set": "inputs~negated",
+    "error_over_tolerance": 0.924226
+   },
+   "blocks_retyped": [
+    "Mix",
+    "Q0_S",
+    "Q0_a1",
+    "Q0_a2",
+    "... 9 more"
+   ]
+  },
+  "version": "fxopt-1",
+  "kind": "graph",
+  "hwbits": 518,
+  "baseline": {
+   "hwbits": null,
+   "reason": "TYPE_MISMATCH: inherited data types around a cycle are inconsistent: an input of Q0_S was resolved as fixdt(1,32,35) but is driven by fixdt(1,64,64) from Q0_a1"
+  },
+  "hw": {
+   "ProdHWDeviceType": "Intel->x86-64 (Windows64)"
+  },
+  "hw_default": true,
+  "hwbits_breakdown": {
+   "outputs": 358,
+   "gain_params": 108,
+   "accumulators": 52,
+   "fir_internals": 0,
+   "total": 518
+  },
+  "hwbits_by_block": {
+   "Mix": {
+    "output_bits": 14,
+    "inner_bits": 14,
+    "hwbits": 28
+   },
+   "Q0_S": {
+    "output_bits": 18,
+    "inner_bits": 18,
+    "hwbits": 36
+   },
+   "Q0_a1": {
+    "output_bits": 18,
+    "inner_bits": 16,
+    "hwbits": 34
+   },
+   "Q0_a2": {
+    "output_bits": 16,
+    "inner_bits": 14,
+    "hwbits": 30
+   },
+   "Q0_b0": {
+    "output_bits": 10,
+    "inner_bits": 10,
+    "hwbits": 20
+   },
+   "Q0_b1": {
+    "output_bits": 12,
+    "inner_bits": 10,
+    "hwbits": 22
+   },
+   "Q0_b2": {
+    "output_bits": 12,
+    "inner_bits": 10,
+    "hwbits": 22
+   },
+   "Q0_dx1": {
+    "output_bits": 14,
+    "inner_bits": 0,
+    "hwbits": 14
+   },
+   "Q0_dx2": {
+    "output_bits": 14,
+    "inner_bits": 0,
+    "hwbits": 14
+   },
+   "Q0_dy1": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "Q0_dy2": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "Q1_S": {
+    "output_bits": 18,
+    "inner_bits": 20,
+    "hwbits": 38
+   },
+   "Q1_a1": {
+    "output_bits": 18,
+    "inner_bits": 14,
+    "hwbits": 32
+   },
+   "Q1_a2": {
+    "output_bits": 18,
+    "inner_bits": 10,
+    "hwbits": 28
+   },
+   "Q1_b0": {
+    "output_bits": 12,
+    "inner_bits": 8,
+    "hwbits": 20
+   },
+   "Q1_b1": {
+    "output_bits": 12,
+    "inner_bits": 8,
+    "hwbits": 20
+   },
+   "Q1_b2": {
+    "output_bits": 12,
+    "inner_bits": 8,
+    "hwbits": 20
+   },
+   "Q1_dx1": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "Q1_dx2": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "Q1_dy1": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "Q1_dy2": {
+    "output_bits": 18,
+    "inner_bits": 0,
+    "hwbits": 18
+   },
+   "x1": {
+    "output_bits": 16,
+    "inner_bits": 0,
+    "hwbits": 16
+   },
+   "x2": {
+    "output_bits": 16,
+    "inner_bits": 0,
+    "hwbits": 16
+   }
+  },
+  "auto_caps": {},
+  "mult_area_proxy": 1824,
+  "cost": {
+   "weights": {
+    "hwbits": 1.0,
+    "mult_area": 0.0
+   },
+   "value": 518.0
+  },
+  "hw_estimate": {
+   "dsp48e1": 10,
+   "lut": 192,
+   "ff": 0,
+   "lut_nodsp": 1616,
+   "generic_gates": 5155,
+   "dff": 136,
+   "status": "predicted, not synthesised",
+   "accuracy": "Resource estimates only. Validation data are outside this package. Synthesise your design to measure resource use.",
+   "model": "engine/hwcost_model.json v4"
+  },
+  "max_abs_diff": 0.000902564209852505,
+  "max_error_over_tolerance": 0.924226,
+  "outports": {
+   "y": {
+    "max_abs_diff": 0.000902564209852505,
+    "at_sample": 1074,
+    "input_set": "inputs~negated",
+    "tolerance": 0.0009765625,
+    "type": "fixdt(1,18,16)"
+   }
+  },
+  "tolerance": 0.0009765625,
+  "reference": "ideal",
+  "error_by_input_set": [
+   {
+    "input_set": "inputs",
+    "outport": "y",
+    "max_abs_diff": 0.0008428990258280492,
+    "at_sample": 1338,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.863129
+   },
+   {
+    "input_set": "inputs~negated",
+    "outport": "y",
+    "max_abs_diff": 0.000902564209852505,
+    "at_sample": 1074,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.924226
+   },
+   {
+    "input_set": "inputs~reversed",
+    "outport": "y",
+    "max_abs_diff": 0.0008712784429537601,
+    "at_sample": 3815,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.892189
+   },
+   {
+    "input_set": "error_search[0]",
+    "outport": "y",
+    "max_abs_diff": 0.0006473368064212753,
+    "at_sample": 25,
+    "tolerance": 0.0009765625,
+    "tolerance_scale": 1.0,
+    "error_over_tolerance": 0.662873
+   },
+   "... 12 more"
+  ],
+  "binding": {
+   "max_abs_diff": 0.000902564209852505,
+   "at_sample": 1074,
+   "input_set": "inputs~negated",
+   "tolerance": 0.0009765625,
+   "type": "fixdt(1,18,16)",
+   "outport": "y",
+   "error_over_tolerance": 0.924226
+  },
+  "guarantees": {
+   "contract": {
+    "inputs": {
+     "x1": {
+      "type": "fixdt(1,16,14)"
+     },
+     "x2": {
+      "type": "fixdt(1,16,14)"
+     }
+    },
+    "error_reference": "ideal",
+    "error_metric": "max_abs_diff per outport, every input set judged on its own",
+    "tolerances": {
+     "y": 0.0009765625
+    },
+    "initial_state": "design",
+    "input_ranges": {
+     "x1": {
+      "min": -0.5,
+      "max": 0.5,
+      "type": "fixdt(1,16,14)"
+     },
+     "x2": {
+      "min": -0.5,
+      "max": 0.5,
+      "type": "fixdt(1,16,14)"
+     }
+    },
+    "horizon": "unbounded (every time step)",
+    "overflow_definition": "any quantisation point (cast after rounding, accumulator partial sum, product step, left shift) outside its type, wrapping or saturating"
+   },
+   "error": {
+    "status": "sampled",
+    "input_sets": [
+     {
+      "label": "inputs",
+      "samples": 4096
+     },
+     {
+      "label": "inputs~negated",
+      "samples": 4096
+     },
+     {
+      "label": "inputs~reversed",
+      "samples": 4096
+     },
+     {
+      "label": "error_search[0]",
+      "samples": 4096
+     },
+     "... 12 more"
+    ],
+    "claim": "max_abs_diff <= tolerance for every judged outport, checked bit-exactly on each input set above; no bound is claimed for any other input sequence"
+   },
+   "overflow": {
+    "status": "bounded",
+    "input_sets": [
+     {
+      "label": "inputs",
+      "samples": 4096
+     },
+     {
+      "label": "inputs~negated",
+      "samples": 4096
+     },
+     {
+      "label": "inputs~reversed",
+      "samples": 4096
+     },
+     {
+      "label": "error_search[0]",
+      "samples": 4096
+     },
+     "... 12 more"
+    ],
+    "ideal_bounds_used_for_sizing": "impulse-response bound of linear systems (search heuristic, not part of the proof)",
+    "proof": {
+     "fingerprint": "8576687ce9fbb98f3eb0c2f6d6042ebe723a3e1f256794949c255126ac95db47",
+     "points_checked": 34,
+     "loops": [
+      {
+       "blocks": "Q0_S, Q0_a1, Q0_a2, Q0_dy1, Q0_dy2",
+       "method": "joint linear region of 11 signals: linear K-step invariant (K = 64, ||A^K|| = 1.08e-06, 4 states, 11 symbols); intersected with an interval post-fixed point F(S) in S after 8 iterations",
+       "proven": true
+      },
+      {
+       "blocks": "Q1_S, Q1_a1, Q1_a2, Q1_dy1, Q1_dy2",
+       "method": "joint linear region of 21 signals: linear K-step invariant (K = 64, ||A^K|| = 0.0226, 8 states, 16 symbols); intersected with an interval post-fixed point F(S) in S after 8 iterations",
+       "proven": true
+      }
+     ],
+     "points_not_proven": [],
+     "reasons": []
+    },
+    "claim": "proven for every input sequence inside input_ranges, at every time step: no quantisation point of this design wraps or saturates"
+   }
+  },
+  "solution": {
+   "blocks": {
+    "x1": {
+     "type": "Inport"
+    },
+    "x2": {
+     "type": "Inport"
+    },
+    "Mix": {
+     "type": "Sum",
+     "AccumDataTypeStr": "fixdt(1,14,12)",
+     "OutDataTypeStr": "fixdt(1,14,12)"
+    },
+    "Q0_S": {
+     "type": "Sum",
+     "Inputs": "+++--",
+     "AccumDataTypeStr": "fixdt(1,18,16)",
+     "OutDataTypeStr": "fixdt(1,18,16)"
+    },
+    "Q0_a1": {
+     "type": "Gain",
+     "Gain": "-1.5752399777881516",
+     "ParamDataTypeStr": "fixdt(1,16,14)",
+     "OutDataTypeStr": "fixdt(1,18,16)"
+    },
+    "Q0_a2": {
+     "type": "Gain",
+     "Gain": "0.6263342591591413",
+     "ParamDataTypeStr": "fixdt(0,14,14)",
+     "OutDataTypeStr": "fixdt(1,16,15)"
+    },
+    "Q0_b0": {
+     "type": "Gain",
+     "Gain": "0.012773570342747455",
+     "ParamDataTypeStr": "fixdt(0,10,16)",
+     "OutDataTypeStr": "fixdt(1,10,15)"
+    },
+    "Q0_b1": {
+     "type": "Gain",
+     "Gain": "0.02554714068549491",
+     "ParamDataTypeStr": "fixdt(0,10,15)",
+     "OutDataTypeStr": "fixdt(1,12,16)"
+    },
+    "Q0_b2": {
+     "type": "Gain",
+     "Gain": "0.012773570342747455",
+     "ParamDataTypeStr": "fixdt(0,10,16)",
+     "OutDataTypeStr": "fixdt(1,12,17)"
+    },
+    "Q0_dx1": {
+     "type": "UnitDelay"
+    },
+    "Q0_dx2": {
+     "type": "UnitDelay"
+    },
+    "Q0_dy1": {
+     "type": "UnitDelay"
+    },
+    "Q0_dy2": {
+     "type": "UnitDelay"
+    },
+    "Q1_S": {
+     "type": "Sum",
+     "Inputs": "+++--",
+     "AccumDataTypeStr": "fixdt(1,20,16)",
+     "OutDataTypeStr": "fixdt(1,18,16)"
+    },
+    "Q1_a1": {
+     "type": "Gain",
+     "Gain": "-1.7688278599237217",
+     "ParamDataTypeStr": "fixdt(1,14,12)",
+     "OutDataTypeStr": "fixdt(1,18,15)"
+    },
+    "Q1_a2": {
+     "type": "Gain",
+     "Gain": "0.826201332947616",
+     "ParamDataTypeStr": "fixdt(0,10,10)",
+     "OutDataTypeStr": "fixdt(1,18,16)"
+    },
+    "Q1_b0": {
+     "type": "Gain",
+     "Gain": "0.014343368255973583",
+     "ParamDataTypeStr": "fixdt(0,8,14)",
+     "OutDataTypeStr": "fixdt(1,12,16)"
+    },
+    "Q1_b1": {
+     "type": "Gain",
+     "Gain": "0.028686736511947166",
+     "ParamDataTypeStr": "fixdt(0,8,13)",
+     "OutDataTypeStr": "fixdt(1,12,16)"
+    },
+    "Q1_b2": {
+     "type": "Gain",
+     "Gain": "0.014343368255973583",
+     "ParamDataTypeStr": "fixdt(0,8,14)",
+     "OutDataTypeStr": "fixdt(1,12,16)"
+    },
+    "Q1_dx1": {
+     "type": "UnitDelay"
+    },
+    "Q1_dx2": {
+     "type": "UnitDelay"
+    },
+    "Q1_dy1": {
+     "type": "UnitDelay"
+    },
+    "Q1_dy2": {
+     "type": "UnitDelay"
+    },
+    "y": {
+     "type": "Outport"
+    }
+   },
+   "compiled_types": {
+    "Mix": "fixdt(1,14,12)",
+    "Q0_S": "fixdt(1,18,16)",
+    "Q0_a1": "fixdt(1,18,16)",
+    "Q0_a2": "fixdt(1,16,15)",
+    "Q0_b0": "fixdt(1,10,15)",
+    "Q0_b1": "fixdt(1,12,16)",
+    "Q0_b2": "fixdt(1,12,17)",
+    "Q0_dx1": "fixdt(1,14,12)",
+    "Q0_dx2": "fixdt(1,14,12)",
+    "Q0_dy1": "fixdt(1,18,16)",
+    "Q0_dy2": "fixdt(1,18,16)",
+    "Q1_S": "fixdt(1,18,16)",
+    "Q1_a1": "fixdt(1,18,15)",
+    "Q1_a2": "fixdt(1,18,16)",
+    "Q1_b0": "fixdt(1,12,16)",
+    "Q1_b1": "fixdt(1,12,16)",
+    "Q1_b2": "fixdt(1,12,16)",
+    "Q1_dx1": "fixdt(1,18,16)",
+    "Q1_dx2": "fixdt(1,18,16)",
+    "Q1_dy1": "fixdt(1,18,16)",
+    "Q1_dy2": "fixdt(1,18,16)",
+    "x1": "fixdt(1,16,14)",
+    "x2": "fixdt(1,16,14)",
+    "y": "fixdt(1,18,16)"
+   }
+  },
+  "search": {
+   "candidates": 1072,
+   "variables": 26,
+   "refine_rounds": 27,
+   "after_uniform": {
+    "hwbits": 590,
+    "max_abs_diff": 0.000941079738431716
+   },
+   "budget_exhausted": false,
+   "seed": 0,
+   "range_repairs": [
+    {
+     "variable": "Q1_S.AccumDataTypeStr",
+     "from": "fixdt(1,18,16)",
+     "to": "fixdt(1,20,16)",
+     "point": "Q1_S: input 4 into the accumulator"
+    }
+   ],
+   "msb_trimmed": [],
+   "hw_search": null,
+   "hw_search_kept": null,
+   "warm_start": null
+  },
+  "deterministic": true,
+  "input_sha256": "3a87e35fd28e200732edc70387c8ac8d80408ee71e17c42c0fbcd71d86d3207c",
+  "run": {
+   "timing_s": {
+    "setup_s": 1.894,
+    "range_proof_s": 7.105,
+    "verify_s": 9.338,
+    "uniform": 2.73,
+    "refine": 7.262,
+    "total_s": 41.406,
+    "total_wall_s": 84.89
+   },
+   "workers": 2,
+   "processes": 16,
+   "busy_at_once": 2,
+   "core_cpu_s": 25.549,
+   "run_dir": "runs/fxopt/3a87e35fd28e2007/20261123T211238Z-3a87e35fd28e2007-19785-3c55a105",
+   "attempt_id": "20261123T211238Z-3a87e35fd28e2007-19785-3c55a105",
+   "last_pass_run_dir": "runs/fxopt/3a87e35fd28e2007/20261123T211319Z-3a87e35fd28e2007-19785-dfebb115",
+   "passes": [
+    "runs/fxopt/3a87e35fd28e2007/20261123T211319Z-3a87e35fd28e2007-19785-dfebb115"
+   ]
+  },
+  "error_search": {
+   "status": "no sequence over the tolerance found",
+   "margin": 1.0,
+   "counterexamples_added": 1,
+   "rounds": [
+    {
+     "worst_error_over_tolerance": 1.170158,
+     "counterexample": true,
+     "exhaustive_over_range": false,
+     "worst_input": {
+      "x1": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        -256,
+        -256,
+        -256,
+        -256,
+        "... 4092 more"
+       ]
+      },
+      "x2": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        -256,
+        -256,
+        -256,
+        -256,
+        "... 4092 more"
+       ]
+      }
+     }
+    },
+    {
+     "worst_error_over_tolerance": 0.950364,
+     "counterexample": false,
+     "exhaustive_over_range": false,
+     "worst_input": {
+      "x1": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        0,
+        0,
+        0,
+        0,
+        "... 27 more"
+       ]
+      },
+      "x2": {
+       "s": 1,
+       "wl": 16,
+       "fl": 14,
+       "ints": [
+        0,
+        0,
+        0,
+        0,
+        "... 27 more"
+       ]
+      }
+     }
+    }
+   ],
+   "work": "24 starts x up to 16 hill-climb rounds per search (fixed, independent of machine load)",
+   "safety_stop_hit": false,
+   "method": "hill-climb over input windows inside the ranges (engine/fxerrsearch.py); heuristic, not a proof"
+  },
+  "time": {
+   "time_budget_s": 60,
+   "elapsed_s": 80.9,
+   "over_budget_s": 20.9,
+   "rule": "time_budget_s bounds the optimisation passes: each re-optimisation gets the rest of the budget but at least as long as the first pass took; the error search rounds are a fixed amount of work (same result on any machine), not cut by the budget, timed here (error_search_s); time_limit_s, when given, caps the request: no error-search round or re-optimisation is started that would end after it (estimated from the previous round), and the stop is reported in error_search.rounds",
+   "passes": [
+    {
+     "pass": "optimisation",
+     "seconds": 36.7,
+     "budget_exhausted": false
+    },
+    {
+     "pass": "error search 1",
+     "seconds": 1.4
+    },
+    {
+     "pass": "re-optimisation 1",
+     "seconds": 41.4,
+     "budget_s": 36.7,
+     "given_minimum": true,
+     "budget_exhausted": false,
+     "warm_start": null
+    },
+    {
+     "pass": "error search 2",
+     "seconds": 1.5
+    }
+   ],
+   "any_pass_budget_exhausted": false,
+   "error_search_s": 2.9
+  },
+  "ranges": {
+   "source": "request"
+  },
+  "settings": {
+   "pair_exchange": false,
+   "wide_exchange": true,
+   "multistart": 2,
+   "warm_reopt": false,
+   "c_core": true,
+   "non_default": [],
+   "sha256": "339b07cf5afa806a"
+  },
+  "warnings": [
+   {
+    "code": "ERROR_BOUND_SAMPLED",
+    "message": "the error bound is only checked on the input sets given (and their variants, see input_variants); other inputs may exceed it -- give input_ranges with error_search, or more input sets, before relying on it"
+   }
+  ]
+ }
+}

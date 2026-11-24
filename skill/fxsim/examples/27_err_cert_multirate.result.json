@@ -1,0 +1,15 @@
+{
+ "command": "cd <fxsim tree root> && python3 -I engine/fxcert < <skill dir>/examples/27_err_cert_multirate.json",
+ "exit_code": 1,
+ "wall_s": 0.2,
+ "note": "Example output captured from fxsim. Long lists are trimmed to their first items.",
+ "stdout": {
+  "status": "error",
+  "code": "UNSUPPORTED",
+  "where": "design",
+  "message": "fxcert does not certify multirate designs yet",
+  "input_sha256": "8c7d5f84b1b73b3ecbc910273692387a049daf340be8394c9d12b9a5ff25d2f4",
+  "refusal_kind": "not_supported",
+  "next_step": "refused, not answered: this configuration has not been verified bit-exact against Simulink. Change the parameter or block named in where / message to a supported form (docs/en/GRAPH.md, docs/en/BLOCKS.md); if the design needs it, report where + message so it can be recorded"
+ }
+}

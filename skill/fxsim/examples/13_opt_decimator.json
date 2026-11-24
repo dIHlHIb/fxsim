@@ -1,0 +1,63 @@
+{
+ "design": {
+  "blocks": {
+   "x": {
+    "type": "Inport"
+   },
+   "F": {
+    "type": "DiscreteFir",
+    "Coefficients": "[0.02 0.06 0.16 0.26 0.26 0.16 0.06 0.02]",
+    "CoefDataTypeStr": "fixdt(1,16,15)",
+    "ProductDataTypeStr": "fixdt(1,32,29)",
+    "AccumDataTypeStr": "fixdt(1,32,29)",
+    "OutDataTypeStr": "fixdt(1,32,29)",
+    "RndMeth": "Floor",
+    "SaturateOnIntegerOverflow": "off"
+   },
+   "DS": {
+    "type": "Downsample",
+    "DownsamplingFactor": "4",
+    "SampleOffset": "0",
+    "InitialConditions": "0",
+    "InputProcessing": "Elements as channels (sample based)",
+    "RateOptions": "Allow multirate processing"
+   },
+   "y": {
+    "type": "Outport"
+   }
+  },
+  "lines": [
+   {
+    "src": "x",
+    "dst": "F"
+   },
+   {
+    "src": "F",
+    "dst": "DS"
+   },
+   {
+    "src": "DS",
+    "dst": "y"
+   }
+  ]
+ },
+ "inputs": {
+  "x": {
+   "kind": "sine",
+   "amplitude": 0.9,
+   "omega": 0.05,
+   "n": 2048,
+   "type": {
+    "s": 1,
+    "wl": 16,
+    "fl": 14
+   }
+  }
+ },
+ "error": {
+  "max_abs": 0.0009765625
+ },
+ "time_budget_s": 10,
+ "time_limit_s": 180,
+ "workers": 2
+}

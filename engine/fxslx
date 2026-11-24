@@ -1,0 +1,201 @@
+#!/usr/bin/env -S python3 -I
+"""fxslx: AI-native CLI to read a Simulink .slx model into fxgraph design JSON and to write data types back.
+
+stdin: one JSON request; stdout: one JSON result. Schema: docs/en/SLX.md.
+  {"op": "list", "path": "model.slx"}   -> top-level blocks and subsystem paths (for "scope")
+  {"op": "read", "path": "model.slx", "scope": "Sub/System"?}
+  {"op": "write_types", "path": "model.slx", "out": "runs/...slx", "blocks": {name: {param: type}}, "scope": ...}
+Errors carry a stable code and are appended to runs/slx_errors.jsonl.
+"""
+import hashlib
+import json
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import fxgraph_lib as G  # noqa: E402
+import fxslx_lib as S  # noqa: E402
+
+ERRLOG = os.path.join(ROOT, "runs", "slx_errors.jsonl")
+import fxcli  # noqa: E402
+
+TYPE_KEYS = S.WRITABLE_TYPES   # one list, kept in engine/fxslx_lib.py
+MAX_BYTES = 512 << 20
+
+
+def _at_root(path):
+    """A relative path is taken from the project directory, whatever the current directory (path
+    and out resolved against the current directory while fxexport and every reported path use the project root)."""
+    return path if os.path.isabs(path) else os.path.join(ROOT, path)
+
+
+def _load(path):
+    if not isinstance(path, str):
+        raise G.GraphError("MISSING_FIELD", "path", "path of the .slx file is required")
+    path = _at_root(path)
+    try:
+        if os.path.getsize(path) > MAX_BYTES:
+            raise G.GraphError("LIMIT_EXCEEDED", "path", "file larger than %d bytes" % MAX_BYTES)
+        with open(path, "rb") as f:
+            return f.read()
+    except OSError as e:
+        raise G.GraphError("FILE_NOT_FOUND", "path", str(e))
+
+
+def _refs(path):
+    """Referenced models (Model blocks): <name>.slx in the directory of the model (docs/en/SLX.md)."""
+    base = os.path.dirname(os.path.abspath(path))
+
+    def load(name):
+        f = os.path.join(base, name + ".slx")
+        return _load(f) if os.path.isfile(f) else None
+    return load
+
+
+def handle(req):
+    if not isinstance(req, dict):
+        raise G.GraphError("BAD_JSON", "stdin", "request must be a JSON object")
+    op = req.get("op")
+    # an unknown request field was accepted silently
+    allowed = {"list": ("op", "path"), "read": ("op", "path", "scope"),
+               "write_types": ("op", "path", "out", "blocks", "scope")}.get(op)
+    if allowed is not None:
+        G.check_request_fields(req, allowed)
+    scope = req.get("scope")
+    if scope is not None and not isinstance(scope, str):
+        raise G.GraphError("BAD_PARAM", "scope", "subsystem path string required")
+    data = _load(req.get("path"))
+    file_sha = hashlib.sha256(data).hexdigest()
+    if op == "list":
+        return dict({"status": "ok", "file_sha256": file_sha}, **S.list_model(data))
+    if op == "read":
+        try:
+            design, info = S.read(data, scope, refs=_refs(req["path"]))
+        except G.GraphError as e:
+            if scope is None and e.code in ("UNSUPPORTED_BLOCK", "UNSUPPORTED", "UNSUPPORTED_RATE"):
+                subs = S.list_model(data)["subsystems"]
+                if subs:   # the usual cause: a source or sink at the top level; point to the subsystem to read
+                    raise G.GraphError(e.code, e.where, "%s -- reading the whole model; to read one subsystem give "
+                                       "\"scope\" (subsystems: %s; list them with {\"op\": \"list\"})"
+                                       % (e.message, ", ".join(subs[:12])))
+            raise
+        return {"status": "ok", "design": design, "info": info, "file_sha256": file_sha}
+    if op == "write_types":
+        out = req.get("out")
+        if not isinstance(out, str):
+            raise G.GraphError("MISSING_FIELD", "out", "output path required")
+        # the output replaced any existing file of the project (sources, recordings data), and a
+        # symbolic link could lead outside it. The real path must lie inside the project; an existing file is
+        # replaced only under runs/ (scratch; a retried request gives the same file) and never the input itself
+        root = os.path.realpath(ROOT)
+        out = _at_root(out)
+        outp = os.path.realpath(out)
+        if not (outp + os.sep).startswith(root + os.sep) or outp == os.path.realpath(_at_root(req["path"])):
+            raise G.GraphError("BAD_PARAM", "out", "output must be a new file inside the project directory %s "
+                               "(for example runs/<name>.slx; the input may be read from anywhere)" % ROOT)
+        rel = os.path.relpath(outp, root).split(os.sep)
+        if rel[0] in (".git", "golden"):
+            raise G.GraphError("BAD_PARAM", "out", "output inside %s/ is not allowed" % rel[0])
+        if os.path.lexists(outp) and (rel[0] != "runs" or not os.path.isfile(outp) or os.path.islink(out)):
+            raise G.GraphError("BAD_PARAM", "out", "%s exists: an existing file is only replaced under runs/"
+                               % os.path.relpath(outp, root))
+        blocks = req.get("blocks")
+        if not isinstance(blocks, dict):
+            raise G.GraphError("MISSING_FIELD", "blocks", "{block name: {type parameter: value}} required")
+        assign, skipped, not_types = {}, {}, {}
+        known = None
+        for name, ps in blocks.items():
+            if not isinstance(ps, dict):
+                raise G.GraphError("BAD_PARAM", "blocks." + name, "object of parameters required")
+            if known is None:
+                known = set(S.read(data, scope)[0]["blocks"])
+            if name not in known:   # F6: a misspelt block name without type parameters was accepted silently
+                raise G.GraphError("BAD_PARAM", "blocks." + name, "no such block in the model%s (names as given "
+                                   "by {\"op\": \"read\"})" % (" scope %r" % scope if scope else ""))
+            rest = sorted(k for k in ps if k not in S.WRITABLE_TYPES and not k.endswith("DataTypeStr"))
+            if rest:
+                not_types[name] = rest
+            # e.g. an fxopt solution.blocks entry: only its data-type parameters are written; every other
+            # *DataTypeStr key is reported, never dropped silently
+            sel = {k: v for k, v in ps.items() if k in S.WRITABLE_TYPES}
+            other = sorted(k for k in ps if k.endswith("DataTypeStr") and k not in S.WRITABLE_TYPES)
+            if other:
+                skipped[name] = other
+            if sel:
+                assign[name] = sel
+        written = {}
+        new = S.write_types(data, assign, scope, written)
+        os.makedirs(os.path.dirname(outp), exist_ok=True)
+        tmp = outp + ".tmp%d" % os.getpid()
+        with open(tmp, "wb") as f:
+            f.write(new)
+        os.replace(tmp, outp)
+        res_warn = []
+        if not assign:
+            res_warn.append("no data-type parameter in the request: the output is a copy of the input")
+        return {"status": "ok", "out": os.path.relpath(outp, root), "blocks_written": len(assign),
+                "params_written": sum(len(v) for v in assign.values()), "type_params_not_written": skipped,
+                # F6: what was done, block by block -- the value before (null: the file did not carry it) and after
+                "written": written,
+                # keys of the request that are not data-type parameters (an fxopt solution block carries others)
+                "other_keys_not_written": not_types, "warnings": res_warn,
+                "file_sha256": file_sha,
+                "out_sha256": hashlib.sha256(new).hexdigest()}
+    raise G.GraphError("BAD_PARAM", "op", "list, read or write_types")
+
+
+def _mem_limit():
+    """Per-run memory limit (without one a large request was killed by the kernel with no
+    structured answer). FX_MEM_BYTES, default 4 GiB; exceeding it is reported as OOM."""
+    try:
+        import resource
+        lim = int(os.environ.get("FX_MEM_BYTES", str(4 << 30)))
+        resource.setrlimit(resource.RLIMIT_DATA, (lim, lim))
+    except Exception:  # noqa: BLE001 -- a platform without the limit still answers
+        pass
+
+
+def main():
+    rc_args = fxcli.reject_arguments("fxslx", ERRLOG)   # stdin only
+    if rc_args is not None:
+        return rc_args
+    _mem_limit()
+    raw = sys.stdin.buffer.read()
+    sha = hashlib.sha256(raw).hexdigest()
+    try:
+        try:
+            req = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            raise G.GraphError("BAD_JSON", "stdin", "invalid JSON: %s" % e)
+        res, rc = handle(req), 0
+        res["input_sha256"] = sha
+    except G.GraphError as e:
+        import error_locations   # located on the request's own block
+        w_, m_ = error_locations.user_loc(locals().get("req"), e.where, e.message)
+        res, rc = {"status": "error", "code": e.code, "where": w_, "message": m_, "input_sha256": sha}, 1
+    except MemoryError:
+        res, rc = {"status": "error", "code": "OOM", "where": "run", "message": "out of memory (FX_MEM_BYTES)",
+                   "input_sha256": sha}, 1
+    except Exception as e:  # noqa: BLE001
+        import traceback
+        tb = traceback.extract_tb(e.__traceback__)
+        at = "%s:%d" % (os.path.basename(tb[-1].filename), tb[-1].lineno) if tb else "?"
+        # the place in the code (an INTERNAL on real models could not be located from outside)
+        res, rc = {"status": "error", "code": "INTERNAL", "where": "%s at %s" % (type(e).__name__, at),
+                   "message": str(e)[:500], "input_sha256": sha}, 1
+    if rc:
+        G.with_next_step(res)
+        try:
+            os.makedirs(os.path.dirname(ERRLOG), exist_ok=True)
+            with open(ERRLOG, "a") as f:
+                f.write(json.dumps(res) + "\n")
+        except OSError:
+            pass
+    sys.stdout.write(json.dumps(res) + "\n")
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

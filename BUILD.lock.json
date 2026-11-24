@@ -1,0 +1,19 @@
+{
+  "build": {
+    "command": "sh engine/build.sh",
+    "outputs": [
+      "engine/fxchain_core",
+      "engine/fxgraph_core"
+    ],
+    "recipe_sha256": "fef11891f3e46886080a217e3a56096ead0c561d074d744fab70b7600207be59"
+  },
+  "format": 2,
+  "packaging_toolchain": {
+    "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)",
+    "python": "CPython 3.14.8",
+    "python_dependencies": "standard library",
+    "target": "arm64-apple-darwin27.2.0"
+  },
+  "path_entry_sha256": "0f3ee2c9fafb64e3754a367437afb80e3926acf681ade1041a4c02e75323187e",
+  "source_files_sha256": "3e4e30a11e1ff4866a59d4c2f6c89198fb24c723f78306df9e9250935353640f"
+}
